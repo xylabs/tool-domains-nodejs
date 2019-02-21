@@ -1,0 +1,30 @@
+{
+  "name": "tool-domains-nodejs",
+  "version": "1.0.0",
+  "description": "XYO Internal Domain Tool",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "export NODE_ENV=test && jest --no-cache --forceExit --coverage --verbose --detectOpenHandles",
+    "build": "tsc",
+    "go": "node dist/index.js",
+    "prepublishOnly": "tsc -b ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/XYOracleNetwork/tool-domains-nodejs.git"
+  },
+  "author": "Arie Trouw",
+  "license": "NONE",
+  "dependencies": {
+    "aws-sdk": "^2.408.0",
+    "commander": "^2.19.0",
+    "dotenv-expand": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/aws-sdk": "^2.7.0",
+    "@types/node": "^11.9.4",
+    "ts-node": "^8.0.2",
+    "tslint-config-airbnb": "^5.11.1",
+    "typescript": "^3.3.3"
+  }
+}
