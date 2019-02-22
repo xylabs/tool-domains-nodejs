@@ -20,9 +20,11 @@ program
 program
   .command('start')
   .description('Start the Scanner')
-  .action(() => {
+  .action(async () => {
     const tool = new XyoDomainScan()
-    tool.start()
+    let result = await tool.start()
+    console.log("====================================")
+    console.log(result)
   })
 
 program.parse(process.argv)
