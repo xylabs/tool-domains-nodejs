@@ -5,6 +5,10 @@ env:
     NPM_TOKEN: npmjs_publish
 
 phases:
+  install:
+    commands:
+      curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
   pre_build:
     commands:
       - echo Installing source NPM dependencies...
