@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+  parameter-store:
+    NPM_TOKEN: npmjs_publish
+
 phases:
   pre_build:
     commands:
@@ -14,9 +18,12 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
+      - npm publish
 
 artifacts:
   files:
     - dist/*
     - package.json
     - node_modules/*
+
+    3411ee92-4577-415d-ac51-a00dfa9e70d5
