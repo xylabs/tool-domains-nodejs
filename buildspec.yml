@@ -6,6 +6,7 @@ env:
     BRANCH_NAME: "master"
   parameter-store:
     NPM_TOKEN: npmjs_publish
+    GIT_TOKEN: github_pipeline
 
 phases:
   install:
@@ -14,6 +15,8 @@ phases:
       - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
       - apt-get update -y
       - apt-get install -y yarn
+      - git config user.name "arietrouw"
+      - git config user.password $GIT_TOKEN
       - git clone -b $BRANCH_NAME $GIT_REPO
   pre_build:
     commands:
