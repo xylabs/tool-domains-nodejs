@@ -10,7 +10,8 @@
     "cli": "node dist/cli.js",
     "buildngo": "yarn build && yarn cli start",
     "version": "",
-    "postversion": "git push --tags && yarn publish . --tag $npm_package_version --new-version $npm_package_version && git push"
+    "x": "git push --tags && yarn publish . --tag $npm_package_version --new-version $npm_package_version && git push",
+    "postversion": "git push --tags"
   },
   "bin": {
     "xydomains": "bin/xydomains"
