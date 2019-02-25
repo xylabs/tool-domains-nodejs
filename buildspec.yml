@@ -31,9 +31,7 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - git push --tags
       - yarn publish . --tag $npm_package_version --new-version $npm_package_version
-      - git push
 
 artifacts:
   files:
