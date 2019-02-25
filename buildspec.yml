@@ -25,5 +25,3 @@ artifacts:
     - dist/*
     - package.json
     - node_modules/*
-
-    3411ee92-4577-415d-ac51-a00dfa9e70d5
