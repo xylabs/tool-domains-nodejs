@@ -4,6 +4,7 @@ env:
   variables:
     GIT_REPO: "https://github.com/XYOracleNetwork/tool-domains-nodejs"
     BRANCH_NAME: "master"
+    GIT_USER: "arietrouw"
   parameter-store:
     NPM_TOKEN: npmjs_publish
     GIT_TOKEN: github_pipeline
@@ -15,11 +16,12 @@ phases:
       - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
       - apt-get update -y
       - apt-get install -y yarn
-      - git config user.name "arietrouw"
-      - git config user.password $GIT_TOKEN
-      - git clone -b $BRANCH_NAME $GIT_REPO
   pre_build:
     commands:
+      - echo “machine git-codecommit.us-east-1.amazonaws.com” >> ~/.netrc
+      - echo “login $GIT_USER” >> ~/.netrc
+      - echo “password $GIT_PASS” >> ~/.netrc
+      - git clone -b $BRANCH_NAME $GIT_REPO
       - echo Installing source NPM dependencies...
       - 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc'
       - yarn install
