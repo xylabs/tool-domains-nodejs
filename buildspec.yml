@@ -1,13 +1,8 @@
 version: 0.2
 
 env:
-  variables:
-    GIT_REPO: "github.com/XYOracleNetwork/tool-domains-nodejs"
-    BRANCH_NAME: "master"
-    GIT_USER: "arietrouw"
   parameter-store:
     NPM_TOKEN: npmjs_publish
-    GIT_TOKEN: github_pipeline
 
 phases:
   install:
@@ -16,7 +11,6 @@ phases:
       - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
       - apt-get update -y
       - apt-get install -y yarn
-      - git clone -b $BRANCH_NAME https://$GIT_USER:$GIT_TOKEN@$GIT_REPO
   pre_build:
     commands:
       - echo Installing source NPM dependencies...
