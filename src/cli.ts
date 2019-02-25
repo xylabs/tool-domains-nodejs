@@ -1,6 +1,6 @@
 import program from 'commander'
 import dotenvExpand from 'dotenv-expand'
-import {XyDomainScan} from './'
+import { XyDomainScan } from './'
 
 const getVersion = (): string => {
   dotenvExpand({
@@ -22,7 +22,7 @@ program
   .description('Start the Scanner')
   .action(async () => {
     const tool = new XyDomainScan()
-    let result = await tool.start()
+    const result = await tool.start()
     console.log("====================================")
     console.log(result)
   })

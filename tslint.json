@@ -1,5 +1,5 @@
 {
-  "extends": ["tslint:latest", "tslint-config-airbnb"],
+  "extends": ["tslint:latest", "@xyo-network/config-tslint"],
   "rules": {
     "trailing-comma": false,
     "ordered-imports": false,

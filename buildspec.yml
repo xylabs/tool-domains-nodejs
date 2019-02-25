@@ -9,17 +9,17 @@ phases:
     commands:
       - echo Installing source NPM dependencies...
       - 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc'
-      - npm install
+      - yarn install
   build:
     commands:
       - echo Build started on `date`
       - echo Compiling the Node.js code
-      - npm run build
-      - npm run test
+      - yarn build
+      - yarn test
   post_build:
     commands:
       - echo Build completed on `date`
-      - npm publish
+      - yarn version --patch
 
 artifacts:
   files:
