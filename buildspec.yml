@@ -8,6 +8,7 @@ phases:
   pre_build:
     commands:
       - echo Installing source NPM dependencies...
+      - 'echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc'
       - npm install
   build:
     commands:
