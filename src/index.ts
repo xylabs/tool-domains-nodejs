@@ -63,10 +63,12 @@ export class XyDomainScan {
     })
   }
 
-  private async getHttpResponse(url: string, timeout = 1000): Promise<string> {
+  private async getHttpResponse(url: string, ssl = false, timeout = 1000): Promise<string> {
+    const prefix = ssl ? "https" : "http"
+    const func = ssl ? https : http
     return new Promise<string>((resolve, reject) => {
       try {
-        http.get(`http://${url}`, { timeout }, (res) => {
+        func.get(`${prefix}://${url}`, { timeout }, (res) => {
           resolve(`${res.statusCode}`)
         }).on('error', (e) => {
           resolve(e.message)
@@ -79,19 +81,18 @@ export class XyDomainScan {
     })
   }
 
-  private async getHttpsResponse(url: string, timeout = 1000): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      try {
-        https.get(`https://${url}`, { timeout }, (res) => {
-          resolve(`${res.statusCode}`)
-        }).on('error', (e) => {
-          resolve(e.message)
-        }).setTimeout(timeout, () => {
-          resolve(`Timeout [${timeout}]`)
-        })
-      } catch (ex) {
-        resolve(`${ex.message}: ${url}`)
-      }
+  private async reverseDns(address: string): Promise<object> {
+    return new Promise((resolve, reject) => {
+      dns.reverse(address, (errReverse, hostnames) => {
+        const result: any = {}
+        result.reverseDns = {}
+        if (errReverse) {
+          result.reverseDns.error = errReverse
+        } else {
+          result.reverseDns.hostNames = hostnames
+        }
+        resolve(result)
+      })
     })
   }
 
@@ -105,17 +106,10 @@ export class XyDomainScan {
         } else {
           (async() => {
             result.http = await this.getHttpResponse(recordSet.Name)
-            result.https = await this.getHttpsResponse(recordSet.Name)
-            dns.reverse(addresses[0].address, (errReverse, hostnames) => {
-              result.reverseDns = {}
-              if (errReverse) {
-                result.reverseDns.error = errReverse
-              } else {
-                result.reverseDns.hostNames = hostnames
-              }
-              console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`)
-              resolve(result)
-            })
+            result.https = await this.getHttpResponse(recordSet.Name, true)
+            result.reverseDns = await this.reverseDns(addresses[0].address)
+            console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`)
+            resolve(result)
           })()
         }
       })
@@ -130,16 +124,11 @@ export class XyDomainScan {
           console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`)
           resolve(result)
         } else {
-          dns.reverse(addresses[0].address, (errReverse, hostnames) => {
-            result.reverseDns = {}
-            if (errReverse) {
-              result.reverseDns.error = errReverse
-            } else {
-              result.reverseDns.hostNames = hostnames
-            }
+          (async() => {
+            result.reverseDns = await this.reverseDns(addresses[0].address)
             console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`)
             resolve(result)
-          })
+          })()
         }
       })
     })

@@ -20,11 +20,37 @@ class XyDomainScan {
     constructor() {
         this.r53 = new aws_sdk_1.Route53();
     }
+    start() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log("Running...");
+            const zones = yield this.getZones();
+            const result = {
+                Zones: Array()
+            };
+            for (const zone of zones.HostedZones) {
+                const recordSetArray = [];
+                const zoneData = {
+                    Info: zone,
+                    ResourceRecordSets: recordSetArray
+                };
+                const resourceRecordSetResponse = yield this.getResources(zone);
+                for (const recordSet of resourceRecordSetResponse.ResourceRecordSets) {
+                    const resourceRecordData = {
+                        RecordSet: recordSet,
+                        Validation: yield this.validateRecordSet(recordSet)
+                    };
+                    zoneData.ResourceRecordSets.push(resourceRecordData);
+                }
+                result.Zones.push(zoneData);
+            }
+            this.saveToFile(result);
+        });
+    }
     getZones() {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                let params = {};
-                this.r53.listHostedZones(params, function (err, data) {
+                const params = {};
+                this.r53.listHostedZones(params, (err, data) => {
                     if (err) {
                         reject(err);
                     }
@@ -38,10 +64,10 @@ class XyDomainScan {
     getResources(zone) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                let params = {
+                const params = {
                     HostedZoneId: zone.Id
                 };
-                this.r53.listResourceRecordSets(params, function (err, data) {
+                this.r53.listResourceRecordSets(params, (err, data) => {
                     if (err) {
                         reject(err);
                     }
@@ -52,11 +78,13 @@ class XyDomainScan {
             });
         });
     }
-    getHttpResponse(url, timeout = 1000) {
+    getHttpResponse(url, ssl = false, timeout = 1000) {
         return __awaiter(this, void 0, void 0, function* () {
+            const prefix = ssl ? "https" : "http";
+            const func = ssl ? https_1.default : http_1.default;
             return new Promise((resolve, reject) => {
                 try {
-                    http_1.default.get(`http://${url}`, { timeout }, (res) => {
+                    func.get(`${prefix}://${url}`, { timeout }, (res) => {
                         resolve(`${res.statusCode}`);
                     }).on('error', (e) => {
                         resolve(e.message);
@@ -70,28 +98,27 @@ class XyDomainScan {
             });
         });
     }
-    getHttpsResponse(url, timeout = 1000) {
+    reverseDns(address) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                try {
-                    https_1.default.get(`https://${url}`, { timeout }, (res) => {
-                        resolve(`${res.statusCode}`);
-                    }).on('error', (e) => {
-                        resolve(e.message);
-                    }).setTimeout(timeout, () => {
-                        resolve(`Timeout [${timeout}]`);
-                    });
-                }
-                catch (ex) {
-                    resolve(`${ex.message}: ${url}`);
-                }
+                dns_1.default.reverse(address, (errReverse, hostnames) => {
+                    const result = {};
+                    result.reverseDns = {};
+                    if (errReverse) {
+                        result.reverseDns.error = errReverse;
+                    }
+                    else {
+                        result.reverseDns.hostNames = hostnames;
+                    }
+                    resolve(result);
+                });
             });
         });
     }
     validateRecordSet_A_CNAME(recordSet) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                let result = {};
+                const result = {};
                 dns_1.default.lookup(recordSet.Name, { all: true }, (err, addresses) => {
                     if (err) {
                         console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`);
@@ -100,18 +127,10 @@ class XyDomainScan {
                     else {
                         (() => __awaiter(this, void 0, void 0, function* () {
                             result.http = yield this.getHttpResponse(recordSet.Name);
-                            result.https = yield this.getHttpsResponse(recordSet.Name);
-                            dns_1.default.reverse(addresses[0].address, (err, hostnames) => {
-                                result.reverseDns = {};
-                                if (err) {
-                                    result.reverseDns.error = err;
-                                }
-                                else {
-                                    result.reverseDns.hostNames = hostnames;
-                                }
-                                console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`);
-                                resolve(result);
-                            });
+                            result.https = yield this.getHttpResponse(recordSet.Name, true);
+                            result.reverseDns = yield this.reverseDns(addresses[0].address);
+                            console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`);
+                            resolve(result);
                         }))();
                     }
                 });
@@ -121,24 +140,18 @@ class XyDomainScan {
     validateRecordSet_MX(recordSet) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                let result = {};
+                const result = {};
                 dns_1.default.lookup(recordSet.Name, { all: true }, (err, addresses) => {
                     if (err) {
                         console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`);
                         resolve(result);
                     }
                     else {
-                        dns_1.default.reverse(addresses[0].address, (err, hostnames) => {
-                            result.reverseDns = {};
-                            if (err) {
-                                result.reverseDns.error = err;
-                            }
-                            else {
-                                result.reverseDns.hostNames = hostnames;
-                            }
+                        (() => __awaiter(this, void 0, void 0, function* () {
+                            result.reverseDns = yield this.reverseDns(addresses[0].address);
                             console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`);
                             resolve(result);
-                        });
+                        }))();
                     }
                 });
             });
@@ -164,38 +177,13 @@ class XyDomainScan {
                     console.log(`failed to open file: ${err}`);
                 }
                 else {
-                    fs_1.default.write(fd, JSON.stringify(obj), (err) => {
-                        if (err) {
-                            console.log(`failed to write file: ${err}`);
+                    fs_1.default.write(fd, JSON.stringify(obj), (errWrite) => {
+                        if (errWrite) {
+                            console.log(`failed to write file: ${errWrite}`);
                         }
                     });
                 }
             });
-        });
-    }
-    start() {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log("Running...");
-            let zones = yield this.getZones();
-            let result = {
-                Zones: Array()
-            };
-            for (let zone of zones.HostedZones) {
-                let zoneData = {
-                    Info: zone,
-                    ResourceRecordSets: new Array()
-                };
-                let resourceRecordSetResponse = yield this.getResources(zone);
-                for (let recordSet of resourceRecordSetResponse.ResourceRecordSets) {
-                    let resourceRecordData = {
-                        RecordSet: recordSet,
-                        Validation: yield this.validateRecordSet(recordSet)
-                    };
-                    zoneData.ResourceRecordSets.push(resourceRecordData);
-                }
-                result.Zones.push(zoneData);
-            }
-            this.saveToFile(result);
         });
     }
 }

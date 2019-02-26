@@ -31,7 +31,7 @@ commander_1.default
     .description('Start the Scanner')
     .action(() => __awaiter(this, void 0, void 0, function* () {
     const tool = new _1.XyDomainScan();
-    let result = yield tool.start();
+    const result = yield tool.start();
     console.log("====================================");
     console.log(result);
 }));
