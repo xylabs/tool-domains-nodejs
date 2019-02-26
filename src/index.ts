@@ -47,7 +47,6 @@ export class XyDomainScan {
       })
     })
   }
-
   private async getResources(zone: Route53.Types.HostedZone): Promise<Route53.Types.ListResourceRecordSetsResponse> {
     return new Promise((resolve, reject) => {
       const params = {
