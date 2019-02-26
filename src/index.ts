@@ -14,6 +14,7 @@ export class XyDomainScan {
     const result: any = {
       Zones: Array<any>()
     }
+
     for (const zone of zones.HostedZones) {
       const recordSetArray: any[] = []
       const zoneData = {
