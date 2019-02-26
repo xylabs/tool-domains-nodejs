@@ -16,35 +16,44 @@ const dns_1 = __importDefault(require("dns"));
 const fs_1 = __importDefault(require("fs"));
 const http_1 = __importDefault(require("http"));
 const https_1 = __importDefault(require("https"));
+const util_1 = require("util");
 class XyDomainScan {
     constructor() {
         this.r53 = new aws_sdk_1.Route53();
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("Running...");
             const zones = yield this.getZones();
             const result = {
                 Zones: Array()
             };
+            console.log(`Zones Found: ${zones.HostedZones.length}`);
+            let completedZones = 0;
+            const zoneCount = zones.HostedZones.length;
             for (const zone of zones.HostedZones) {
+                completedZones++;
+                console.log(`Processing Zone: ${zone.Name}: [${completedZones}/${zoneCount}]`);
                 const recordSetArray = [];
                 const zoneData = {
                     Info: zone,
                     ResourceRecordSets: recordSetArray
                 };
                 const resourceRecordSetResponse = yield this.getResources(zone);
+                let completedRecordSets = 0;
+                const recordSetCount = resourceRecordSetResponse.ResourceRecordSets.length;
                 for (const recordSet of resourceRecordSetResponse.ResourceRecordSets) {
+                    completedRecordSets++;
+                    console.log(`Zone:[${completedZones}/${zoneCount}] Record:[${completedRecordSets}/${recordSetCount}]: ${recordSet.Name}`);
                     const resourceRecordData = {
                         RecordSet: recordSet,
                         Validation: yield this.validateRecordSet(recordSet)
                     };
-                    console.log(JSON.stringify(resourceRecordData));
                     zoneData.ResourceRecordSets.push(resourceRecordData);
                 }
                 result.Zones.push(zoneData);
             }
-            this.saveToFile(result);
+            console.log(`Saving to File: output.json`);
+            this.saveToFile("output.json", result);
         });
     }
     getZones() {
@@ -99,20 +108,17 @@ class XyDomainScan {
             });
         });
     }
-    reverseDns(address) {
+    reverseDns(addresses) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                dns_1.default.reverse(address, (errReverse, hostnames) => {
-                    const result = {};
-                    result.reverseDns = {};
-                    if (errReverse) {
-                        result.reverseDns.error = errReverse;
-                    }
-                    else {
-                        result.reverseDns.hostNames = hostnames;
-                    }
-                    resolve(result);
-                });
+                if (util_1.isArray(addresses)) {
+                    dns_1.default.reverse(addresses[0], (err, hostNames) => {
+                        resolve({ err, hostNames });
+                    });
+                }
+                else {
+                    resolve({ err: "Invalid Address" });
+                }
             });
         });
     }
@@ -120,12 +126,7 @@ class XyDomainScan {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 dns_1.default.lookup(name, { all: true }, (err, addresses) => {
-                    if (err) {
-                        resolve(err);
-                    }
-                    else {
-                        resolve(addresses);
-                    }
+                    resolve({ err, addresses });
                 });
             });
         });
@@ -136,9 +137,7 @@ class XyDomainScan {
             result.addresses = yield this.dnsLookup(recordSet.Name);
             result.http = yield this.getHttpResponse(recordSet.Name);
             result.https = yield this.getHttpResponse(recordSet.Name, true);
-            if (result.addresses && result.addresses.length > 0) {
-                result.reverseDns = yield this.reverseDns(result.addresses[0].address);
-            }
+            result.reverseDns = yield this.reverseDns(result.addresses);
             return result;
         });
     }
@@ -146,9 +145,7 @@ class XyDomainScan {
         return __awaiter(this, void 0, void 0, function* () {
             const result = {};
             result.addresses = yield this.dnsLookup(recordSet.Name);
-            if (result.addresses && result.addresses.length > 0) {
-                result.reverseDns = yield this.reverseDns(result.addresses[0].address);
-            }
+            result.reverseDns = yield this.reverseDns(result.addresses);
             return result;
         });
     }
@@ -165,9 +162,9 @@ class XyDomainScan {
             }
         });
     }
-    saveToFile(obj) {
+    saveToFile(filename, obj) {
         return __awaiter(this, void 0, void 0, function* () {
-            fs_1.default.open('output.json', 'w', (err, fd) => {
+            fs_1.default.open(filename, 'w', (err, fd) => {
                 if (err) {
                     console.log(`failed to open file: ${err}`);
                 }
