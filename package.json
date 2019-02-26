@@ -1,6 +1,6 @@
 {
   "name": "@xyo-network/tool-domains-nodejs",
-  "version": "1.0.6",
+  "version": "1.0.793",
   "description": "XYO Internal Domain Tool",
   "main": "src/index.js",
   "scripts": {
@@ -8,9 +8,7 @@
     "test": "yarn tslint --config tslint.json src/*",
     "build": "tsc",
     "cli": "node dist/cli.js",
-    "buildngo": "yarn build && yarn cli start",
-    "version": "",
-    "postversion": "yarn publish . --tag $npm_package_version --new-version $npm_package_version"
+    "buildngo": "yarn build && yarn cli start"
   },
   "bin": {
     "xydomains": "bin/xydomains"

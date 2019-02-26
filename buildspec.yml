@@ -3,7 +3,7 @@ version: 0.2
 env:
   parameter-store:
     NPM_TOKEN: npmjs_publish
-
+ 
 phases:
   install:
     commands:
