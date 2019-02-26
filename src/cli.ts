@@ -12,7 +12,6 @@ const getVersion = (): string => {
 
   return process.env.APP_VERSION || 'Unknown'
 }
-
 program
   .version(getVersion())
   .usage('$0 <cmd> [args]')
