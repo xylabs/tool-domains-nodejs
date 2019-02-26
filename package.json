@@ -1,6 +1,6 @@
 {
   "name": "@xyo-network/tool-domains-nodejs",
-  "version": "1.0.794",
+  "version": "1.0.795",
   "description": "XYO Internal Domain Tool",
   "main": "src/index.js",
   "scripts": {
