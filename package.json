@@ -1,6 +1,6 @@
 {
   "name": "@xyo-network/tool-domains-nodejs",
-  "version": "1.0.801",
+  "version": "1.0.802",
   "description": "XYO Internal Domain Tool",
   "main": "src/index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "build": "tsc",
     "cli": "node dist/cli.js",
     "buildngo": "yarn build && yarn cli start",
-    "publish": "yarn publish . --tag $npm_package_version --new-version $npm_package_version"
+    "publish-npm": "yarn publish . --tag $npm_package_version --new-version $npm_package_version"
   },
   "bin": {
     "xydomains": "bin/xydomains"
