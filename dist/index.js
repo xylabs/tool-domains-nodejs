@@ -39,6 +39,7 @@ class XyDomainScan {
                         RecordSet: recordSet,
                         Validation: yield this.validateRecordSet(recordSet)
                     };
+                    console.log(JSON.stringify(resourceRecordData));
                     zoneData.ResourceRecordSets.push(resourceRecordData);
                 }
                 result.Zones.push(zoneData);
@@ -115,46 +116,40 @@ class XyDomainScan {
             });
         });
     }
-    validateRecordSet_A_CNAME(recordSet) {
+    dnsLookup(name) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                const result = {};
-                dns_1.default.lookup(recordSet.Name, { all: true }, (err, addresses) => {
+                dns_1.default.lookup(name, { all: true }, (err, addresses) => {
                     if (err) {
-                        console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`);
-                        resolve(result);
+                        resolve(err);
                     }
                     else {
-                        (() => __awaiter(this, void 0, void 0, function* () {
-                            result.http = yield this.getHttpResponse(recordSet.Name);
-                            result.https = yield this.getHttpResponse(recordSet.Name, true);
-                            result.reverseDns = yield this.reverseDns(addresses[0].address);
-                            console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`);
-                            resolve(result);
-                        }))();
+                        resolve(addresses);
                     }
                 });
             });
         });
     }
+    validateRecordSet_A_CNAME(recordSet) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = {};
+            result.addresses = yield this.dnsLookup(recordSet.Name);
+            result.http = yield this.getHttpResponse(recordSet.Name);
+            result.https = yield this.getHttpResponse(recordSet.Name, true);
+            if (result.addresses && result.addresses.length > 0) {
+                result.reverseDns = yield this.reverseDns(result.addresses[0].address);
+            }
+            return result;
+        });
+    }
     validateRecordSet_MX(recordSet) {
         return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                const result = {};
-                dns_1.default.lookup(recordSet.Name, { all: true }, (err, addresses) => {
-                    if (err) {
-                        console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`);
-                        resolve(result);
-                    }
-                    else {
-                        (() => __awaiter(this, void 0, void 0, function* () {
-                            result.reverseDns = yield this.reverseDns(addresses[0].address);
-                            console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`);
-                            resolve(result);
-                        }))();
-                    }
-                });
-            });
+            const result = {};
+            result.addresses = yield this.dnsLookup(recordSet.Name);
+            if (result.addresses && result.addresses.length > 0) {
+                result.reverseDns = yield this.reverseDns(result.addresses[0].address);
+            }
+            return result;
         });
     }
     validateRecordSet(recordSet) {

@@ -27,6 +27,7 @@ export class XyDomainScan {
           RecordSet: recordSet,
           Validation: await this.validateRecordSet(recordSet)
         }
+        console.log(JSON.stringify(resourceRecordData))
         zoneData.ResourceRecordSets.push(resourceRecordData)
       }
       result.Zones.push(zoneData)
@@ -96,42 +97,36 @@ export class XyDomainScan {
     })
   }
 
-  private async validateRecordSet_A_CNAME(recordSet: Route53.Types.ResourceRecordSet): Promise<any> {
+  private async dnsLookup(name: string): Promise<object> {
     return new Promise((resolve, reject) => {
-      const result: any = {}
-      dns.lookup(recordSet.Name, { all: true }, (err, addresses) => {
+      dns.lookup(name, { all: true }, (err, addresses) => {
         if (err) {
-          console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`)
-          resolve(result)
+          resolve(err)
         } else {
-          (async() => {
-            result.http = await this.getHttpResponse(recordSet.Name)
-            result.https = await this.getHttpResponse(recordSet.Name, true)
-            result.reverseDns = await this.reverseDns(addresses[0].address)
-            console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`)
-            resolve(result)
-          })()
+          resolve(addresses)
         }
       })
     })
   }
 
+  private async validateRecordSet_A_CNAME(recordSet: Route53.Types.ResourceRecordSet): Promise<any> {
+    const result: any = {}
+    result.addresses = await this.dnsLookup(recordSet.Name)
+    result.http = await this.getHttpResponse(recordSet.Name)
+    result.https = await this.getHttpResponse(recordSet.Name, true)
+    if (result.addresses && result.addresses.length > 0) {
+      result.reverseDns = await this.reverseDns(result.addresses[0].address)
+    }
+    return result
+  }
+
   private async validateRecordSet_MX(recordSet: Route53.Types.ResourceRecordSet): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const result: any = {}
-      dns.lookup(recordSet.Name, { all: true }, (err, addresses) => {
-        if (err) {
-          console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`)
-          resolve(result)
-        } else {
-          (async() => {
-            result.reverseDns = await this.reverseDns(addresses[0].address)
-            console.log(`${recordSet.Name}(${recordSet.Type}): [${JSON.stringify(result)}]`)
-            resolve(result)
-          })()
-        }
-      })
-    })
+    const result: any = {}
+    result.addresses = await this.dnsLookup(recordSet.Name)
+    if (result.addresses && result.addresses.length > 0) {
+      result.reverseDns = await this.reverseDns(result.addresses[0].address)
+    }
+    return result
   }
 
   private async validateRecordSet(recordSet: Route53.Types.ResourceRecordSet) {
