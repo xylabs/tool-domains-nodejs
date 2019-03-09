@@ -27,7 +27,6 @@ class DomainValidator extends base_2.BaseValidator {
         return this;
     }
     createRecord(name, record) {
-        console.log(`RecordValidator - create: ${name}`);
         switch (record.type) {
             case "A":
                 return new a_1.RecordValidatorA(name);

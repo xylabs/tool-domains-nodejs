@@ -20,5 +20,6 @@ export class Config {
   public verbose = true
   public aws?: AWS = undefined
   public expected?: Expected = undefined
+  public timeout = 1000
   public domains?: Domain[] = undefined
 }

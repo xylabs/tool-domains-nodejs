@@ -1,17 +1,22 @@
 import http from 'http'
 import https from 'https'
+import { Config } from '../config'
 
 export class BaseValidator {
   public name: string
+  public config: Config
   public errors?: string[]
+  public errorCount = 0
 
-  constructor(name: string) {
+  constructor(name: string, config: Config) {
     this.name = name
+    this.config = config
   }
 
   public addError(err: string) {
     this.errors = this.errors || []
     this.errors.push(err)
+    this.errorCount++
   }
 
   protected async getHttpResponse(ssl = false, timeout = 1000): Promise < string > {

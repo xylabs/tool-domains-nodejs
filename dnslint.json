@@ -1,8 +1,8 @@
 {
-  "verbose": true,
   "aws": {
-    "enabled": false
+    "enabled": true
   },
+  "timeout": 5000,
   "expected": {
     "addresses": {
       "required": true,
