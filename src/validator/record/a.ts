@@ -8,6 +8,7 @@ export class RecordValidatorA extends RecordValidator {
   public reverseDns?: any
 
   public async validate(config: object): Promise<RecordValidatorA> {
+    console.log("RecordValidatorA-validate")
     this.addresses = await DNS.lookup(this.name)
     this.http = await this.getHttpResponse()
     this.https = await this.getHttpResponse(true)

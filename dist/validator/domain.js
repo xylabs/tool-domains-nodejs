@@ -1,36 +1,39 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const record_1 = require("./record");
-const base_1 = require("./base");
+const a_1 = require("./record/a");
+const base_1 = require("./record/base");
+const base_2 = require("./base");
 const dns_1 = require("../dns");
-class DomainValidator extends base_1.BaseValidator {
+class DomainValidator extends base_2.BaseValidator {
     constructor() {
         super(...arguments);
         this.records = [];
     }
-    validate(config) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const records = yield dns_1.DNS.resolveAny(this.name);
-                for (const record of records) {
-                    const validator = record_1.RecordValidator.create(this.name, record);
-                    yield validator.validate(config);
-                    this.records.push(validator);
-                }
+    async validate(config) {
+        try {
+            console.log(`DomainValidator - validate: ${this.name}`);
+            const records = await dns_1.DNS.resolveAny(this.name);
+            for (const record of records) {
+                console.log(`validate: ${record}`);
+                const validator = this.createRecord(this.name, record);
+                await validator.validate(config);
+                this.records.push(validator);
             }
-            catch (ex) {
-                this.addError(ex);
-            }
-            return this;
-        });
+        }
+        catch (ex) {
+            console.error(ex);
+            this.addError(ex);
+        }
+        return this;
+    }
+    createRecord(name, record) {
+        console.log(`RecordValidator - create: ${name}`);
+        switch (record.type) {
+            case "A":
+                return new a_1.RecordValidatorA(name);
+            default:
+                return new base_1.RecordValidator(name);
+        }
     }
 }
 exports.DomainValidator = DomainValidator;

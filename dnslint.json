@@ -16,7 +16,9 @@
     }
   },
   "domains": [
-    "xyo.network",
+    {
+      "name": "xyo.network"
+    },
     {
       "name": "xy.company"
     }

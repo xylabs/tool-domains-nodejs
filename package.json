@@ -1,6 +1,6 @@
 {
   "name": "@xyo-network/tool-domains-nodejs",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "XYO Internal Domain Tool",
   "main": "src/index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "test": "yarn tslint --config tslint.json src/*",
     "build": "tsc",
     "cli": "node dist/cli.js",
-    "buildngo": "yarn build && yarn cli start",
+    "develop": "yarn ts-node src/cli.ts start",
     "publish-npm": "yarn publish . --new-version $npm_package_version"
   },
   "bin": {
@@ -31,7 +31,7 @@
     "@types/aws-sdk": "^2.7.0",
     "@types/node": "^11.9.4",
     "@xyo-network/config-tslint": "^0.1.7",
-    "ts-node": "^8.0.2",
+    "ts-node": "^8.0.3",
     "tslint": "^5.13.0",
     "tslint-config-airbnb": "^5.11.1",
     "typescript": "^3.3.3"

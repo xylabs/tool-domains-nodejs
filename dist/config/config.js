@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -19,19 +11,17 @@ class Config {
         this.expected = undefined;
         this.domains = undefined;
     }
-    static load(fileName = './dnslint.json') {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                try {
-                    load_json_file_1.default(fileName).then((json) => {
-                        const config = new Config();
-                        resolve(Object.assign({}, config, (json)));
-                    });
-                }
-                catch (ex) {
-                    reject(ex);
-                }
-            });
+    static async load(fileName = './dnslint.json') {
+        return new Promise((resolve, reject) => {
+            try {
+                load_json_file_1.default(fileName).then((json) => {
+                    const config = new Config();
+                    resolve({ ...config, ...(json) });
+                });
+            }
+            catch (ex) {
+                reject(ex);
+            }
         });
     }
 }

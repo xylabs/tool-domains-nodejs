@@ -2,13 +2,13 @@ import dns from 'dns'
 
 export class DNS {
 
-  public static async lookup(name: string): Promise < object > {
+  public static async lookup(name: string): Promise < string > {
     return new Promise((resolve, reject) => {
-      dns.lookup(name, { all: true }, (err, addresses) => {
+      dns.lookup(name, 4, (err, address) => {
         if (err) {
           reject(err)
         } else {
-          resolve({ err, addresses })
+          resolve(address)
         }
       })
     })
@@ -25,19 +25,15 @@ export class DNS {
     })
   }
 
-  public static async reverse(addresses: string[]): Promise < string[] > {
+  public static async reverse(address: string): Promise < string[] > {
     return new Promise((resolve, reject) => {
-      if (addresses.length > 0) {
-        dns.reverse(addresses[0], (err, hostNames) => {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(hostNames)
-          }
-        })
-      } else {
-        reject("Need at least one address")
-      }
+      dns.reverse(address, (err, hostNames) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(hostNames)
+        }
+      })
     })
   }
 }

@@ -14,6 +14,7 @@ export class XyDomainScan {
     this.config = await Config.load()
     const domains = new Map<string, DomainValidator>()
     const result: any = {
+      domains: []
     }
 
     if (oc(this.config).aws.enabled(true)) {
@@ -27,11 +28,13 @@ export class XyDomainScan {
     let completedDomains = 0
     for (const domain of domains.values()) {
       completedDomains++
+      result.domains.push(domain)
       console.log(`Domain:[${completedDomains}/${domains.size}]: ${domain}`)
       await domain.validate(this.config)
     }
 
     console.log(`Saving to File: output.json`)
+    console.log(JSON.stringify(result))
     this.saveToFile("output.json", result)
   }
 
