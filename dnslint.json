@@ -1,0 +1,24 @@
+{
+  "verbose": true,
+  "aws": {
+    "enabled": false
+  },
+  "expected": {
+    "addresses": {
+      "required": true,
+      "minimum": 1
+    },
+    "http": {
+      "code": 200
+    },
+    "https": {
+      "code": 200
+    }
+  },
+  "domains": [
+    "xyo.network",
+    {
+      "name": "xy.company"
+    }
+  ]
+}
