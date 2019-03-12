@@ -1,22 +1,21 @@
 import { RecordValidator } from './base'
-import { DNS } from '../../dns'
 import { Config } from '../../config'
 
 export class RecordValidatorCNAME extends RecordValidator {
-  public addresses?: any
-  public http?: any
-  public https?: any
-  public reverseDns?: any
 
-  constructor(name: string, config: Config) {
-    super(name, "CNAME", config)
+  constructor(name: string) {
+    super(name, "CNAME")
   }
 
-  public async validate(): Promise<RecordValidatorCNAME> {
-    this.addresses = await DNS.lookup(this.name)
-    this.http = await this.getHttpResponse()
-    this.https = await this.getHttpResponse(true)
-    this.reverseDns = await DNS.reverse(this.addresses)
-    return this
+  public async validate(config: Config): Promise<number> {
+    try {
+      this.addresses = await this.lookup()
+      this.http = await this.checkHttp(config)
+      this.https = await this.checkHttps(config)
+      this.reverseDns = await this.reverseLookup()
+    } catch (ex) {
+      this.addError("validate", ex)
+    }
+    return super.validate(config)
   }
 }

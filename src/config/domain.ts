@@ -1,5 +1,3 @@
-import loadJsonFile from 'load-json-file'
-
 export class Domain {
   public name: string
 

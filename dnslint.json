@@ -15,12 +15,17 @@
       "code": 200
     }
   },
+  "records": {
+    "default": {
+      "enabled": false
+    },
+    "a": {
+      "enabled": true
+    }
+  },
   "domains": [
     {
-      "name": "xyo.network"
-    },
-    {
-      "name": "xy.company"
+      "name": "layerone.co"
     }
   ]
 }

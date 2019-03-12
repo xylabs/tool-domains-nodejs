@@ -9,13 +9,13 @@ export class XyDomainScan {
 
   private aws = new AWS()
   private config?: Config
-  private errorCount = 0
 
   public async start() {
     this.config = await Config.load()
     const domains = new Map<string, DomainValidator>()
     const result: any = {
-      domains: []
+      domains: [],
+      errorCount: 0
     }
 
     if (oc(this.config).aws.enabled(true)) {
@@ -31,8 +31,7 @@ export class XyDomainScan {
       completedDomains++
       result.domains.push(domain)
       console.log(`Domain:[${completedDomains}/${domains.size}]: ${domain.name}`)
-      await domain.validate(this.config)
-      this.errorCount += domain.errorCount
+      result.errorCount += await domain.validate(this.config)
     }
 
     console.log(`Saving to File: output.json`)
@@ -43,7 +42,7 @@ export class XyDomainScan {
   private async addAWSDomains(domains: Map<string, DomainValidator>) {
     const awsDomains = await this.aws.getDomains()
     for (const domain of awsDomains) {
-      domains.set(domain, new DomainValidator(domain, this.config || new Config()))
+      domains.set(domain, new DomainValidator(domain))
     }
     return domains
   }
@@ -51,7 +50,7 @@ export class XyDomainScan {
   private async addConfigDomains(domains: Map<string, DomainValidator>) {
     if (this.config && this.config.domains) {
       for (const domain of this.config.domains) {
-        domains.set(domain.name, new DomainValidator(domain.name, this.config || new Config()))
+        domains.set(domain.name, new DomainValidator(domain.name))
       }
     }
     return domains

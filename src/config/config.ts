@@ -2,6 +2,7 @@ import loadJsonFile from 'load-json-file'
 import { AWS } from './aws'
 import { Expected } from './expected'
 import { Domain } from './domain'
+import { Records } from './records'
 
 export class Config {
 
@@ -22,4 +23,5 @@ export class Config {
   public expected?: Expected = undefined
   public timeout = 1000
   public domains?: Domain[] = undefined
+  public records?: Records = undefined
 }
