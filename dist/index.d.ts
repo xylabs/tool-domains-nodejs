@@ -1,13 +1,8 @@
 export declare class XyDomainScan {
-    private r53;
+    private aws;
+    private config?;
     start(): Promise<void>;
-    private getZones;
-    private getResources;
-    private getHttpResponse;
-    private reverseDns;
-    private dnsLookup;
-    private validateRecordSet_A_CNAME;
-    private validateRecordSet_MX;
-    private validateRecordSet;
+    private addAWSDomains;
+    private addConfigDomains;
     private saveToFile;
 }

@@ -1,0 +1,31 @@
+{
+  "aws": {
+    "enabled": true
+  },
+  "timeout": 5000,
+  "expected": {
+    "addresses": {
+      "required": true,
+      "minimum": 1
+    },
+    "http": {
+      "code": 200
+    },
+    "https": {
+      "code": 200
+    }
+  },
+  "records": {
+    "default": {
+      "enabled": false
+    },
+    "a": {
+      "enabled": true
+    }
+  },
+  "domains": [
+    {
+      "name": "layerone.co"
+    }
+  ]
+}
