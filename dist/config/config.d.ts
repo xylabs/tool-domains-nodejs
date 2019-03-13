@@ -1,10 +1,10 @@
 import { AWS } from './aws';
-import { Expected } from './expected';
-import { Domain } from './domain';
+import { DomainsConfig } from './domains';
 export declare class Config {
     static load(fileName?: string): Promise<Config>;
-    verbose: boolean;
     aws?: AWS;
-    expected?: Expected;
-    domains?: Domain[];
+    domains?: DomainsConfig;
+    getRecordTimeout(domainName: string, recordName: string): number;
+    isRecordEnabled(domainName: string, recordName: string): boolean;
+    isReverseDNSEnabled(domainName: string, recordName: string): boolean;
 }

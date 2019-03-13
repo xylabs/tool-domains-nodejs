@@ -1,6 +1,6 @@
 import { AWS } from './aws'
 import fs from 'fs'
-import { Config, Domain } from './config'
+import { Config, DomainConfig } from './config'
 import { RecordValidator, DomainValidator } from './validator'
 import { oc } from 'ts-optchain'
 import { DNS } from './dns'
@@ -8,10 +8,10 @@ import { DNS } from './dns'
 export class XyDomainScan {
 
   private aws = new AWS()
-  private config?: Config
+  private config = new Config()
 
   public async start() {
-    this.config = await Config.load()
+    Object.assign(this.config, await Config.load())
     const domains = new Map<string, DomainValidator>()
     const result: any = {
       domains: [],
@@ -35,7 +35,6 @@ export class XyDomainScan {
     }
 
     console.log(`Saving to File: output.json`)
-    console.log(JSON.stringify(result))
     this.saveToFile("output.json", result)
   }
 
@@ -49,8 +48,10 @@ export class XyDomainScan {
 
   private async addConfigDomains(domains: Map<string, DomainValidator>) {
     if (this.config && this.config.domains) {
-      for (const domain of this.config.domains) {
-        domains.set(domain.name, new DomainValidator(domain.name))
+      const keys = Object.keys(this.config.domains)
+      for (const key of keys) {
+        const domain = this.config.domains[key]
+        domains.set(key, new DomainValidator(key))
       }
     }
     return domains

@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
-class RecordValidatorA extends base_1.RecordValidator {
+class RecordValidatorCNAME extends base_1.RecordValidator {
     constructor(name) {
-        super(name, "A");
+        super(name, "CNAME");
     }
     async validate(timeout) {
         try {
@@ -18,5 +18,5 @@ class RecordValidatorA extends base_1.RecordValidator {
         return super.validate(timeout);
     }
 }
-exports.RecordValidatorA = RecordValidatorA;
-//# sourceMappingURL=a.js.map
+exports.RecordValidatorCNAME = RecordValidatorCNAME;
+//# sourceMappingURL=cname.js.map

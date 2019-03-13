@@ -1,12 +1,11 @@
-import { Record } from './record'
-import { oc } from 'ts-optchain'
+import { RecordConfig } from './record'
 
-export class Records {
-  public default?: Record
-  public a?: Record
-  public aaaa?: Record
-  public cname?: Record
-  public mx?: Record
+export class RecordsConfig {
+  public default?: RecordConfig
+  public a?: RecordConfig
+  public aaaa?: RecordConfig
+  public cname?: RecordConfig
+  public mx?: RecordConfig
   [key: string]: any
 
   public isEnabled(type: string): boolean {

@@ -11,12 +11,14 @@ const ts_optchain_1 = require("ts-optchain");
 class XyDomainScan {
     constructor() {
         this.aws = new aws_1.AWS();
+        this.config = new config_1.Config();
     }
     async start() {
-        this.config = await config_1.Config.load();
+        Object.assign(this.config, await config_1.Config.load());
         const domains = new Map();
         const result = {
-            domains: []
+            domains: [],
+            errorCount: 0
         };
         if (ts_optchain_1.oc(this.config).aws.enabled(true)) {
             await this.addAWSDomains(domains);
@@ -27,11 +29,10 @@ class XyDomainScan {
         for (const domain of domains.values()) {
             completedDomains++;
             result.domains.push(domain);
-            console.log(`Domain:[${completedDomains}/${domains.size}]: ${domain}`);
-            await domain.validate(this.config);
+            console.log(`Domain:[${completedDomains}/${domains.size}]: ${domain.name}`);
+            result.errorCount += await domain.validate(this.config);
         }
         console.log(`Saving to File: output.json`);
-        console.log(JSON.stringify(result));
         this.saveToFile("output.json", result);
     }
     async addAWSDomains(domains) {
@@ -43,8 +44,10 @@ class XyDomainScan {
     }
     async addConfigDomains(domains) {
         if (this.config && this.config.domains) {
-            for (const domain of this.config.domains) {
-                domains.set(domain.name, new validator_1.DomainValidator(domain.name));
+            const keys = Object.keys(this.config.domains);
+            for (const key of keys) {
+                const domain = this.config.domains[key];
+                domains.set(key, new validator_1.DomainValidator(key));
             }
         }
         return domains;
