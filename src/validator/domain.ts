@@ -5,20 +5,25 @@ import { BaseValidator } from './base'
 import { DNS } from '../dns'
 import { AnyRecord } from 'dns'
 import chalk from 'chalk'
+import { Config } from '../config'
 
 export class DomainValidator extends BaseValidator {
   public records: RecordValidator[] = []
 
-  public async validate(config: object): Promise<number> {
+  public async validate(config: Config): Promise<number> {
     let errorCount = 0
     try {
       const records = await DNS.resolveAny(this.name)
       for (const record of records) {
-        const validator = this.createRecord(this.name, record)
-        await validator.validate(config)
-        this.records.push(validator)
-        if (validator.errors) {
-          errorCount += validator.errors.length
+        if (config.isRecordEnabled(this.name, record.type)) {
+          const validator = this.createRecord(this.name, record)
+          await validator.validate(config.getRecordTimeout(this.name, record.type))
+          this.records.push(validator)
+          if (validator.errors) {
+            errorCount += validator.errors.length
+          }
+        } else {
+          console.log(chalk.gray(`Record Disabled: ${record.type}`))
         }
       }
       if (errorCount === 0) {
@@ -27,6 +32,7 @@ export class DomainValidator extends BaseValidator {
         console.error(chalk.red(`${this.name}: ${errorCount} Errors`))
       }
     } catch (ex) {
+      console.error(chalk.red(ex.message))
       this.addError("domain", ex)
     }
     return errorCount

@@ -7,15 +7,15 @@ export class RecordValidatorA extends RecordValidator {
     super(name, "A")
   }
 
-  public async validate(config: Config): Promise<number> {
+  public async validate(timeout: number): Promise<number> {
     try {
       this.addresses = await this.lookup()
-      this.http = await this.checkHttp(config)
-      this.https = await this.checkHttps(config)
-      this.reverseDns = await this.reverseLookup()
+      this.http = await this.checkHttp(timeout)
+      this.https = await this.checkHttps(timeout)
+      // this.reverseDns = await this.reverseLookup()
     } catch (ex) {
       this.addError("validate", ex)
     }
-    return super.validate(config)
+    return super.validate(timeout)
   }
 }

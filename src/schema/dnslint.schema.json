@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "dnslint.sections.schema.json",
+  "additionalItems": false,
+  "additionalProperties": false,
+  "definitions": {
+    "source": {
+      "$id": "#definitions/source",
+      "title": "Source",
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean"}
+      }
+    },
+    "record": {
+      "$id": "#definitions/record",
+      "title": "Record",
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "addresses": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "minimum": {"type": "number"}
+          }
+        },
+        "http": {"$ref": "#/definitions/http"},
+        "https": {"$ref": "#/definitions/https"},
+        "reverseDNS": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"}
+          }
+        }
+      }
+    },
+    "http": {
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "code": {"type": "number"}
+      }
+    },
+    "https": {
+      "allOf": [
+        {"$ref": "#/definitions/http"}
+      ],
+      "properties": {
+        "version": {"type": "string"}
+      }
+    },
+    "domain": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "enabled": {"type": "boolean"},
+        "timeout": {"type": "number"},
+        "records": {"$ref": "#/definitions/records"}
+      }
+    },
+    "records": {
+      "type": "object",
+      "properties": {
+        "default": {"$ref": "#/definitions/record"},
+        "a": {"$ref": "#/definitions/record"},
+        "aaaa": {"$ref": "#/definitions/record"},
+        "cname": {"$ref": "#/definitions/record"},
+        "mx": {"$ref": "#/definitions/record"},
+        "txt": {"$ref": "#/definitions/record"}
+      }
+    },
+    "results": {
+      "$id": "#definitions/results",
+      "title": "Results",
+      "type": "object",
+      "properties": {
+        "records": {"$ref": "#/definitions/records"}
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "$schema": {"type": "string"},
+    "aws": {"$ref": "#/definitions/source"},
+    "domains": {
+      "type": "object",
+      "items": {"$ref": "#/definitions/domain"}
+    }
+  }
+}

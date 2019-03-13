@@ -1,31 +1,24 @@
 {
+  "$schema": "./src/schema/dnslint.schema.json#",
   "aws": {
     "enabled": true
   },
-  "timeout": 5000,
-  "expected": {
-    "addresses": {
-      "required": true,
-      "minimum": 1
-    },
-    "http": {
-      "code": 200
-    },
-    "https": {
-      "code": 200
-    }
-  },
-  "records": {
+  "domains": {
     "default": {
-      "enabled": false
-    },
-    "a": {
-      "enabled": true
+      "enabled": true,
+      "records": {
+        "default": {
+          "http": {
+            "code": 301
+          },
+          "https": {
+            "code": 200
+          },
+          "reverseDNS": {
+            "enabled": false
+          }
+        }
+      }
     }
-  },
-  "domains": [
-    {
-      "name": "layerone.co"
-    }
-  ]
+  }
 }

@@ -3,6 +3,7 @@ import { Config } from '../../config'
 import { DNS } from '../../dns'
 import http from 'http'
 import https from 'https'
+import chalk from 'chalk'
 export class RecordValidator extends BaseValidator {
 
   public type: string
@@ -16,26 +17,26 @@ export class RecordValidator extends BaseValidator {
     this.type = type
   }
 
-  public async validate(config: object): Promise<number> {
+  public async validate(timeout: number): Promise<number> {
     if (this.errors) {
       return this.errors.length
     }
     return 0
   }
 
-  protected async checkHttp(config: Config) {
+  protected async checkHttp(timeout: number) {
     try {
-      this.http = await this.getHttpResponse(false, config.timeout)
+      this.http = await this.getHttpResponse(false, timeout)
     } catch (ex) {
       this.addError("http", ex)
     }
   }
 
-  protected async checkHttps(config: Config) {
+  protected async checkHttps(timeout: number) {
     try {
-      this.http = await this.getHttpResponse(true, config.timeout)
+      this.https = await this.getHttpResponse(true, timeout)
     } catch (ex) {
-      this.addError("http", ex)
+      this.addError("https", ex)
     }
   }
 

@@ -1,8 +1,8 @@
 import loadJsonFile from 'load-json-file'
 import { AWS } from './aws'
-import { Expected } from './expected'
-import { Domain } from './domain'
-import { Records } from './records'
+import { DomainConfig } from './domain'
+import chalk from 'chalk'
+import { DomainsConfig } from './domains'
 
 export class Config {
 
@@ -14,14 +14,43 @@ export class Config {
           resolve({ ...config, ...(json) })
         })
       } catch (ex) {
-        reject(ex)
+        console.log(chalk.yellow("No dnslint.json config file found.  Using defaults."))
+        resolve(new Config())
       }
     })
   }
-  public verbose = true
+
   public aws?: AWS = undefined
-  public expected?: Expected = undefined
-  public timeout = 1000
-  public domains?: Domain[] = undefined
-  public records?: Records = undefined
+  public domains?: DomainsConfig
+
+  public getRecordTimeout(domainName: string, recordName: string): number {
+    let timeout = 1000
+    if (this.domains !== undefined) {
+      const domainConfig: DomainConfig = this.domains[domainName]
+      if (domainConfig) {
+        timeout = domainConfig.getTimeout(recordName)
+      }
+    }
+    return timeout
+  }
+
+  public isRecordEnabled(domainName: string, recordName: string): boolean {
+    if (this.domains !== undefined) {
+      const domainConfig: DomainConfig = this.domains[domainName]
+      if (domainConfig) {
+        return domainConfig.isRecordEnabled(recordName)
+      }
+    }
+    return true
+  }
+
+  public isReverseDNSEnabled(domainName: string, recordName: string): boolean {
+    if (this.domains !== undefined) {
+      const domainConfig: DomainConfig = this.domains[domainName]
+      if (domainConfig) {
+        return domainConfig.isReverseDNSEnabled(recordName)
+      }
+    }
+    return true
+  }
 }

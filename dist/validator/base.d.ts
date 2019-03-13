@@ -1,7 +1,7 @@
+import 'chalk';
 export declare class BaseValidator {
     name: string;
-    errors?: string[];
+    errors?: object[];
     constructor(name: string);
-    addError(err: string): void;
-    protected getHttpResponse(ssl?: boolean, timeout?: number): Promise<string>;
+    addError(action: string, error: any): void;
 }
