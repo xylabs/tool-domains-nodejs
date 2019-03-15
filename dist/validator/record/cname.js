@@ -1,15 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
-class RecordValidatorCNAME extends base_1.RecordValidator {
-    constructor(name) {
+const dns_1 = require("../../dns");
+class RecordValidatorCname extends base_1.RecordValidator {
+    constructor(name, value) {
         super(name, "CNAME");
+        this.value = value;
     }
     async validate(timeout) {
         try {
-            this.addresses = await this.lookup();
-            this.http = await this.checkHttp(timeout);
-            this.https = await this.checkHttps(timeout);
+            const ip = await dns_1.DNS.lookup(this.value);
+            if (ip) {
+                this.http = await this.checkHttp(ip, this.name, timeout);
+                this.https = await this.checkHttps(ip, this.name, timeout);
+            }
             // this.reverseDns = await this.reverseLookup()
         }
         catch (ex) {
@@ -18,5 +22,5 @@ class RecordValidatorCNAME extends base_1.RecordValidator {
         return super.validate(timeout);
     }
 }
-exports.RecordValidatorCNAME = RecordValidatorCNAME;
+exports.RecordValidatorCname = RecordValidatorCname;
 //# sourceMappingURL=cname.js.map

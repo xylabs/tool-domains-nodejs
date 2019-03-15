@@ -1,6 +1,7 @@
 import { AWS } from './aws'
 import fs from 'fs'
-import { Config, DomainConfig } from './config'
+import { Config } from './config'
+import { DomainConfig } from './config/domain'
 import { RecordValidator, DomainValidator } from './validator'
 import { oc } from 'ts-optchain'
 import { DNS } from './dns'
@@ -50,8 +51,10 @@ export class XyDomainScan {
     if (this.config && this.config.domains) {
       const keys = Object.keys(this.config.domains)
       for (const key of keys) {
-        const domain = this.config.domains[key]
-        domains.set(key, new DomainValidator(key))
+        if (key !== "default") {
+          const domain = this.config.domains[key]
+          domains.set(key, new DomainValidator(key))
+        }
       }
     }
     return domains

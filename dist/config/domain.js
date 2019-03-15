@@ -1,10 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class DomainConfig {
-    constructor() {
+    constructor(domainConfig) {
         this.records = undefined;
         this.enabled = true;
         this.timeout = 1000;
+        if (domainConfig) {
+            Object.assign(this, domainConfig);
+        }
     }
     isRecordEnabled(record) {
         if (!this.enabled) {
@@ -28,23 +31,16 @@ class DomainConfig {
         }
         return true;
     }
-    getTimeout(record) {
+    getRecordConfig(recordType, property) {
         if (this.records) {
-            const recordConfig = this.records[record];
+            const recordConfig = this.records[recordType] || this.records.default;
             if (recordConfig) {
-                if (recordConfig.timeout === undefined) {
-                    if (this.records !== undefined && this.records.default !== undefined) {
-                        if (this.records.default.timeout !== undefined) {
-                            return this.records.default.timeout;
-                        }
-                    }
-                }
-                else {
-                    return recordConfig.timeout;
+                if (recordConfig[property] !== undefined) {
+                    return recordConfig[property];
                 }
             }
         }
-        return this.timeout;
+        return this[property];
     }
     isReverseDNSEnabled(record) {
         if (this.records) {

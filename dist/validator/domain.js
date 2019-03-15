@@ -5,11 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const a_1 = require("./record/a");
 const cname_1 = require("./record/cname");
-const base_1 = require("./record/base");
-const base_2 = require("./base");
+const base_1 = require("./base");
 const dns_1 = require("../dns");
 const chalk_1 = __importDefault(require("chalk"));
-class DomainValidator extends base_2.BaseValidator {
+const mx_1 = require("./record/mx");
+const txt_1 = require("./record/txt");
+class DomainValidator extends base_1.BaseValidator {
     constructor() {
         super(...arguments);
         this.records = [];
@@ -17,19 +18,26 @@ class DomainValidator extends base_2.BaseValidator {
     async validate(config) {
         let errorCount = 0;
         try {
-            const records = await dns_1.DNS.resolveAny(this.name);
-            for (const record of records) {
-                if (config.isRecordEnabled(this.name, record.type)) {
-                    const validator = this.createRecord(this.name, record);
-                    await validator.validate(config.getRecordTimeout(this.name, record.type));
-                    this.records.push(validator);
-                    if (validator.errors) {
-                        errorCount += validator.errors.length;
-                    }
+            if (config.isRecordEnabled(this.name, "A")) {
+                this.records = this.records.concat(await this.validateA());
+            }
+            if (config.isRecordEnabled(this.name, "CNAME")) {
+                this.records = this.records.concat(await this.validateCname());
+            }
+            if (config.isRecordEnabled(this.name, "MX")) {
+                this.records = this.records.concat(await this.validateMx());
+            }
+            if (config.isRecordEnabled(this.name, "TXT")) {
+                this.records = this.records.concat(await this.validateTxt());
+            }
+            for (const record of this.records) {
+                await record.validate(config.getRecordTimeout(this.name, record.name));
+                if (record.errors) {
+                    errorCount += record.errors.length;
                 }
-                else {
-                    console.log(chalk_1.default.gray(`Record Disabled: ${record.type}`));
-                }
+            }
+            if (this.errors) {
+                errorCount += this.errors.length;
             }
             if (errorCount === 0) {
                 console.log(chalk_1.default.green(`${this.name}: OK`));
@@ -39,20 +47,68 @@ class DomainValidator extends base_2.BaseValidator {
             }
         }
         catch (ex) {
-            console.error(chalk_1.default.red(ex.message));
             this.addError("domain", ex);
+        }
+        if (this.errors) {
+            return this.errors.length + errorCount;
         }
         return errorCount;
     }
-    createRecord(name, record) {
-        switch (record.type) {
-            case "A":
-                return new a_1.RecordValidatorA(name);
-            case "CNAME":
-                return new cname_1.RecordValidatorCNAME(name);
-            default:
-                return new base_1.RecordValidator(name, record.type);
+    async validateA() {
+        const validators = [];
+        try {
+            const records = await dns_1.DNS.resolve4(this.name);
+            for (const record of records) {
+                const validator = new a_1.RecordValidatorA(this.name, record);
+                validators.push(validator);
+            }
         }
+        catch (ex) {
+            this.addError("domain:validateA", ex);
+        }
+        return validators;
+    }
+    async validateCname() {
+        const validators = [];
+        try {
+            const records = await dns_1.DNS.resolveCname(this.name);
+            for (const record of records) {
+                const validator = new cname_1.RecordValidatorCname(this.name, record);
+                validators.push(validator);
+            }
+        }
+        catch (ex) {
+            this.addError("domain:validateCname", ex);
+        }
+        return validators;
+    }
+    async validateMx() {
+        const validators = [];
+        try {
+            const records = await dns_1.DNS.resolveMx(this.name);
+            for (const record of records) {
+                const validator = new mx_1.RecordValidatorMx(this.name, record);
+                validators.push(validator);
+            }
+        }
+        catch (ex) {
+            this.addError("domain:validateMx", ex);
+        }
+        return validators;
+    }
+    async validateTxt() {
+        const validators = [];
+        try {
+            const records = await dns_1.DNS.resolveTxt(this.name);
+            for (const record of records) {
+                const validator = new txt_1.RecordValidatorTxt(this.name, record);
+                validators.push(validator);
+            }
+        }
+        catch (ex) {
+            this.addError("domain:validateTxt", ex);
+        }
+        return validators;
     }
 }
 exports.DomainValidator = DomainValidator;

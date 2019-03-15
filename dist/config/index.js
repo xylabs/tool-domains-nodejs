@@ -1,11 +1,59 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var aws_1 = require("./aws");
-exports.AWS = aws_1.AWS;
-var expected_1 = require("./expected");
-exports.Expected = expected_1.Expected;
-var domain_1 = require("./domain");
-exports.DomainConfig = domain_1.DomainConfig;
-var config_1 = require("./config");
-exports.Config = config_1.Config;
+const load_json_file_1 = __importDefault(require("load-json-file"));
+const domain_1 = require("./domain");
+const chalk_1 = __importDefault(require("chalk"));
+class Config {
+    constructor() {
+        this.aws = undefined;
+    }
+    static async load(fileName = './dnslint.json') {
+        return new Promise((resolve, reject) => {
+            try {
+                load_json_file_1.default(fileName).then((json) => {
+                    const config = new Config();
+                    resolve({ ...config, ...json });
+                });
+            }
+            catch (ex) {
+                console.log(chalk_1.default.yellow("No dnslint.json config file found.  Using defaults."));
+                resolve(new Config());
+            }
+        });
+    }
+    getRecordTimeout(domainName, recordName) {
+        let timeout = 1000;
+        if (this.domains !== undefined) {
+            const domainConfig = this.domains[domainName] || this.domains.default;
+            if (domainConfig) {
+                const config = new domain_1.DomainConfig(domainConfig);
+                timeout = config.getTimeout(recordName);
+            }
+        }
+        return timeout;
+    }
+    isRecordEnabled(domainName, recordName) {
+        if (this.domains !== undefined) {
+            const domainConfig = this.domains[domainName];
+            if (domainConfig) {
+                const config = new domain_1.DomainConfig(domainConfig);
+                return config.isRecordEnabled(recordName);
+            }
+        }
+        return true;
+    }
+    isReverseDNSEnabled(domainName, recordName) {
+        if (this.domains !== undefined) {
+            const domainConfig = this.domains[domainName];
+            if (domainConfig) {
+                return domainConfig.isReverseDNSEnabled(recordName);
+            }
+        }
+        return true;
+    }
+}
+exports.Config = Config;
 //# sourceMappingURL=index.js.map

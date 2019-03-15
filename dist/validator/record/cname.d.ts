@@ -1,5 +1,6 @@
 import { RecordValidator } from './base';
-export declare class RecordValidatorCNAME extends RecordValidator {
-    constructor(name: string);
+export declare class RecordValidatorCname extends RecordValidator {
+    value: string;
+    constructor(name: string, value: string);
     validate(timeout: number): Promise<number>;
 }
