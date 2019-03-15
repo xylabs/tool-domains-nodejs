@@ -1,9 +1,21 @@
 import { RecordsConfig } from "./records"
 
-export class DomainConfig {
+interface IDomainConfig {
+  [key: string]: any
+  enabled: boolean
+  timeout: number
+}
+
+export class DomainConfig implements IDomainConfig {
   public records?: RecordsConfig = undefined
   public enabled = true
   public timeout = 1000
+
+  constructor(domainConfig?: DomainConfig) {
+    if (domainConfig) {
+      Object.assign(this, domainConfig)
+    }
+  }
 
   public isRecordEnabled(record: string): boolean {
     if (!this.enabled) {
@@ -27,22 +39,16 @@ export class DomainConfig {
     return true
   }
 
-  public getTimeout(record: string): number {
+  public getRecordConfigProperty(recordType: string, property: string): any {
     if (this.records) {
-      const recordConfig = this.records[record]
+      const recordConfig = this.records[recordType] || this.records.default
       if (recordConfig) {
-        if (recordConfig.timeout === undefined) {
-          if (this.records !== undefined && this.records.default !== undefined) {
-            if (this.records.default.timeout !== undefined) {
-              return this.records.default.timeout
-            }
-          }
-        } else {
-          return recordConfig.timeout
+        if (recordConfig[property] !== undefined) {
+          return recordConfig[property]
         }
       }
     }
-    return this.timeout
+    return (this as IDomainConfig)[property]
   }
 
   public isReverseDNSEnabled(record: string): boolean {

@@ -1,11 +1,13 @@
 import { RecordValidatorA } from './record/a'
-import { RecordValidatorCNAME } from './record/cname'
+import { RecordValidatorCname } from './record/cname'
 import { RecordValidator } from './record/base'
 import { BaseValidator } from './base'
 import { DNS } from '../dns'
 import { AnyRecord } from 'dns'
 import chalk from 'chalk'
 import { Config } from '../config'
+import { RecordValidatorMx } from './record/mx'
+import { RecordValidatorTxt } from './record/txt'
 
 export class DomainValidator extends BaseValidator {
   public records: RecordValidator[] = []
@@ -13,18 +15,26 @@ export class DomainValidator extends BaseValidator {
   public async validate(config: Config): Promise<number> {
     let errorCount = 0
     try {
-      const records = await DNS.resolveAny(this.name)
-      for (const record of records) {
-        if (config.isRecordEnabled(this.name, record.type)) {
-          const validator = this.createRecord(this.name, record)
-          await validator.validate(config.getRecordTimeout(this.name, record.type))
-          this.records.push(validator)
-          if (validator.errors) {
-            errorCount += validator.errors.length
-          }
-        } else {
-          console.log(chalk.gray(`Record Disabled: ${record.type}`))
+      if (config.isRecordEnabled(this.name, "A")) {
+        this.records = this.records.concat(await this.validateA())
+      }
+      if (config.isRecordEnabled(this.name, "CNAME")) {
+        this.records = this.records.concat(await this.validateCname())
+      }
+      if (config.isRecordEnabled(this.name, "MX")) {
+        this.records = this.records.concat(await this.validateMx())
+      }
+      if (config.isRecordEnabled(this.name, "TXT")) {
+        this.records = this.records.concat(await this.validateTxt())
+      }
+      for (const record of this.records) {
+        await record.validate(config.getRecordTimeout(this.name, record.name))
+        if (record.errors) {
+          errorCount += record.errors.length
         }
+      }
+      if (this.errors) {
+        errorCount += this.errors.length
       }
       if (errorCount === 0) {
         console.log(chalk.green(`${this.name}: OK`))
@@ -32,21 +42,69 @@ export class DomainValidator extends BaseValidator {
         console.error(chalk.red(`${this.name}: ${errorCount} Errors`))
       }
     } catch (ex) {
-      console.error(chalk.red(ex.message))
       this.addError("domain", ex)
     }
+    if (this.errors) {
+      return this.errors.length + errorCount
+    }
     return errorCount
+
   }
 
-  private createRecord(name: string, record: AnyRecord) {
-    switch (record.type) {
-      case "A":
-        return new RecordValidatorA(name)
-      case "CNAME":
-        return new RecordValidatorCNAME(name)
-      default:
-        return new RecordValidator(name, record.type)
+  private async validateA() {
+    const validators: RecordValidatorA[] = []
+    try {
+      const records = await DNS.resolve4(this.name)
+      for (const record of records) {
+        const validator = new RecordValidatorA(this.name, record)
+        validators.push(validator)
+      }
+    } catch (ex) {
+      this.addError("domain:validateA", ex)
     }
+    return validators
+  }
+
+  private async validateCname() {
+    const validators: RecordValidatorCname[] = []
+    try {
+      const records = await DNS.resolveCname(this.name)
+      for (const record of records) {
+        const validator = new RecordValidatorCname(this.name, record)
+        validators.push(validator)
+      }
+    } catch (ex) {
+      this.addError("domain:validateCname", ex)
+    }
+    return validators
+  }
+
+  private async validateMx() {
+    const validators: RecordValidatorMx[] = []
+    try {
+      const records = await DNS.resolveMx(this.name)
+      for (const record of records) {
+        const validator = new RecordValidatorMx(this.name, record)
+        validators.push(validator)
+      }
+    } catch (ex) {
+      this.addError("domain:validateMx", ex)
+    }
+    return validators
+  }
+
+  private async validateTxt() {
+    const validators: RecordValidatorTxt[] = []
+    try {
+      const records = await DNS.resolveTxt(this.name)
+      for (const record of records) {
+        const validator = new RecordValidatorTxt(this.name, record)
+        validators.push(validator)
+      }
+    } catch (ex) {
+      this.addError("domain:validateTxt", ex)
+    }
+    return validators
   }
 
 }

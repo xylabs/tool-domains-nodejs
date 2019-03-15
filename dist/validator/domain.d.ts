@@ -4,5 +4,8 @@ import { Config } from '../config';
 export declare class DomainValidator extends BaseValidator {
     records: RecordValidator[];
     validate(config: Config): Promise<number>;
-    private createRecord;
+    private validateA;
+    private validateCname;
+    private validateMx;
+    private validateTxt;
 }

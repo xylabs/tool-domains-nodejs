@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
 class RecordValidatorA extends base_1.RecordValidator {
-    constructor(name) {
+    constructor(name, value) {
         super(name, "A");
+        this.value = value;
     }
     async validate(timeout) {
         try {
-            this.addresses = await this.lookup();
-            this.http = await this.checkHttp(timeout);
-            this.https = await this.checkHttps(timeout);
+            this.http = await this.checkHttp(this.value, this.name, timeout);
+            this.https = await this.checkHttps(this.value, this.name, timeout);
             // this.reverseDns = await this.reverseLookup()
         }
         catch (ex) {

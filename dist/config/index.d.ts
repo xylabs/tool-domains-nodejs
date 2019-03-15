@@ -1,4 +1,10 @@
-export { AWS } from './aws';
-export { Expected } from './expected';
-export { DomainConfig } from './domain';
-export { Config } from './config';
+import { AWS } from './aws';
+import { DomainsConfig } from './domains';
+export declare class Config {
+    static load(fileName?: string): Promise<Config>;
+    aws?: AWS;
+    domains?: DomainsConfig;
+    getRecordTimeout(domainName: string, recordName: string): number;
+    isRecordEnabled(domainName: string, recordName: string): boolean;
+    isReverseDNSEnabled(domainName: string, recordName: string): boolean;
+}

@@ -17,11 +17,67 @@ class DNS {
             });
         });
     }
-    static async resolveAny(name) {
+    static async resolve4(name) {
         return new Promise((resolve, reject) => {
-            dns_1.default.resolveAny(name, (err, records) => {
+            dns_1.default.resolve4(name, (err, records) => {
                 if (err) {
-                    reject(err);
+                    if (err.code !== 'ENODATA') {
+                        reject(err);
+                    }
+                    else {
+                        resolve([]);
+                    }
+                }
+                else {
+                    resolve(records);
+                }
+            });
+        });
+    }
+    static async resolveCname(name) {
+        return new Promise((resolve, reject) => {
+            dns_1.default.resolveCname(name, (err, records) => {
+                if (err) {
+                    if (err.code !== 'ENODATA') {
+                        reject(err);
+                    }
+                    else {
+                        resolve([]);
+                    }
+                }
+                else {
+                    resolve(records);
+                }
+            });
+        });
+    }
+    static async resolveMx(name) {
+        return new Promise((resolve, reject) => {
+            dns_1.default.resolveMx(name, (err, records) => {
+                if (err) {
+                    if (err.code !== 'ENODATA') {
+                        reject(err);
+                    }
+                    else {
+                        resolve([]);
+                    }
+                }
+                else {
+                    resolve(records);
+                }
+            });
+        });
+    }
+    static async resolveTxt(name) {
+        return new Promise((resolve, reject) => {
+            dns_1.default.resolveTxt(name, (err, records) => {
+                if (err) {
+                    if (err.code !== 'ENODATA') {
+                        reject(err);
+                    }
+                    else {
+                        resolve([]);
+                    }
                 }
                 else {
                     resolve(records);
