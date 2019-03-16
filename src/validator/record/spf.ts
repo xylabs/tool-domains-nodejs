@@ -22,13 +22,13 @@ export class RecordValidatorSpf extends RecordValidator {
         const found = this.getFound(this.value[i])
         if (missing === -1) { // not missing
           if (found !== -1) { // found
-            this.addError("validateSpf", `Duplicate SPF: ${this.value[i]}`)
+            this.addError("validateSpf", `Duplicate SPF [${this.name}]: ${this.value[i]}`)
           } else { // not found
-            this.addError("validateSpf", `Unexpected SPF: ${this.value[i]}`)
+            this.addError("validateSpf", `Unexpected SPF [${this.name}]: ${this.value[i]}`)
           }
         } else { // missing
           if (found !== -1) { // found
-            this.addError("validateSpf", `Invalid SPF Expectations [Double]: ${this.value[i]}`)
+            this.addError("validateSpf", `Double Expectation SPF [${this.name}]: ${this.value[i]}`)
           } else { // not found
             this.found.push(this.value[i]) // add to found
             this.missing.splice(missing, 1) // remove from missing

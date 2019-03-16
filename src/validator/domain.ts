@@ -28,11 +28,12 @@ export class DomainValidator extends BaseValidator {
         this.records = this.records.concat(await this.validateTxt())
       }
       for (const record of this.records) {
-        await record.validate(config.getRecordTimeout(this.name, record.name))
+        await record.validate(config.getRecordTimeout(this.name, record.type))
         if (record.errors) {
           errorCount += record.errors.length
         }
       }
+      this.validateDomainRules()
       if (this.errors) {
         errorCount += this.errors.length
       }
@@ -49,6 +50,23 @@ export class DomainValidator extends BaseValidator {
     }
     return errorCount
 
+  }
+
+  private getRecordTypeCount(type: string) {
+    let count = 0
+    for (const record of this.records) {
+      if (record.type === type) {
+        count++
+      }
+    }
+    return count
+  }
+
+  private validateDomainRules() {
+    // we do not allow both A and CNAME records
+    if (this.getRecordTypeCount("A") > 0 && this.getRecordTypeCount("CNAME") > 0) {
+      this.addError("domain", `Conflict: Has both A and CNAME records [${this.name}]`)
+    }
   }
 
   private async validateA() {

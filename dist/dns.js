@@ -21,7 +21,7 @@ class DNS {
         return new Promise((resolve, reject) => {
             dns_1.default.resolve4(name, (err, records) => {
                 if (err) {
-                    if (err.code !== 'ENODATA') {
+                    if (err.code !== 'ENOTFOUND') {
                         reject(err);
                     }
                     else {
@@ -38,7 +38,7 @@ class DNS {
         return new Promise((resolve, reject) => {
             dns_1.default.resolveCname(name, (err, records) => {
                 if (err) {
-                    if (err.code !== 'ENODATA') {
+                    if (err.code !== 'ENOTFOUND') {
                         reject(err);
                     }
                     else {
@@ -55,7 +55,7 @@ class DNS {
         return new Promise((resolve, reject) => {
             dns_1.default.resolveMx(name, (err, records) => {
                 if (err) {
-                    if (err.code !== 'ENODATA') {
+                    if (err.code !== 'ENOTFOUND') {
                         reject(err);
                     }
                     else {
@@ -72,7 +72,7 @@ class DNS {
         return new Promise((resolve, reject) => {
             dns_1.default.resolveTxt(name, (err, records) => {
                 if (err) {
-                    if (err.code !== 'ENODATA') {
+                    if (err.code !== 'ENOTFOUND') {
                         reject(err);
                     }
                     else {

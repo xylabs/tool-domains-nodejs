@@ -31,7 +31,7 @@ class DomainValidator extends base_1.BaseValidator {
                 this.records = this.records.concat(await this.validateTxt());
             }
             for (const record of this.records) {
-                await record.validate(config.getRecordTimeout(this.name, record.name));
+                await record.validate(config.getRecordTimeout(this.name, record.type));
                 if (record.errors) {
                     errorCount += record.errors.length;
                 }

@@ -3,33 +3,44 @@ import { AWS } from './aws'
 import { DomainConfig } from './domain'
 import chalk from 'chalk'
 import { DomainsConfig } from './domains'
+import defaultConfig from './default.json'
+import merge from 'merge'
 
 export class Config {
 
-  public static async load(fileName: string = './dnslint.json'): Promise<Config> {
-    return new Promise((resolve, reject) => {
+  public static async load(filename: string = './dnslint.json'): Promise<Config> {
+    try {
+      const defaultJson = await loadJsonFile(`${__dirname}/default.json`)
       try {
-        loadJsonFile(fileName).then((json: any) => {
-          const config = new Config()
-          resolve({ ...config, ...json })
-        })
+        const userJson = await loadJsonFile(filename)
+        console.log(chalk.gray("Loaded User Config"))
+        return new Config(merge.recursive(true, defaultConfig, userJson))
       } catch (ex) {
         console.log(chalk.yellow("No dnslint.json config file found.  Using defaults."))
-        resolve(new Config())
+        return new Config(defaultConfig)
       }
-    })
+    } catch (ex) {
+      console.log(chalk.red(`Failed to load defaults: ${ex}`))
+      return new Config()
+    }
   }
 
-  public aws?: AWS = undefined
-  public domains?: DomainsConfig
+  public aws ?: AWS = undefined
+  public domains ?: DomainsConfig
 
-  public getRecordTimeout(domainName: string, recordName: string): number {
+  constructor(config?: any) {
+    if (config) {
+      Object.assign(this, config)
+    }
+  }
+
+  public getRecordTimeout(domainName: string, recordType: string): number {
     let timeout = 1000
     if (this.domains !== undefined) {
       const domainConfig: DomainConfig = this.domains[domainName] || this.domains.default
       if (domainConfig) {
         const config = new DomainConfig(domainConfig)
-        timeout = config.getRecordConfigProperty(recordName, "timeout")
+        timeout = config.getRecordConfigProperty(recordType, "timeout")
       }
     }
     return timeout

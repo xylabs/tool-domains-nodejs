@@ -1,7 +1,7 @@
 export declare class XyDomainScan {
     private aws;
     private config;
-    start(): Promise<void>;
+    start(): Promise<any>;
     private addAWSDomains;
     private addConfigDomains;
     private saveToFile;

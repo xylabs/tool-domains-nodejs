@@ -31,7 +31,7 @@ export class RecordValidatorTxt extends RecordValidator {
             break
           }
           default: {
-            this.addError("validate", `Unexpected space TXT record: ${this.value}`)
+            this.addError("validate", `Unexpected space TXT record [${this.name}]: ${this.value}`)
             break
           }
         }
@@ -48,12 +48,12 @@ export class RecordValidatorTxt extends RecordValidator {
               break
             }
             default: {
-              this.addError("validate", `Unexpected equals TXT record: ${this.value}`)
+              this.addError("validate", `Unexpected equals TXT record [${this.name}]: ${this.value}`)
               break
             }
           }
         } else {
-          this.addError("validate", `Unexpected TXT record: ${this.value}`)
+          this.addError("validate", `Unexpected TXT record [${this.name}]: ${this.value}`)
         }
       }
     } catch (ex) {

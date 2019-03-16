@@ -26,6 +26,7 @@ commander_1.default
     const result = await tool.start();
     console.log("====================================");
     console.log(result);
+    return result;
 });
 commander_1.default.parse(process.argv);
 if (process.argv.length < 3) {
