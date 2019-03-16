@@ -1,6 +1,7 @@
 import program from 'commander'
 import dotenvExpand from 'dotenv-expand'
 import { XyDomainScan } from './'
+import { inspect } from 'util'
 
 const getVersion = (): string => {
   dotenvExpand({
@@ -12,23 +13,33 @@ const getVersion = (): string => {
 
   return process.env.APP_VERSION || 'Unknown'
 }
+
+const start = async () => {
+  const tool = new XyDomainScan()
+  const result = await tool.start()
+  console.log("==== Finished ====")
+  return result
+}
+
 program
   .version(getVersion())
-  .usage('$0 <cmd> [args]')
 
 program
   .command('start')
-  .description('Start the Scanner')
-  .action(async () => {
-    const tool = new XyDomainScan()
-    const result = await tool.start()
-    console.log("====================================")
-    console.log(result)
-    return result
+  .description('Start the Scanner (Default)')
+  .action(start)
+
+program
+  .command('config <provider>')
+  .description('Configure a part of the system')
+  .action(async(provider) => {
+    console.log(provider)
+    return 0
   })
 
 program.parse(process.argv)
 
-if (process.argv.length < 3) {
-  program.help()
+// if no args, then default to start
+if (program.args.length < 1) {
+  start()
 }

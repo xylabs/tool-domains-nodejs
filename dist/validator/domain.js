@@ -36,6 +36,7 @@ class DomainValidator extends base_1.BaseValidator {
                     errorCount += record.errors.length;
                 }
             }
+            this.validateDomainRules();
             if (this.errors) {
                 errorCount += this.errors.length;
             }
@@ -43,6 +44,7 @@ class DomainValidator extends base_1.BaseValidator {
                 console.log(chalk_1.default.green(`${this.name}: OK`));
             }
             else {
+                this.addError("validate", `Errors Detected[${this.name}]: ${errorCount}`);
                 console.error(chalk_1.default.red(`${this.name}: ${errorCount} Errors`));
             }
         }
@@ -52,7 +54,22 @@ class DomainValidator extends base_1.BaseValidator {
         if (this.errors) {
             return this.errors.length + errorCount;
         }
-        return errorCount;
+        return super.validate(config);
+    }
+    getRecordTypeCount(type) {
+        let count = 0;
+        for (const record of this.records) {
+            if (record.type === type) {
+                count++;
+            }
+        }
+        return count;
+    }
+    validateDomainRules() {
+        // we do not allow both A and CNAME records
+        if (this.getRecordTypeCount("A") > 0 && this.getRecordTypeCount("CNAME") > 0) {
+            this.addError("domain", `Conflict: Has both A and CNAME records [${this.name}]`);
+        }
     }
     async validateA() {
         const validators = [];

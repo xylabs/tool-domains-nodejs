@@ -6,10 +6,9 @@ export declare class RecordValidator extends BaseValidator {
     https?: any;
     reverseDns?: any;
     constructor(name: string, type: string);
-    validate(timeout: number): Promise<number>;
     protected checkHttp(ip: string, hostname: string, timeout: number): Promise<any>;
     protected checkHttps(ip: string, hostname: string, timeout: number): Promise<any>;
-    protected reverseLookup(): Promise<string[] | undefined>;
+    protected reverseLookup(ip: string, hostname: string, timeout: number): Promise<void>;
     private validateHttpHeaders;
     private validateHeader;
     private validateHttpsHeaders;

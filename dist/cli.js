@@ -15,21 +15,28 @@ const getVersion = () => {
     });
     return process.env.APP_VERSION || 'Unknown';
 };
-commander_1.default
-    .version(getVersion())
-    .usage('$0 <cmd> [args]');
-commander_1.default
-    .command('start')
-    .description('Start the Scanner')
-    .action(async () => {
+const start = async () => {
     const tool = new _1.XyDomainScan();
     const result = await tool.start();
-    console.log("====================================");
-    console.log(result);
+    console.log("==== Finished ====");
     return result;
+};
+commander_1.default
+    .version(getVersion());
+commander_1.default
+    .command('start')
+    .description('Start the Scanner (Default)')
+    .action(start);
+commander_1.default
+    .command('config <provider>')
+    .description('Configure a part of the system')
+    .action(async (provider) => {
+    console.log(provider);
+    return 0;
 });
 commander_1.default.parse(process.argv);
-if (process.argv.length < 3) {
-    commander_1.default.help();
+// if no args, then default to start
+if (commander_1.default.args.length < 1) {
+    start();
 }
 //# sourceMappingURL=cli.js.map

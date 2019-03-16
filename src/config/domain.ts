@@ -59,14 +59,13 @@ export class DomainConfig implements IDomainConfig {
           if (this.records !== undefined && this.records.default !== undefined) {
             if (
                 this.records.default !== undefined &&
-                this.records.default.reverseDNS !== undefined &&
-                this.records.default.reverseDNS.enabled !== undefined
+                this.records.default.reverseDNS !== undefined
               ) {
-              return this.records.default.reverseDNS.enabled
+              return this.records.default.reverseDNS
             }
           }
         } else if (
-          recordConfig.reverseDNS.enabled !== undefined
+          recordConfig.reverseDNS !== undefined
         ) {
           return recordConfig.reverseDNS.enabled
         }

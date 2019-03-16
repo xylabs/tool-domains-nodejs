@@ -12,16 +12,10 @@ class RecordValidator extends base_1.BaseValidator {
         super(name);
         this.type = type;
     }
-    async validate(timeout) {
-        if (this.errors) {
-            return this.errors.length;
-        }
-        return 0;
-    }
     async checkHttp(ip, hostname, timeout) {
         try {
             const result = await this.getHttpResponse(ip, hostname, timeout, false);
-            this.validateHttpHeaders(result.headers);
+            this.validateHttpHeaders(result.headers, ip);
             return result;
         }
         catch (ex) {
@@ -31,77 +25,65 @@ class RecordValidator extends base_1.BaseValidator {
     async checkHttps(ip, hostname, timeout) {
         try {
             const result = await this.getHttpResponse(ip, hostname, timeout, true);
-            this.validateHttpsHeaders(result.headers);
+            this.validateHttpsHeaders(result.headers, ip);
             return result;
         }
         catch (ex) {
             this.addError("https", ex);
         }
     }
-    async reverseLookup() {
+    async reverseLookup(ip, hostname, timeout) {
+        // right now we only check for cloudfront
         try {
-            return await dns_1.DNS.reverse(this.name);
+            const names = await dns_1.DNS.reverse(ip);
+            let found = false;
+            for (const name of names) {
+                if (name.endsWith('.r.cloudfront.net')) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                this.addError("reverseLookup", `ReverseDNS Mismatch ${names.join(',')} [Expected: '*.r.cloudfront.net']`);
+            }
         }
         catch (ex) {
-            this.addError("reverseLookup", ex);
+            this.addError("reverseLookup", `${ex}`);
         }
     }
-    validateHttpHeaders(headers) {
+    validateHttpHeaders(headers, ip) {
         let errorCount = 0;
         if (headers.location === undefined) {
-            this.addError("http", "Missing location header");
-            errorCount++;
+            errorCount += this.validateHeader("http", ip, headers, "location", true);
         }
         return errorCount;
     }
     // if value is undefined, we assume that it is a wildcard
-    validateHeader(action, headers, name, required, value) {
-        if (headers[name] === undefined) {
+    validateHeader(action, ip, headers, headerName, required, value) {
+        if (headers[headerName] === undefined) {
             if (required) {
-                this.addError(action, `Missing header: ${name}`);
-                return false;
+                this.addError(action, `Missing header [${this.name}/${ip}]: ${headerName}`);
+                return 1;
             }
         }
         else {
             if (value) {
-                if (headers[name] !== value) {
-                    this.addError(action, `Incorrect header value [${name}]: ${headers[name]} [Expected: ${value}]`);
-                    return false;
+                if (headers[headerName] !== value) {
+                    this.addError(action, `Incorrect header value [${this.name}/${ip}]: [${headerName}]: ${headers[headerName]} [Expected: ${value}]`);
+                    return 1;
                 }
             }
         }
-        return true;
+        return 0;
     }
-    validateHttpsHeaders(headers) {
+    validateHttpsHeaders(headers, ip) {
         let errorCount = 0;
-        if (headers["content-type"] !== "text/html; charset=utf-8") {
-            this.addError("http", "Invalid or missing content-type header");
-            errorCount++;
-        }
-        if (headers["content-security-policy"] !== "object-src 'none'") {
-            this.addError("http", "Invalid or missing content-security-policy header");
-            errorCount++;
-        }
-        if (headers["content-security-policy"] !== "object-src 'none'") {
-            this.addError("http", "Invalid or missing content-security-policy header");
-            errorCount++;
-        }
-        if (headers["x-content-type-options"] !== "nosniff") {
-            this.addError("http", "Invalid or missing x-content-type-options header");
-            errorCount++;
-        }
-        if (headers["x-frame-options"] !== "DENY") {
-            this.addError("http", "Invalid or missing x-frame-options header");
-            errorCount++;
-        }
-        if (headers["x-xss-protection"] !== "1; mode=block") {
-            this.addError("http", "Invalid or missing x-xss-protection header");
-            errorCount++;
-        }
-        if (headers["referrer-policy"] !== "same-origin") {
-            this.addError("http", "Invalid or missing referrer-policy header");
-            errorCount++;
-        }
+        errorCount += this.validateHeader("https", ip, headers, "content-type", true);
+        errorCount += this.validateHeader("https", ip, headers, "content-security-policy", true, "object-src 'none'");
+        errorCount += this.validateHeader("https", ip, headers, "x-content-type-options", true, "nosniff");
+        errorCount += this.validateHeader("https", ip, headers, "x-frame-options", true, "DENY");
+        errorCount += this.validateHeader("https", ip, headers, "x-xss-protection", true, "1; mode=block");
+        errorCount += this.validateHeader("https", ip, headers, "referrer-policy", true, "same-origin");
         return errorCount;
     }
     sanitizeResponse(res, callTime) {
@@ -133,11 +115,11 @@ class RecordValidator extends base_1.BaseValidator {
                     result.bytesRead = bytesRead;
                     resolve(result);
                 }).setTimeout(timeout, () => {
-                    reject(`Timeout [${timeout}]`);
+                    reject(`Timeout [${this.name}]: ${timeout}`);
                 });
             }
             catch (ex) {
-                this.addError("getHttpResponse", ex);
+                this.addError("getHttpResponse", `[${this.name}]: ${ex}`);
                 reject(ex);
             }
         });

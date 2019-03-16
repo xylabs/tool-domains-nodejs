@@ -3,6 +3,7 @@ import { Config } from '../../config'
 import { DNS } from '../../dns'
 import { RecordValidatorSpf } from './spf'
 import chalk from 'chalk'
+import { RecordValidatorDmarc } from './dmarc'
 
 export class RecordValidatorTxt extends RecordValidator {
 
@@ -21,6 +22,18 @@ export class RecordValidatorTxt extends RecordValidator {
       const spaceSplit = this.value[0].split(" ")
       if (spaceSplit.length > 1) {
         switch (spaceSplit[0]) {
+          case "v=DMARC1;": {
+            const validateDmarc = new RecordValidatorDmarc(this.name, this.value, [
+              "p=none;",
+              "adkim=r;",
+              "aspf=r;",
+              "pct=100;",
+              "sp=none;"
+            ])
+            await validateDmarc.validate(timeout)
+            this.addErrors(validateDmarc.errors)
+            break
+          }
           case "v=spf1": {
             const validateSpf = new RecordValidatorSpf(this.name, this.value, [
               "include:mail.zendesk.com",
@@ -57,7 +70,7 @@ export class RecordValidatorTxt extends RecordValidator {
         }
       }
     } catch (ex) {
-      this.addError("validate", ex)
+      this.addError("RecordValidatorTxt.validate", `Unexpected Error[${this.name}]: ${ex}`)
     }
     return super.validate(timeout)
   }

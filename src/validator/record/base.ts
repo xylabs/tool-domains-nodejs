@@ -17,13 +17,6 @@ export class RecordValidator extends BaseValidator {
     this.type = type
   }
 
-  public async validate(timeout: number) {
-    if (this.errors) {
-      return this.errors.length
-    }
-    return 0
-  }
-
   protected async checkHttp(ip: string, hostname: string, timeout: number) {
     try {
       const result = await this.getHttpResponse(ip, hostname, timeout, false)
@@ -44,11 +37,22 @@ export class RecordValidator extends BaseValidator {
     }
   }
 
-  protected async reverseLookup() {
+  protected async reverseLookup(ip: string, hostname: string, timeout: number) {
+    // right now we only check for cloudfront
     try {
-      return await DNS.reverse(this.name)
+      const names = await DNS.reverse(ip)
+      let found = false
+      for (const name of names) {
+        if (name.endsWith('.r.cloudfront.net')) {
+          found = true
+          break
+        }
+      }
+      if (!found) {
+        this.addError("reverseLookup", `ReverseDNS Mismatch ${names.join(',')} [Expected: '*.r.cloudfront.net']`)
+      }
     } catch (ex) {
-      this.addError("reverseLookup", ex)
+      this.addError("reverseLookup", `${ex}`)
     }
   }
 

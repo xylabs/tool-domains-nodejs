@@ -1,9 +1,14 @@
 {
   "$schema": "./src/schema/dnslint.schema.json#",
   "aws": {
-    "enabled": false
+    "enabled": true
   },
   "domains": {
+    "default": {
+      "reverseDNS": {
+        "enabled": true
+      }
+    },
     "xyo.network": {
       "enabled": true
     },
