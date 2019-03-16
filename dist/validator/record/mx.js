@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
 class RecordValidatorMx extends base_1.RecordValidator {
-    constructor(name, value) {
-        super(name, "MX");
-        this.value = value;
+    constructor(config) {
+        super({ name: config.name, type: "MX" });
+        this.value = config.value;
     }
-    async validate(timeout) {
+    async validate(config) {
         try {
             switch (this.value.exchange) {
                 case "aspmx.l.google.com": {
@@ -47,7 +47,7 @@ class RecordValidatorMx extends base_1.RecordValidator {
         catch (ex) {
             this.addError("RecordValidatorMx.validate", `Unexpected Error [${this.name}]: ${ex}`);
         }
-        return super.validate(timeout);
+        return super.validate(config);
     }
 }
 exports.RecordValidatorMx = RecordValidatorMx;

@@ -1,7 +1,7 @@
 {
   "$schema": "./src/schema/dnslint.schema.json#",
   "aws": {
-    "enabled": true
+    "enabled": false
   },
   "domains": {
     "default": {
@@ -12,10 +12,13 @@
     "xyo.network": {
       "enabled": true
     },
+    "s1._domainkey.xyo.network": {
+      "enabled": true
+    },
     "coinworldtour.com": {
       "enabled:": true
     },
-    "devapi.xyfindit.com": {
+    "api.xyfindit.com": {
       "enabled": true
     }
   }

@@ -12,34 +12,42 @@ export class RecordValidatorTxt extends RecordValidator {
   public googleVerification?: string
   public facebookVerification?: string
 
-  constructor(name: string, value: string[]) {
-    super(name, "TXT")
-    this.value = value
+  constructor(config: {name: string, value: string[]}) {
+    super({ name: config.name, type: "TXT" })
+    this.value = config.value
   }
 
-  public async validate(timeout: number) {
+  public async validate(config: {timeout: number}) {
     try {
       const spaceSplit = this.value[0].split(" ")
       if (spaceSplit.length > 1) {
         switch (spaceSplit[0]) {
           case "v=DMARC1;": {
-            const validateDmarc = new RecordValidatorDmarc(this.name, this.value, [
+            const validateDmarc = new RecordValidatorDmarc({name: this.name, value: this.value, expected: [
               "p=none;",
               "adkim=r;",
               "aspf=r;",
               "pct=100;",
               "sp=none;"
-            ])
-            await validateDmarc.validate(timeout)
+            ]})
+            await validateDmarc.validate(config)
+            this.addErrors(validateDmarc.errors)
+            break
+          }
+          case "k=rsa;": {
+            const validateDmarc = new RecordValidatorDmarc({name: this.name, value: this.value, expected: [
+              "t=s;"
+            ]})
+            await validateDmarc.validate(config)
             this.addErrors(validateDmarc.errors)
             break
           }
           case "v=spf1": {
-            const validateSpf = new RecordValidatorSpf(this.name, this.value, [
+            const validateSpf = new RecordValidatorSpf({name: this.name, value: this.value, expected: [
               "include:mail.zendesk.com",
               "include:_spf.google.com"
-            ])
-            await validateSpf.validate(timeout)
+            ]})
+            await validateSpf.validate(config)
             this.addErrors(validateSpf.errors)
             break
           }
@@ -72,6 +80,6 @@ export class RecordValidatorTxt extends RecordValidator {
     } catch (ex) {
       this.addError("RecordValidatorTxt.validate", `Unexpected Error[${this.name}]: ${ex}`)
     }
-    return super.validate(timeout)
+    return super.validate(config)
   }
 }

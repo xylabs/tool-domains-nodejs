@@ -56,7 +56,17 @@
         "name": {"type": "string"},
         "enabled": {"type": "boolean"},
         "timeout": {"type": "number"},
+        "type": {"type": "string"},
         "records": {"$ref": "#/definitions/records"}
+      }
+    },
+    "server": {
+      "type": "object",
+      "properties": {
+        "include": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
       }
     },
     "records": {
@@ -86,6 +96,10 @@
     "domains": {
       "type": "object",
       "items": {"$ref": "#/definitions/domain"}
+    },
+    "servers": {
+      "type": "object",
+      "items": {"$ref": "#/definitions/server"}
     }
   }
 }

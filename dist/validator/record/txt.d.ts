@@ -4,6 +4,11 @@ export declare class RecordValidatorTxt extends RecordValidator {
     spf: boolean;
     googleVerification?: string;
     facebookVerification?: string;
-    constructor(name: string, value: string[]);
-    validate(timeout: number): Promise<number>;
+    constructor(config: {
+        name: string;
+        value: string[];
+    });
+    validate(config: {
+        timeout: number;
+    }): Promise<number>;
 }

@@ -5,19 +5,19 @@ export class RecordValidatorA extends RecordValidator {
 
   public value: string
 
-  constructor(name: string, value: string) {
-    super(name, "A")
-    this.value = value
+  constructor(config: { name: string, value: string }) {
+    super({ name: config.name, type: "A" })
+    this.value = config.value
   }
 
-  public async validate(timeout: number) {
+  public async validate(config: { timeout: number }) {
     try {
-      this.http = await this.checkHttp(this.value, this.name, timeout)
-      this.https = await this.checkHttps(this.value, this.name, timeout)
-      this.reverseDns = await this.reverseLookup(this.value, this.name, timeout)
+      this.http = await this.checkHttp(this.value, this.name, config.timeout)
+      this.https = await this.checkHttps(this.value, this.name, config.timeout)
+      this.reverseDns = await this.reverseLookup(this.value, this.name, config.timeout)
     } catch (ex) {
       this.addError("validate", `Unexpected Error[${this.name}]: ${ex}`)
     }
-    return super.validate(timeout)
+    return super.validate(config)
   }
 }

@@ -5,6 +5,9 @@ import { DomainConfig } from './config/domain'
 import { RecordValidator, DomainValidator } from './validator'
 import { oc } from 'ts-optchain'
 import { DNS } from './dns'
+import { DomainValidatorWebsite } from './validator/domain/website'
+import { DomainValidatorDomainKey } from './validator/domain/domainkey'
+import { DomainValidatorApi } from './validator/domain/api'
 
 export class XyDomainScan {
 
@@ -31,7 +34,7 @@ export class XyDomainScan {
     for (const domain of domains.values()) {
       completedDomains++
       result.domains.push(domain)
-      console.log(`Domain:[${completedDomains}/${domains.size}]: ${domain.name}`)
+      console.log(`Domain:[${completedDomains}/${domains.size}]: ${domain.name} [${domain.serverType}]`)
       result.errorCount += await domain.validate(this.config)
     }
 
@@ -40,10 +43,38 @@ export class XyDomainScan {
     return result
   }
 
+  private getServerType(domain: string) {
+    if (this.config.servers) {
+      for (const key of Object.keys(this.config.servers)) {
+        const server = this.config.servers[key]
+        const include = server.include
+        if (include) {
+          for (const filter of include) {
+            if (domain.match(filter)) {
+              return key
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private createValidator(domain: string) {
+    switch (this.getServerType(domain)) {
+      case "website":
+        return new DomainValidatorWebsite({ name: domain })
+      case "api":
+        return new DomainValidatorApi({ name: domain })
+      case "domainkey":
+        return new DomainValidatorDomainKey({ name: domain })
+    }
+    return new DomainValidatorWebsite({ name: domain })
+  }
+
   private async addAWSDomains(domains: Map<string, DomainValidator>) {
     const awsDomains = await this.aws.getDomains()
     for (const domain of awsDomains) {
-      domains.set(domain, new DomainValidator(domain))
+      domains.set(domain, this.createValidator(domain))
     }
     return domains
   }
@@ -54,7 +85,7 @@ export class XyDomainScan {
       for (const key of keys) {
         if (key !== "default") {
           const domain = this.config.domains[key]
-          domains.set(key, new DomainValidator(key))
+          domains.set(key, this.createValidator(key))
         }
       }
     }

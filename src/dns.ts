@@ -14,6 +14,22 @@ export class DNS {
     })
   }
 
+  public static async resolve(name: string, type: string): Promise < any[] > {
+    return new Promise((resolve, reject) => {
+      dns.resolve(name, type, (err, addresses: any) => {
+        if (err) {
+          if (err.code !== 'ENODATA' && err.code !== 'ENOTFOUND') {
+            reject(err)
+          } else {
+            resolve([])
+          }
+        } else {
+          resolve(addresses)
+        }
+      })
+    })
+  }
+
   public static async resolve4(name: string): Promise < string[] > {
     return new Promise((resolve, reject) => {
       dns.resolve4(name, (err, records: string[]) => {

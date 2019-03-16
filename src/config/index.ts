@@ -5,6 +5,7 @@ import chalk from 'chalk'
 import { DomainsConfig } from './domains'
 import defaultConfig from './default.json'
 import merge from 'merge'
+import { ServersConfig } from './servers'
 
 export class Config {
 
@@ -27,6 +28,7 @@ export class Config {
 
   public aws ?: AWS = undefined
   public domains ?: DomainsConfig
+  public servers ?: ServersConfig
 
   constructor(config?: any) {
     if (config) {

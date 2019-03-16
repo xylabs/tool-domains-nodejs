@@ -4,34 +4,42 @@ const base_1 = require("./base");
 const spf_1 = require("./spf");
 const dmarc_1 = require("./dmarc");
 class RecordValidatorTxt extends base_1.RecordValidator {
-    constructor(name, value) {
-        super(name, "TXT");
+    constructor(config) {
+        super({ name: config.name, type: "TXT" });
         this.spf = false;
-        this.value = value;
+        this.value = config.value;
     }
-    async validate(timeout) {
+    async validate(config) {
         try {
             const spaceSplit = this.value[0].split(" ");
             if (spaceSplit.length > 1) {
                 switch (spaceSplit[0]) {
                     case "v=DMARC1;": {
-                        const validateDmarc = new dmarc_1.RecordValidatorDmarc(this.name, this.value, [
-                            "p=none;",
-                            "adkim=r;",
-                            "aspf=r;",
-                            "pct=100;",
-                            "sp=none;"
-                        ]);
-                        await validateDmarc.validate(timeout);
+                        const validateDmarc = new dmarc_1.RecordValidatorDmarc({ name: this.name, value: this.value, expected: [
+                                "p=none;",
+                                "adkim=r;",
+                                "aspf=r;",
+                                "pct=100;",
+                                "sp=none;"
+                            ] });
+                        await validateDmarc.validate(config);
+                        this.addErrors(validateDmarc.errors);
+                        break;
+                    }
+                    case "k=rsa;": {
+                        const validateDmarc = new dmarc_1.RecordValidatorDmarc({ name: this.name, value: this.value, expected: [
+                                "t=s;"
+                            ] });
+                        await validateDmarc.validate(config);
                         this.addErrors(validateDmarc.errors);
                         break;
                     }
                     case "v=spf1": {
-                        const validateSpf = new spf_1.RecordValidatorSpf(this.name, this.value, [
-                            "include:mail.zendesk.com",
-                            "include:_spf.google.com"
-                        ]);
-                        await validateSpf.validate(timeout);
+                        const validateSpf = new spf_1.RecordValidatorSpf({ name: this.name, value: this.value, expected: [
+                                "include:mail.zendesk.com",
+                                "include:_spf.google.com"
+                            ] });
+                        await validateSpf.validate(config);
                         this.addErrors(validateSpf.errors);
                         break;
                     }
@@ -67,7 +75,7 @@ class RecordValidatorTxt extends base_1.RecordValidator {
         catch (ex) {
             this.addError("RecordValidatorTxt.validate", `Unexpected Error[${this.name}]: ${ex}`);
         }
-        return super.validate(timeout);
+        return super.validate(config);
     }
 }
 exports.RecordValidatorTxt = RecordValidatorTxt;

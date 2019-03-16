@@ -8,9 +8,9 @@ const dns_1 = require("../../dns");
 const http_1 = __importDefault(require("http"));
 const https_1 = __importDefault(require("https"));
 class RecordValidator extends base_1.BaseValidator {
-    constructor(name, type) {
-        super(name);
-        this.type = type;
+    constructor(config) {
+        super(config);
+        this.type = config.type;
     }
     async checkHttp(ip, hostname, timeout) {
         try {

@@ -3,7 +3,6 @@ import { Config } from '../../config'
 import { DNS } from '../../dns'
 import http, { IncomingMessage } from 'http'
 import https from 'https'
-import chalk from 'chalk'
 export class RecordValidator extends BaseValidator {
 
   public type: string
@@ -12,9 +11,9 @@ export class RecordValidator extends BaseValidator {
   public https?: any
   public reverseDns?: any
 
-  constructor(name: string, type: string) {
-    super(name)
-    this.type = type
+  constructor(config: { name: string, type: string }) {
+    super(config)
+    this.type = config.type
   }
 
   protected async checkHttp(ip: string, hostname: string, timeout: number) {
@@ -71,7 +70,7 @@ export class RecordValidator extends BaseValidator {
       headers: any,
       headerName: string,
       required: boolean,
-      value?: string) {
+      value ?: string) {
     if (headers[headerName] === undefined) {
       if (required) {
         this.addError(action, `Missing header [${this.name}/${ip}]: ${headerName}`)

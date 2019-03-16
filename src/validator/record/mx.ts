@@ -7,12 +7,12 @@ export class RecordValidatorMx extends RecordValidator {
 
   public value: MxRecord
 
-  constructor(name: string, value: MxRecord) {
-    super(name, "MX")
-    this.value = value
+  constructor(config: {name: string, value: MxRecord}) {
+    super({ name: config.name, type:"MX" })
+    this.value = config.value
   }
 
-  public async validate(timeout: number) {
+  public async validate(config: { timeout: number }) {
     try {
       switch (this.value.exchange) {
         case "aspmx.l.google.com": {
@@ -62,6 +62,6 @@ export class RecordValidatorMx extends RecordValidator {
     } catch (ex) {
       this.addError("RecordValidatorMx.validate", `Unexpected Error [${this.name}]: ${ex}`)
     }
-    return super.validate(timeout)
+    return super.validate(config)
   }
 }

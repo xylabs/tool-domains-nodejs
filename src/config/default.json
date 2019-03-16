@@ -48,5 +48,25 @@
         }
       }
     }
+  },
+  "servers": {
+    "api": 
+    {
+      "include": [
+        "^api\\."
+      ]
+    },
+    "domainkey":
+    {
+      "include": [
+        "^..\\._domainkey\\."
+      ]
+    },
+    "website":
+    {
+      "include": [
+        "^www\\."
+      ]
+    }
   }
 }
