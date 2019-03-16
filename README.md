@@ -2,7 +2,7 @@
 
 ![logo]
 
-# Domain Check CLI Tool (tool-domains-nodejs)
+# DNSLint (tool-domains-nodejs)
 
 [![Build Status](https://travis-ci.com/XYOracleNetwork/tool-domains-nodejs.svg?token=A85R2pDnngMDyWoqeLUG&branch=master)](https://travis-ci.com/XYOracleNetwork/tool-domains-nodejs)
 
@@ -14,16 +14,16 @@ Internal XY tool for checking domain configurations in AWS
 
 ```sh
 # install globally
-npm install -g @xyo-network/tool-domains-nodejs
+npm install -g dnslint
 ```
 
-This will expose a cli named `xydomains` to launch the tool.
+This will expose a cli named `dnslint` to launch the tool.
 
 Note: Make sure you have your AWS credatials configured
 
 ```sh
 # Start check
-xydomains start
+dnslint start
 ```
 
 This will scan your entire AWS Route53 and output results in output.json
