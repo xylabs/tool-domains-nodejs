@@ -12,7 +12,7 @@ export class XyDomainScan {
   private config = new Config()
 
   public async start() {
-    Object.assign(this.config, await Config.load())
+    this.config = await Config.load()
     const domains = new Map<string, DomainValidator>()
     const result: any = {
       domains: [],
@@ -37,6 +37,7 @@ export class XyDomainScan {
 
     console.log(`Saving to File: output.json`)
     this.saveToFile("output.json", result)
+    return result
   }
 
   private async addAWSDomains(domains: Map<string, DomainValidator>) {

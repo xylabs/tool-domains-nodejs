@@ -14,7 +14,7 @@ class XyDomainScan {
         this.config = new config_1.Config();
     }
     async start() {
-        Object.assign(this.config, await config_1.Config.load());
+        this.config = await config_1.Config.load();
         const domains = new Map();
         const result = {
             domains: [],
@@ -34,6 +34,7 @@ class XyDomainScan {
         }
         console.log(`Saving to File: output.json`);
         this.saveToFile("output.json", result);
+        return result;
     }
     async addAWSDomains(domains) {
         const awsDomains = await this.aws.getDomains();

@@ -1,0 +1,52 @@
+{
+    "$schema": "../schema/dnslint.schema.json#",
+    "aws": {
+        "enabled": true
+    },
+    "domains": {
+        "default": {
+            "enabled": true,
+            "timeout": 500,
+            "records": {
+                "default": {
+                    "reverseDNS": {
+                        "enabled": false
+                    }
+                },
+                "a": {
+                    "enabled": true,
+                    "http": {
+                        "code": 301
+                    },
+                    "https": {
+                        "code": 200
+                    }
+                },
+                "aaaa": {
+                    "enabled": true,
+                    "http": {
+                        "code": 301
+                    },
+                    "https": {
+                        "code": 200
+                    }
+                },
+                "cname": {
+                    "enabled": true,
+                    "http": {
+                        "code": 301
+                    },
+                    "https": {
+                        "code": 200
+                    }
+                },
+                "mx": {
+                    "enabled": true
+                },
+                "txt": {
+                    "enabled": true
+                }
+            }
+        }
+    }
+}

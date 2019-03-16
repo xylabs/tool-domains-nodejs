@@ -31,7 +31,7 @@ class DomainConfig {
         }
         return true;
     }
-    getRecordConfig(recordType, property) {
+    getRecordConfigProperty(recordType, property) {
         if (this.records) {
             const recordConfig = this.records[recordType] || this.records.default;
             if (recordConfig) {

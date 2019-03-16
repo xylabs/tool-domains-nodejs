@@ -24,6 +24,7 @@ program
     const result = await tool.start()
     console.log("====================================")
     console.log(result)
+    return result
   })
 
 program.parse(process.argv)

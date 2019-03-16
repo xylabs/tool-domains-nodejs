@@ -27,7 +27,7 @@ export class RecordValidator extends BaseValidator {
   protected async checkHttp(ip: string, hostname: string, timeout: number) {
     try {
       const result = await this.getHttpResponse(ip, hostname, timeout, false)
-      this.validateHttpHeaders(result.headers)
+      this.validateHttpHeaders(result.headers, ip)
       return result
     } catch (ex) {
       this.addError("http", ex)
@@ -37,7 +37,7 @@ export class RecordValidator extends BaseValidator {
   protected async checkHttps(ip: string, hostname: string, timeout: number) {
     try {
       const result = await this.getHttpResponse(ip, hostname, timeout, true)
-      this.validateHttpsHeaders(result.headers)
+      this.validateHttpsHeaders(result.headers, ip)
       return result
     } catch (ex) {
       this.addError("https", ex)
@@ -52,45 +52,51 @@ export class RecordValidator extends BaseValidator {
     }
   }
 
-  private validateHttpHeaders(headers: any) {
+  private validateHttpHeaders(headers: any, ip: string) {
     let errorCount = 0
     if (headers.location === undefined) {
-      this.addError("http", "Missing location header")
-      errorCount++
+      errorCount += this.validateHeader("http", ip, headers, "location", true)
     }
     return errorCount
   }
 
-  private validateHttpsHeaders(headers: any) {
+  // if value is undefined, we assume that it is a wildcard
+  private validateHeader(
+      action: string,
+      ip: string,
+      headers: any,
+      headerName: string,
+      required: boolean,
+      value?: string) {
+    if (headers[headerName] === undefined) {
+      if (required) {
+        this.addError(action, `Missing header [${this.name}/${ip}]: ${headerName}`)
+        return 1
+      }
+    } else {
+      if (value) {
+        if (headers[headerName] !== value) {
+          this.addError(
+            action,
+            `Incorrect header value [${this.name}/${ip}]: [${headerName}]: ${headers[headerName]} [Expected: ${value}]`)
+          return 1
+        }
+      }
+    }
+    return 0
+  }
+
+  private validateHttpsHeaders(headers: any, ip: string) {
     let errorCount = 0
-    if (headers["content-type"] !== "text/html; charset=utf-8") {
-      this.addError("http", "Invalid or missing content-type header")
-      errorCount++
-    }
-    if (headers["content-security-policy"] !== "object-src 'none'") {
-      this.addError("http", "Invalid or missing content-security-policy header")
-      errorCount++
-    }
-    if (headers["content-security-policy"] !== "object-src 'none'") {
-      this.addError("http", "Invalid or missing content-security-policy header")
-      errorCount++
-    }
-    if (headers["x-content-type-options"] !== "nosniff") {
-      this.addError("http", "Invalid or missing x-content-type-options header")
-      errorCount++
-    }
-    if (headers["x-frame-options"] !== "DENY") {
-      this.addError("http", "Invalid or missing x-frame-options header")
-      errorCount++
-    }
-    if (headers["x-xss-protection"] !== "1; mode=block") {
-      this.addError("http", "Invalid or missing x-xss-protection header")
-      errorCount++
-    }
-    if (headers["referrer-policy"] !== "same-origin") {
-      this.addError("http", "Invalid or missing referrer-policy header")
-      errorCount++
-    }
+
+    errorCount += this.validateHeader("https", ip, headers, "content-type", true)
+
+    errorCount += this.validateHeader("https", ip, headers, "content-security-policy", true, "object-src 'none'")
+    errorCount += this.validateHeader("https", ip, headers, "x-content-type-options", true, "nosniff")
+    errorCount += this.validateHeader("https", ip, headers, "x-frame-options", true, "DENY")
+    errorCount += this.validateHeader("https", ip, headers, "x-xss-protection", true, "1; mode=block")
+    errorCount += this.validateHeader("https", ip, headers, "referrer-policy", true, "same-origin")
+
     return errorCount
   }
 
@@ -124,10 +130,10 @@ export class RecordValidator extends BaseValidator {
           result.bytesRead = bytesRead
           resolve(result)
         }).setTimeout(timeout, () => {
-          reject(`Timeout [${timeout}]`)
+          reject(`Timeout [${this.name}]: ${timeout}`)
         })
       } catch (ex) {
-        this.addError("getHttpResponse", ex)
+        this.addError("getHttpResponse", `[${this.name}]: ${ex}`)
         reject(ex)
       }
     })

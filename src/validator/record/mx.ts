@@ -17,36 +17,46 @@ export class RecordValidatorMx extends RecordValidator {
       switch (this.value.exchange) {
         case "aspmx.l.google.com": {
           if (this.value.priority !== 1) {
-            this.addError("validate", `Incorrect Priority: ${this.value.exchange}=${this.value.priority} [Expected=1]`)
+            this.addError(
+              "validate",
+              `Incorrect Priority [${this.name}]: ${this.value.exchange}=${this.value.priority} [Expected=1]`)
           }
           break
         }
         case "alt1.aspmx.l.google.com": {
           if (this.value.priority !== 5) {
-            this.addError("validate", `Incorrect Priority: ${this.value.exchange}=${this.value.priority} [Expected=5]`)
+            this.addError(
+              "validate",
+              `Incorrect Priority [${this.name}]: ${this.value.exchange}=${this.value.priority} [Expected=5]`)
           }
           break
         }
         case "alt2.aspmx.l.google.com": {
           if (this.value.priority !== 5) {
-            this.addError("validate", `Incorrect Priority: ${this.value.exchange}=${this.value.priority} [Expected=5]`)
+            this.addError(
+              "validate",
+              `Incorrect Priority [${this.name}]: ${this.value.exchange}=${this.value.priority} [Expected=5]`)
           }
           break
         }
         case "aspmx2.googlemail.com": {
           if (this.value.priority !== 10) {
-            this.addError("validate", `Incorrect Priority: ${this.value.exchange}=${this.value.priority} [Expected=10]`)
+            this.addError(
+              "validate",
+              `Incorrect Priority [${this.name}]: ${this.value.exchange}=${this.value.priority} [Expected=10]`)
           }
           break
         }
         case "aspmx3.googlemail.com": {
           if (this.value.priority !== 10) {
-            this.addError("validate", `Incorrect Priority: ${this.value.exchange}=${this.value.priority} [Expected=10]`)
+            this.addError(
+              "validate",
+              `Incorrect Priority [${this.name}]: ${this.value.exchange}=${this.value.priority} [Expected=10]`)
           }
           break
         }
         default: {
-          this.addError("validate", `Unexpected Exchange: ${this.value.exchange}=${this.value.priority}`)
+          this.addError("validate", `Unexpected Exchange [${this.name}]: ${this.value.exchange}=${this.value.priority}`)
         }
       }
     } catch (ex) {

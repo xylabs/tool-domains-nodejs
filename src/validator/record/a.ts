@@ -16,7 +16,7 @@ export class RecordValidatorA extends RecordValidator {
       this.https = await this.checkHttps(this.value, this.name, timeout)
       // this.reverseDns = await this.reverseLookup()
     } catch (ex) {
-      this.addError("validate", ex)
+      this.addError("validate", `[${this.name}]: ${ex}`)
     }
     return super.validate(timeout)
   }

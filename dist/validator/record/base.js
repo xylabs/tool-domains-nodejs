@@ -54,6 +54,24 @@ class RecordValidator extends base_1.BaseValidator {
         }
         return errorCount;
     }
+    // if value is undefined, we assume that it is a wildcard
+    validateHeader(action, headers, name, required, value) {
+        if (headers[name] === undefined) {
+            if (required) {
+                this.addError(action, `Missing header: ${name}`);
+                return false;
+            }
+        }
+        else {
+            if (value) {
+                if (headers[name] !== value) {
+                    this.addError(action, `Incorrect header value [${name}]: ${headers[name]} [Expected: ${value}]`);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
     validateHttpsHeaders(headers) {
         let errorCount = 0;
         if (headers["content-type"] !== "text/html; charset=utf-8") {

@@ -10,6 +10,9 @@
  */
 {
   "extends": "./tsconfig.base.json",
+  "include": [
+    "src/**/*.json"
+  ],
   "exclude": [
     "src/test/**/*"
   ]

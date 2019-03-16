@@ -11,6 +11,7 @@ export declare class RecordValidator extends BaseValidator {
     protected checkHttps(ip: string, hostname: string, timeout: number): Promise<any>;
     protected reverseLookup(): Promise<string[] | undefined>;
     private validateHttpHeaders;
+    private validateHeader;
     private validateHttpsHeaders;
     private sanitizeResponse;
     private getHttpResponse;
