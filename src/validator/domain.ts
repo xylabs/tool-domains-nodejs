@@ -40,6 +40,7 @@ export class DomainValidator extends BaseValidator {
       if (errorCount === 0) {
         console.log(chalk.green(`${this.name}: OK`))
       } else {
+        this.addError("validate", `Errors Detected[${this.name}]: ${errorCount}`)
         console.error(chalk.red(`${this.name}: ${errorCount} Errors`))
       }
     } catch (ex) {
@@ -48,7 +49,7 @@ export class DomainValidator extends BaseValidator {
     if (this.errors) {
       return this.errors.length + errorCount
     }
-    return errorCount
+    return super.validate(config)
 
   }
 

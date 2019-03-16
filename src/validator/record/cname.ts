@@ -17,10 +17,10 @@ export class RecordValidatorCname extends RecordValidator {
       if (ip) {
         this.http = await this.checkHttp(ip, this.name, timeout)
         this.https = await this.checkHttps(ip, this.name, timeout)
+        this.reverseDns = await this.reverseLookup(ip, this.name, timeout)
       }
-      // this.reverseDns = await this.reverseLookup()
     } catch (ex) {
-      this.addError("validate", ex)
+      this.addError("RecordValidatorCname.validate", `[${this.name}]: ${ex}`)
     }
     return super.validate(timeout)
   }

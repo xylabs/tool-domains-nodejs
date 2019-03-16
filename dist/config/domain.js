@@ -49,13 +49,12 @@ class DomainConfig {
                 if (recordConfig.reverseDNS === undefined && recordConfig.reverseDNS.enabled === undefined) {
                     if (this.records !== undefined && this.records.default !== undefined) {
                         if (this.records.default !== undefined &&
-                            this.records.default.reverseDNS !== undefined &&
-                            this.records.default.reverseDNS.enabled !== undefined) {
-                            return this.records.default.reverseDNS.enabled;
+                            this.records.default.reverseDNS !== undefined) {
+                            return this.records.default.reverseDNS;
                         }
                     }
                 }
-                else if (recordConfig.reverseDNS.enabled !== undefined) {
+                else if (recordConfig.reverseDNS !== undefined) {
                     return recordConfig.reverseDNS.enabled;
                 }
             }

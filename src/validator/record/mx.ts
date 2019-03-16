@@ -60,7 +60,7 @@ export class RecordValidatorMx extends RecordValidator {
         }
       }
     } catch (ex) {
-      this.addError("validate", ex)
+      this.addError("RecordValidatorMx.validate", `Unexpected Error [${this.name}]: ${ex}`)
     }
     return super.validate(timeout)
   }

@@ -9,7 +9,16 @@ class BaseValidator {
     constructor(name) {
         this.name = name;
     }
+    async validate(arg) {
+        if (this.errors) {
+            this.valid = false;
+            return this.errors.length;
+        }
+        this.valid = true;
+        return 0;
+    }
     addError(action, error) {
+        this.valid = false;
         this.errors = this.errors || [];
         this.errors.push(new error_1.ValidationError(action, error));
         console.error(chalk_1.default.red(`${action}: ${error}`));

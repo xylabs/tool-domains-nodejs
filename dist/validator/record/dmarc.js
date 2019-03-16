@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
-class RecordValidatorSpf extends base_1.RecordValidator {
+class RecordValidatorDmarc extends base_1.RecordValidator {
     constructor(name, value, expected) {
-        super(name, "TXT(SPF)");
+        super(name, "TXT(DMARC)");
         this.found = [];
         this.value = value;
         this.missing = expected;
@@ -15,15 +15,15 @@ class RecordValidatorSpf extends base_1.RecordValidator {
                 const found = this.getFound(this.value[i]);
                 if (missing === -1) { // not missing
                     if (found !== -1) { // found
-                        this.addError("validateSpf", `Duplicate [${this.name}]: ${this.value[i]}`);
+                        this.addError("validateDmarc", `Duplicate [${this.name}]: ${this.value[i]}`);
                     }
                     else { // not found
-                        this.addError("validateSpf", `Unexpected [${this.name}]: ${this.value[i]}`);
+                        this.addError("validateDmarc", `Unexpected [${this.name}]: ${this.value[i]}`);
                     }
                 }
                 else { // missing
                     if (found !== -1) { // found
-                        this.addError("validateSpf", `Double Expectation [${this.name}]: ${this.value[i]}`);
+                        this.addError("validateDmarc", `Double Expectation [${this.name}]: ${this.value[i]}`);
                     }
                     else { // not found
                         this.found.push(this.value[i]); // add to found
@@ -33,7 +33,7 @@ class RecordValidatorSpf extends base_1.RecordValidator {
             }
         }
         catch (ex) {
-            this.addError("RecordValidatorSpf.validate", `Unexpected Error[${this.name}]: ${ex}`);
+            this.addError("validateDmarc.validate", `Unexpected Error[${this.name}]: ${ex}`);
         }
         return super.validate(timeout);
     }
@@ -54,5 +54,5 @@ class RecordValidatorSpf extends base_1.RecordValidator {
         return -1;
     }
 }
-exports.RecordValidatorSpf = RecordValidatorSpf;
-//# sourceMappingURL=spf.js.map
+exports.RecordValidatorDmarc = RecordValidatorDmarc;
+//# sourceMappingURL=dmarc.js.map
