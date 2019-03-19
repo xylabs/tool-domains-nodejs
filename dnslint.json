@@ -3,20 +3,28 @@
   "aws": {
     "enabled": true
   },
-  "domains": {
-    "default": {
+  "domains": [
+    {
+      "name": "default",
       "reverseDNS": {
-        "enabled": true
+        "enabled": false
       }
     },
-    "xyo.network": {
+    {
+      "name": "xyo.network",
       "enabled": true
     },
-    "coinworldtour.com": {
-      "enabled:": true
+    {
+      "name": "s1._domainkey.xyo.network",
+      "enabled": true
     },
-    "devapi.xyfindit.com": {
+    {
+      "name": "coinworldtour.com",
+      "enabled": true
+    },
+    {
+      "name": "api.xyfindit.com",
       "enabled": true
     }
-  }
+  ]
 }

@@ -1,4 +1,5 @@
 import { Route53 } from 'aws-sdk'
+import chalk from 'chalk'
 
 export class AWS {
   private r53 = new Route53()
@@ -19,11 +20,13 @@ export class AWS {
   }
 
   private async getZones(): Promise<Route53.Types.ListHostedZonesResponse> {
+    console.log(chalk.gray(`Getting AWS Zones`))
     return new Promise((resolve, reject) => {
       const params = {}
 
       this.r53.listHostedZones(params, (err, data) => {
         if (err) {
+          console.error(chalk.red(`aws.getZones: ${err}`))
           reject(err)
         } else {
           resolve(data)

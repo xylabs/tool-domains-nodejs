@@ -1,16 +1,10 @@
 import { RecordsConfig } from "./records";
-interface IDomainConfig {
-    [key: string]: any;
-    enabled: boolean;
-    timeout: number;
-}
-export declare class DomainConfig implements IDomainConfig {
+export declare class DomainConfig {
+    name: string;
     records?: RecordsConfig;
     enabled: boolean;
     timeout: number;
-    constructor(domainConfig?: DomainConfig);
-    isRecordEnabled(record: string): boolean;
-    getRecordConfigProperty(recordType: string, property: string): any;
-    isReverseDNSEnabled(record: string): boolean;
+    constructor(name: string);
+    isRecordEnabled(type: string): boolean;
+    isReverseDNSEnabled(type: string): boolean;
 }
-export {};

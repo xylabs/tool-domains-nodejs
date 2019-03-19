@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const aws_sdk_1 = require("aws-sdk");
+const chalk_1 = __importDefault(require("chalk"));
 class AWS {
     constructor() {
         this.r53 = new aws_sdk_1.Route53();
@@ -18,10 +22,12 @@ class AWS {
         return result;
     }
     async getZones() {
+        console.log(chalk_1.default.gray(`Getting AWS Zones`));
         return new Promise((resolve, reject) => {
             const params = {};
             this.r53.listHostedZones(params, (err, data) => {
                 if (err) {
+                    console.error(chalk_1.default.red(`aws.getZones: ${err}`));
                     reject(err);
                 }
                 else {

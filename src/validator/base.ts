@@ -1,17 +1,23 @@
 import chalk from 'chalk'
 import { ValidationError } from './error'
-import { Config } from '../config'
+import _ from 'lodash'
 
 export class BaseValidator {
   public name: string
   public errors?: ValidationError[]
   public valid?: boolean
+  protected config: any
 
-  constructor(name: string) {
-    this.name = name
+  constructor(config: {name: string}) {
+    this.name = config.name
+    this.config = config
   }
 
-  public async validate(arg: any) {
+  public toJSON () {
+    return _.omit(this, ["config"])
+  }
+
+  public async validate(config: {}) {
     if (this.errors) {
       this.valid = false
       return this.errors.length

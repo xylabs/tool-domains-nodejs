@@ -9,13 +9,13 @@ export class RecordValidatorDmarc extends RecordValidator {
   public missing: string[]
   public found: string[] = []
 
-  constructor(name: string, value: string[], expected: string[]) {
-    super(name, "TXT(DMARC)")
-    this.value = value
-    this.missing = expected
+  constructor(config: { name: string, value: string[], expected: string[] }) {
+    super({ name: config.name, type: "TXT(DMARC)" })
+    this.value = config.value
+    this.missing = config.expected
   }
 
-  public async validate(timeout: number) {
+  public async validate(config: {timeout: number}) {
     try {
       for (let i = 1; i < this.value.length; i++) {
         const missing = this.getMissing(this.value[i])
@@ -38,7 +38,7 @@ export class RecordValidatorDmarc extends RecordValidator {
     } catch (ex) {
       this.addError("validateDmarc.validate", `Unexpected Error[${this.name}]: ${ex}`)
     }
-    return super.validate(timeout)
+    return super.validate(config)
   }
 
   private getMissing(value: string) {

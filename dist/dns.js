@@ -17,6 +17,23 @@ class DNS {
             });
         });
     }
+    static async resolve(name, type) {
+        return new Promise((resolve, reject) => {
+            return dns_1.default.resolve(name, type, (err, addresses) => {
+                if (err) {
+                    if (err.code !== 'ENODATA' && err.code !== 'ENOTFOUND') {
+                        reject(err);
+                    }
+                    else {
+                        resolve([]);
+                    }
+                }
+                else {
+                    resolve(addresses);
+                }
+            });
+        });
+    }
     static async resolve4(name) {
         return new Promise((resolve, reject) => {
             dns_1.default.resolve4(name, (err, records) => {

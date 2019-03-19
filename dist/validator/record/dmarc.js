@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
 class RecordValidatorDmarc extends base_1.RecordValidator {
-    constructor(name, value, expected) {
-        super(name, "TXT(DMARC)");
+    constructor(config) {
+        super({ name: config.name, type: "TXT(DMARC)" });
         this.found = [];
-        this.value = value;
-        this.missing = expected;
+        this.value = config.value;
+        this.missing = config.expected;
     }
-    async validate(timeout) {
+    async validate(config) {
         try {
             for (let i = 1; i < this.value.length; i++) {
                 const missing = this.getMissing(this.value[i]);
@@ -35,7 +35,7 @@ class RecordValidatorDmarc extends base_1.RecordValidator {
         catch (ex) {
             this.addError("validateDmarc.validate", `Unexpected Error[${this.name}]: ${ex}`);
         }
-        return super.validate(timeout);
+        return super.validate(config);
     }
     getMissing(value) {
         for (let i = 0; i < this.missing.length; i++) {

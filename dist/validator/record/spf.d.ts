@@ -3,8 +3,14 @@ export declare class RecordValidatorSpf extends RecordValidator {
     value: string[];
     missing: string[];
     found: string[];
-    constructor(name: string, value: string[], expected: string[]);
-    validate(timeout: number): Promise<number>;
+    constructor(config: {
+        name: string;
+        value: string[];
+        expected: string[];
+    });
+    validate(config: {
+        timeout: number;
+    }): Promise<number>;
     private getMissing;
     private getFound;
 }

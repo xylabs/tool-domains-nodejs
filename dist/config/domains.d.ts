@@ -1,4 +1,7 @@
 import { DomainConfig } from "./domain";
-export declare class DomainsConfig {
-    [key: string]: DomainConfig;
+export declare class DomainsConfig extends Array<DomainConfig> {
+    private mapCache?;
+    concat(domains: DomainConfig[]): DomainsConfig;
+    getConfig(domain: string, serverType?: string): DomainConfig;
+    getMap(): Map<string, DomainConfig>;
 }

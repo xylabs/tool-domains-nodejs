@@ -3,6 +3,11 @@ import { RecordValidator } from './base';
 import { MxRecord } from 'dns';
 export declare class RecordValidatorMx extends RecordValidator {
     value: MxRecord;
-    constructor(name: string, value: MxRecord);
-    validate(timeout: number): Promise<number>;
+    constructor(config: {
+        name: string;
+        value: MxRecord;
+    });
+    validate(config: {
+        timeout: number;
+    }): Promise<number>;
 }

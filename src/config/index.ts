@@ -5,14 +5,30 @@ import chalk from 'chalk'
 import { DomainsConfig } from './domains'
 import defaultConfig from './default.json'
 import merge from 'merge'
+import { ServersConfig } from './servers'
+import Ajv from 'ajv'
+import schema from '../schema/dnslint.schema.json'
+import { RecordConfig } from './record'
 
 export class Config {
 
   public static async load(filename: string = './dnslint.json'): Promise<Config> {
     try {
       const defaultJson = await loadJsonFile(`${__dirname}/default.json`)
+      const ajv = new Ajv({ schemaId: 'id' })
+      const validate = ajv.compile(schema)
+      if (!validate(defaultJson)) {
+        console.error(chalk.red(`${validate.errors}`))
+      } else {
+        console.log(chalk.green("Default Config Validated"))
+      }
       try {
         const userJson = await loadJsonFile(filename)
+        if (!validate(userJson)) {
+          console.error(chalk.red(`${validate.errors}`))
+        } else {
+          console.log(chalk.green("User Config Validated"))
+        }
         console.log(chalk.gray("Loaded User Config"))
         return new Config(merge.recursive(true, defaultConfig, userJson))
       } catch (ex) {
@@ -27,43 +43,24 @@ export class Config {
 
   public aws ?: AWS = undefined
   public domains ?: DomainsConfig
+  public servers ?: ServersConfig
 
   constructor(config?: any) {
     if (config) {
       Object.assign(this, config)
     }
+    this.domains = new DomainsConfig().concat(this.domains || [])
+    this.servers = new ServersConfig().concat(this.servers || [])
   }
 
-  public getRecordTimeout(domainName: string, recordType: string): number {
-    let timeout = 1000
-    if (this.domains !== undefined) {
-      const domainConfig: DomainConfig = this.domains[domainName] || this.domains.default
-      if (domainConfig) {
-        const config = new DomainConfig(domainConfig)
-        timeout = config.getRecordConfigProperty(recordType, "timeout")
-      }
+  public getRecordConfig(serverType: string, domainName: string, recordType: string) {
+    const result = new RecordConfig(recordType)
+    if (this.servers !== undefined) {
+      Object.assign(result, this.servers.getConfig(serverType))
     }
-    return timeout
-  }
-
-  public isRecordEnabled(domainName: string, recordName: string): boolean {
     if (this.domains !== undefined) {
-      const domainConfig: DomainConfig = this.domains[domainName]
-      if (domainConfig) {
-        const config = new DomainConfig(domainConfig)
-        return config.isRecordEnabled(recordName)
-      }
+      Object.assign(result, this.domains.getConfig(domainName))
     }
-    return true
-  }
-
-  public isReverseDNSEnabled(domainName: string, recordName: string): boolean {
-    if (this.domains !== undefined) {
-      const domainConfig: DomainConfig = this.domains[domainName]
-      if (domainConfig) {
-        return domainConfig.isReverseDNSEnabled(recordName)
-      }
-    }
-    return true
+    return result
   }
 }

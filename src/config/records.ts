@@ -1,21 +1,36 @@
 import { RecordConfig } from './record'
 
-export class RecordsConfig {
-  public default?: RecordConfig
-  public a?: RecordConfig
-  public aaaa?: RecordConfig
-  public cname?: RecordConfig
-  public mx?: RecordConfig
-  [key: string]: any
+export class RecordsConfig extends Array <RecordConfig> {
 
   public isEnabled(type: string): boolean {
+    const map = this.getMap()
     let value = true
-    const obj = this[type]
+    const obj = map.get(type)
+
     if (obj && obj.enabled !== undefined) {
       value = obj.enabled
-    } else if (this.default && this.default.enabled !== undefined) {
-      value = this.default.enabled
+    } else {
+      const def = map.get("default")
+      if (def && def.enabled !== undefined) {
+        value = def.enabled
+      }
     }
     return value
+  }
+
+  public getConfig(type: string) {
+    const result = new RecordConfig(type)
+    const map = this.getMap()
+    Object.assign(result, map.get("default"))
+    Object.assign(result, map.get(type))
+    return result
+  }
+
+  public getMap() {
+    const map = new Map<string, RecordConfig>()
+    for (const record of this) {
+      map.set(record.name, record)
+    }
+    return map
   }
 }

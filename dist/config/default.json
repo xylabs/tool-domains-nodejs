@@ -3,17 +3,20 @@
     "aws": {
         "enabled": true
     },
-    "domains": {
-        "default": {
+    "domains": [
+        {
+            "name": "default",
             "enabled": true,
             "timeout": 500,
-            "records": {
-                "default": {
+            "records": [
+                {
+                    "type": "default",
                     "reverseDNS": {
                         "enabled": false
                     }
                 },
-                "a": {
+                {
+                    "type": "a",
                     "enabled": true,
                     "http": {
                         "code": 301
@@ -22,7 +25,8 @@
                         "code": 200
                     }
                 },
-                "aaaa": {
+                {
+                    "type": "aaaa",
                     "enabled": true,
                     "http": {
                         "code": 301
@@ -31,7 +35,8 @@
                         "code": 200
                     }
                 },
-                "cname": {
+                {
+                    "type": "cname",
                     "enabled": true,
                     "http": {
                         "code": 301
@@ -40,13 +45,82 @@
                         "code": 200
                     }
                 },
-                "mx": {
+                {
+                    "type": "mx",
                     "enabled": true
                 },
-                "txt": {
+                {
+                    "type": "txt",
                     "enabled": true
                 }
-            }
+            ]
         }
-    }
+    ],
+    "servers": [
+        {
+            "name": "api",
+            "include": [
+                "^api\\."
+            ],
+            "records": [
+                {
+                    "type": "a|cname",
+                    "allowed": [1]
+                },
+                {
+                    "type": "a",
+                    "allowed": [0, 4]
+                },
+                {
+                    "type": "cname",
+                    "allowed": [0, 1]
+                },
+                {
+                    "type": "txt",
+                    "allowed": [0, 1, 2, 3]
+                }
+            ]
+        },
+        {
+            "name": "domainkey",
+            "include": [
+                "\\._domainkey\\."
+            ],
+            "records": [
+                {
+                    "type": "txt",
+                    "allowed": [1]
+                }
+            ]
+        },
+        {
+            "name": "website",
+            "default": true,
+            "include": [
+                "^www\\."
+            ],
+            "records": [
+                {
+                    "type": "a|cname",
+                    "allowed": [1]
+                },
+                {
+                    "type": "a",
+                    "allowed": [0, 4]
+                },
+                {
+                    "type": "cname",
+                    "allowed": [0, 1]
+                },
+                {
+                    "type": "mx",
+                    "allowed": [0, 5]
+                },
+                {
+                    "type": "txt",
+                    "allowed": [0, 1, 2, 3]
+                }
+            ]
+        }
+    ]
 }

@@ -4,22 +4,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const load_json_file_1 = __importDefault(require("load-json-file"));
-const domain_1 = require("./domain");
 const chalk_1 = __importDefault(require("chalk"));
+const domains_1 = require("./domains");
 const default_json_1 = __importDefault(require("./default.json"));
 const merge_1 = __importDefault(require("merge"));
+const servers_1 = require("./servers");
+const ajv_1 = __importDefault(require("ajv"));
+const dnslint_schema_json_1 = __importDefault(require("../schema/dnslint.schema.json"));
+const record_1 = require("./record");
 class Config {
     constructor(config) {
         this.aws = undefined;
         if (config) {
             Object.assign(this, config);
         }
+        this.domains = new domains_1.DomainsConfig().concat(this.domains || []);
+        this.servers = new servers_1.ServersConfig().concat(this.servers || []);
     }
     static async load(filename = './dnslint.json') {
         try {
             const defaultJson = await load_json_file_1.default(`${__dirname}/default.json`);
+            const ajv = new ajv_1.default({ schemaId: 'id' });
+            const validate = ajv.compile(dnslint_schema_json_1.default);
+            if (!validate(defaultJson)) {
+                console.error(chalk_1.default.red(`${validate.errors}`));
+            }
+            else {
+                console.log(chalk_1.default.green("Default Config Validated"));
+            }
             try {
                 const userJson = await load_json_file_1.default(filename);
+                if (!validate(userJson)) {
+                    console.error(chalk_1.default.red(`${validate.errors}`));
+                }
+                else {
+                    console.log(chalk_1.default.green("User Config Validated"));
+                }
                 console.log(chalk_1.default.gray("Loaded User Config"));
                 return new Config(merge_1.default.recursive(true, default_json_1.default, userJson));
             }
@@ -33,35 +53,15 @@ class Config {
             return new Config();
         }
     }
-    getRecordTimeout(domainName, recordType) {
-        let timeout = 1000;
-        if (this.domains !== undefined) {
-            const domainConfig = this.domains[domainName] || this.domains.default;
-            if (domainConfig) {
-                const config = new domain_1.DomainConfig(domainConfig);
-                timeout = config.getRecordConfigProperty(recordType, "timeout");
-            }
+    getRecordConfig(serverType, domainName, recordType) {
+        const result = new record_1.RecordConfig(recordType);
+        if (this.servers !== undefined) {
+            Object.assign(result, this.servers.getConfig(serverType));
         }
-        return timeout;
-    }
-    isRecordEnabled(domainName, recordName) {
         if (this.domains !== undefined) {
-            const domainConfig = this.domains[domainName];
-            if (domainConfig) {
-                const config = new domain_1.DomainConfig(domainConfig);
-                return config.isRecordEnabled(recordName);
-            }
+            Object.assign(result, this.domains.getConfig(domainName));
         }
-        return true;
-    }
-    isReverseDNSEnabled(domainName, recordName) {
-        if (this.domains !== undefined) {
-            const domainConfig = this.domains[domainName];
-            if (domainConfig) {
-                return domainConfig.isReverseDNSEnabled(recordName);
-            }
-        }
-        return true;
+        return result;
     }
 }
 exports.Config = Config;

@@ -5,11 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = __importDefault(require("chalk"));
 const error_1 = require("./error");
+const lodash_1 = __importDefault(require("lodash"));
 class BaseValidator {
-    constructor(name) {
-        this.name = name;
+    constructor(config) {
+        this.name = config.name;
+        this.config = config;
     }
-    async validate(arg) {
+    toJSON() {
+        return lodash_1.default.omit(this, ["config"]);
+    }
+    async validate(config) {
         if (this.errors) {
             this.valid = false;
             return this.errors.length;

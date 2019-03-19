@@ -1,60 +1,31 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class DomainConfig {
-    constructor(domainConfig) {
+    constructor(name) {
         this.records = undefined;
         this.enabled = true;
         this.timeout = 1000;
-        if (domainConfig) {
-            Object.assign(this, domainConfig);
-        }
+        this.name = name;
     }
-    isRecordEnabled(record) {
+    isRecordEnabled(type) {
         if (!this.enabled) {
             return false;
         }
         if (this.records) {
-            const recordConfig = this.records[record];
+            const recordConfig = this.records.getConfig(type);
             if (recordConfig) {
-                if (recordConfig.enabled === undefined) {
-                    if (this.records !== undefined && this.records.default !== undefined) {
-                        if (this.records.default.enabled === undefined) {
-                            return true;
-                        }
-                        return this.records.default.enabled;
-                    }
-                }
-                else {
+                if (recordConfig.enabled !== undefined) {
                     return recordConfig.enabled;
                 }
             }
         }
         return true;
     }
-    getRecordConfigProperty(recordType, property) {
+    isReverseDNSEnabled(type) {
         if (this.records) {
-            const recordConfig = this.records[recordType] || this.records.default;
+            const recordConfig = this.records.getConfig(type);
             if (recordConfig) {
-                if (recordConfig[property] !== undefined) {
-                    return recordConfig[property];
-                }
-            }
-        }
-        return this[property];
-    }
-    isReverseDNSEnabled(record) {
-        if (this.records) {
-            const recordConfig = this.records[record];
-            if (recordConfig) {
-                if (recordConfig.reverseDNS === undefined && recordConfig.reverseDNS.enabled === undefined) {
-                    if (this.records !== undefined && this.records.default !== undefined) {
-                        if (this.records.default !== undefined &&
-                            this.records.default.reverseDNS !== undefined) {
-                            return this.records.default.reverseDNS;
-                        }
-                    }
-                }
-                else if (recordConfig.reverseDNS !== undefined) {
+                if (recordConfig.reverseDNS !== undefined && recordConfig.reverseDNS.enabled !== undefined) {
                     return recordConfig.reverseDNS.enabled;
                 }
             }

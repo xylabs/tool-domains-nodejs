@@ -12,15 +12,16 @@ export class RecordValidator extends BaseValidator {
   public https?: any
   public reverseDns?: any
 
-  constructor(name: string, type: string) {
-    super(name)
-    this.type = type
+  constructor(config: { name: string, type: string }) {
+    super(config)
+    this.type = config.type
   }
 
   protected async checkHttp(ip: string, hostname: string, timeout: number) {
     try {
       const result = await this.getHttpResponse(ip, hostname, timeout, false)
       this.validateHttpHeaders(result.headers, ip)
+      console.log(chalk.gray(`http[${timeout}]: ${ip}: ${result.statusCode}`))
       return result
     } catch (ex) {
       this.addError("http", ex)
@@ -31,6 +32,7 @@ export class RecordValidator extends BaseValidator {
     try {
       const result = await this.getHttpResponse(ip, hostname, timeout, true)
       this.validateHttpsHeaders(result.headers, ip)
+      console.log(chalk.gray(`https[${timeout}]: ${ip}: ${result.statusCode}`))
       return result
     } catch (ex) {
       this.addError("https", ex)
@@ -71,7 +73,7 @@ export class RecordValidator extends BaseValidator {
       headers: any,
       headerName: string,
       required: boolean,
-      value?: string) {
+      value ?: string) {
     if (headers[headerName] === undefined) {
       if (required) {
         this.addError(action, `Missing header [${this.name}/${ip}]: ${headerName}`)
