@@ -7,6 +7,7 @@ const base_1 = require("../base");
 const dns_1 = require("../../dns");
 const http_1 = __importDefault(require("http"));
 const https_1 = __importDefault(require("https"));
+const chalk_1 = __importDefault(require("chalk"));
 class RecordValidator extends base_1.BaseValidator {
     constructor(config) {
         super(config);
@@ -16,6 +17,7 @@ class RecordValidator extends base_1.BaseValidator {
         try {
             const result = await this.getHttpResponse(ip, hostname, timeout, false);
             this.validateHttpHeaders(result.headers, ip);
+            console.log(chalk_1.default.gray(`http[${timeout}]: ${hostname}: ${result}`));
             return result;
         }
         catch (ex) {
@@ -26,6 +28,7 @@ class RecordValidator extends base_1.BaseValidator {
         try {
             const result = await this.getHttpResponse(ip, hostname, timeout, true);
             this.validateHttpsHeaders(result.headers, ip);
+            console.log(chalk_1.default.gray(`https[${timeout}]: ${hostname}: ${result}`));
             return result;
         }
         catch (ex) {

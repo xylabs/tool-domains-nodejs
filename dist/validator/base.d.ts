@@ -8,7 +8,7 @@ export declare class BaseValidator {
         name: string;
     });
     toJSON(): Partial<this>;
-    validate({}: {}): Promise<number>;
+    validate(config: {}): Promise<number>;
     addError(action: string, error: any): void;
     addErrors(errors: ValidationError[] | undefined): void;
 }

@@ -3,6 +3,7 @@ import { Config } from '../../config'
 import { DNS } from '../../dns'
 import http, { IncomingMessage } from 'http'
 import https from 'https'
+import chalk from 'chalk'
 export class RecordValidator extends BaseValidator {
 
   public type: string
@@ -20,6 +21,7 @@ export class RecordValidator extends BaseValidator {
     try {
       const result = await this.getHttpResponse(ip, hostname, timeout, false)
       this.validateHttpHeaders(result.headers, ip)
+      console.log(chalk.gray(`http[${timeout}]: ${ip}: ${result.statusCode}`))
       return result
     } catch (ex) {
       this.addError("http", ex)
@@ -30,6 +32,7 @@ export class RecordValidator extends BaseValidator {
     try {
       const result = await this.getHttpResponse(ip, hostname, timeout, true)
       this.validateHttpsHeaders(result.headers, ip)
+      console.log(chalk.gray(`https[${timeout}]: ${ip}: ${result.statusCode}`))
       return result
     } catch (ex) {
       this.addError("https", ex)

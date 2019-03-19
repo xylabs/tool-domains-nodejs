@@ -8,30 +8,27 @@ export class DomainValidatorApi extends DomainValidator {
   }
 
   public async validate(config: Config): Promise<number> {
+    const recordConfigA = config.getRecordConfig(this.serverType, this.name, "A")
+    const recordConfigCname = config.getRecordConfig(this.serverType, this.name, "CNAME")
+    const recordConfigMx = config.getRecordConfig(this.serverType, this.name, "MX")
+    const recordConfigTxt = config.getRecordConfig(this.serverType, this.name, "TXT")
 
-    await this.verifyRecordCounts({
-      A: 4,
-      CNAME: 0,
-      MX: 0,
-      TXT: 0
-    })
-
-    if (config.isRecordEnabled(this.name, "A")) {
+    if (recordConfigA.isEnabled()) {
       this.records = this.records.concat(
         await this.validateA(
-          { resolve: true, timeout: config.getRecordTimeout(this.name, "A") }
+          { resolve: true, timeout: recordConfigA.getTimeout() }
         ))
     }
-    if (config.isRecordEnabled(this.name, "CNAME")) {
+    if (recordConfigCname.isEnabled()) {
       this.records = this.records.concat(
         await this.validateCname(
-          { resolve: false, timeout: config.getRecordTimeout(this.name, "CNAME") }
+          { resolve: false, timeout: recordConfigCname.getTimeout() }
         ))
     }
-    if (config.isRecordEnabled(this.name, "MX")) {
+    if (recordConfigMx.isEnabled()) {
       this.records = this.records.concat(await this.validateMx())
     }
-    if (config.isRecordEnabled(this.name, "TXT")) {
+    if (recordConfigTxt.isEnabled()) {
       this.records = this.records.concat(await this.validateTxt())
     }
     return super.validate(config)

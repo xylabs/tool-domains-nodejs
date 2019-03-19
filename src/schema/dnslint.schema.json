@@ -1,11 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "id": "dnslint.sections.schema.json",
+  "id": "dnslint.schema.json",
   "additionalItems": false,
   "additionalProperties": false,
   "definitions": {
     "source": {
       "$id": "#definitions/source",
+      "additionalProperties": false,
       "title": "Source",
       "type": "object",
       "properties": {
@@ -14,10 +15,18 @@
     },
     "record": {
       "$id": "#definitions/record",
+      "additionalProperties": false,
       "title": "Record",
       "type": "object",
       "properties": {
+        "type": {"type": "string"},
         "enabled": {"type": "boolean"},
+        "allowed": {
+            "type": "array",
+            "items": {
+              
+            }
+        },
         "addresses": {
           "type": "object",
           "properties": {
@@ -36,6 +45,8 @@
       }
     },
     "http": {
+      "$id": "#definitions/http",
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "enabled": {"type": "boolean"},
@@ -43,63 +54,70 @@
       }
     },
     "https": {
-      "allOf": [
-        {"$ref": "#/definitions/http"}
-      ],
+      "$id": "#definitions/https",
+      "additionalProperties": false,
       "properties": {
+        "enabled": {"type": "boolean"},
+        "code": {"type": "number"},
         "version": {"type": "string"}
       }
     },
     "domain": {
+      "$id": "#definitions/domain",
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "name": {"type": "string"},
         "enabled": {"type": "boolean"},
         "timeout": {"type": "number"},
+        "reverseDNS": {
+          "enabled": "boolean"
+        },
         "type": {"type": "string"},
-        "records": {"$ref": "#/definitions/records"}
-      }
-    },
-    "server": {
-      "type": "object",
-      "properties": {
-        "include": {
+        "records": {
           "type": "array",
-          "items": {"type": "string"}
+          "items": {
+            "$ref": "#/definitions/record"
+          }
         }
       }
     },
-    "records": {
+    "server": {
+      "$id": "#definitions/server",
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "default": {"$ref": "#/definitions/record"},
-        "a": {"$ref": "#/definitions/record"},
-        "aaaa": {"$ref": "#/definitions/record"},
-        "cname": {"$ref": "#/definitions/record"},
-        "mx": {"$ref": "#/definitions/record"},
-        "txt": {"$ref": "#/definitions/record"}
-      }
-    },
-    "results": {
-      "$id": "#definitions/results",
-      "title": "Results",
-      "type": "object",
-      "properties": {
-        "records": {"$ref": "#/definitions/records"}
+        "name": {"type": "string"},
+        "default": {"type": "boolean"},
+        "include": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/record"
+          }
+        }
       }
     }
   },
   "type": "object",
   "properties": {
     "$schema": {"type": "string"},
+    "additionalProperties": false,
     "aws": {"$ref": "#/definitions/source"},
     "domains": {
-      "type": "object",
-      "items": {"$ref": "#/definitions/domain"}
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/domain"
+      }
     },
     "servers": {
-      "type": "object",
-      "items": {"$ref": "#/definitions/server"}
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/server"
+      }
     }
   }
 }

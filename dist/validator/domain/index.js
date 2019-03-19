@@ -19,12 +19,25 @@ class DomainValidator extends base_1.BaseValidator {
     }
     async validate(config) {
         let errorCount = 0;
+        const recordConfigA = config.getRecordConfig(this.serverType, this.name, "A");
+        const recordConfigCname = config.getRecordConfig(this.serverType, this.name, "CNAME");
+        const recordConfigMx = config.getRecordConfig(this.serverType, this.name, "MX");
+        const recordConfigTxt = config.getRecordConfig(this.serverType, this.name, "TXT");
         try {
+            if (recordConfigA.isEnabled()) {
+                this.records = this.records.concat(await this.validateA({ resolve: true, timeout: recordConfigA.getTimeout() }));
+            }
+            if (recordConfigCname.isEnabled()) {
+                this.records = this.records.concat(await this.validateCname({ resolve: false, timeout: recordConfigCname.getTimeout() }));
+            }
+            if (recordConfigMx.isEnabled()) {
+                this.records = this.records.concat(await this.validateMx());
+            }
+            if (recordConfigTxt.isEnabled()) {
+                this.records = this.records.concat(await this.validateTxt());
+            }
             for (const record of this.records) {
-                await record.validate(config.getRecordTimeout(this.name, record.type));
-                if (record.errors) {
-                    errorCount += record.errors.length;
-                }
+                errorCount += await record.validate(config);
             }
             await this.validateDomainRules();
             if (this.errors) {
@@ -47,7 +60,12 @@ class DomainValidator extends base_1.BaseValidator {
         return super.validate(config);
     }
     async getRecordTypeCount(type) {
-        return (await dns_1.DNS.resolve(this.name, type)).length;
+        const subTypes = type.split('|');
+        let count = 0;
+        for (const subType of subTypes) {
+            count += (await dns_1.DNS.resolve(this.name, type)).length;
+        }
+        return count;
     }
     async validateDomainRules() {
         // we do not allow both A and CNAME records
@@ -111,13 +129,29 @@ class DomainValidator extends base_1.BaseValidator {
         }
         return validators;
     }
-    async verifyRecordCounts(records) {
+    async verifyRecordCounts(config) {
         let errorCount = 0;
-        for (const key of Object.keys(records)) {
-            const count = await this.getRecordTypeCount(key);
-            if (records[key] !== count) {
-                this.addError('verifyRecordCounts', `Invalid Record Count: ${key} = ${count} [Expected: ${records[key]}]`);
-                errorCount++;
+        if (config.servers) {
+            const serverConfig = config.servers.getMap().get(this.serverType);
+            if (serverConfig) {
+                const records = serverConfig.records;
+                if (records) {
+                    for (const record of records) {
+                        if (record.allowed) {
+                            const count = await this.getRecordTypeCount(record.name);
+                            let allowed = false;
+                            for (const allow of record.allowed) {
+                                if (count === allow) {
+                                    allowed = true;
+                                }
+                            }
+                            if (!allowed) {
+                                this.addError('verifyRecordCounts', `Invalid Record Count: ${record.name} = ${count} [Expected: ${record.allowed}]`);
+                                errorCount++;
+                            }
+                        }
+                    }
+                }
             }
         }
         return errorCount;

@@ -12,7 +12,7 @@ export class RecordValidatorCname extends RecordValidator {
     config.timeout = config.timeout || 1000
   }
 
-  public async validate() {
+  public async validate(config: { timeout: number }) {
     try {
       const ip = await DNS.lookup(this.value)
       if (ip && this.config.resolve) {
@@ -23,6 +23,6 @@ export class RecordValidatorCname extends RecordValidator {
     } catch (ex) {
       this.addError("RecordValidatorCname.validate", `[${this.name}]: ${ex}`)
     }
-    return super.validate(this.config)
+    return super.validate(config)
   }
 }

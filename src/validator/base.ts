@@ -17,7 +17,7 @@ export class BaseValidator {
     return _.omit(this, ["config"])
   }
 
-  public async validate({}) {
+  public async validate(config: {}) {
     if (this.errors) {
       this.valid = false
       return this.errors.length

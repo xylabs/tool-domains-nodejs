@@ -1,25 +1,30 @@
 {
   "$schema": "./src/schema/dnslint.schema.json#",
   "aws": {
-    "enabled": false
+    "enabled": true
   },
-  "domains": {
-    "default": {
+  "domains": [
+    {
+      "name": "default",
       "reverseDNS": {
-        "enabled": true
+        "enabled": false
       }
     },
-    "xyo.network": {
+    {
+      "name": "xyo.network",
       "enabled": true
     },
-    "s1._domainkey.xyo.network": {
+    {
+      "name": "s1._domainkey.xyo.network",
       "enabled": true
     },
-    "coinworldtour.com": {
-      "enabled:": true
+    {
+      "name": "coinworldtour.com",
+      "enabled": true
     },
-    "api.xyfindit.com": {
+    {
+      "name": "api.xyfindit.com",
       "enabled": true
     }
-  }
+  ]
 }

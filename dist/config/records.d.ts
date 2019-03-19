@@ -1,10 +1,6 @@
 import { RecordConfig } from './record';
-export declare class RecordsConfig {
-    default?: RecordConfig;
-    a?: RecordConfig;
-    aaaa?: RecordConfig;
-    cname?: RecordConfig;
-    mx?: RecordConfig;
-    [key: string]: any;
+export declare class RecordsConfig extends Array<RecordConfig> {
     isEnabled(type: string): boolean;
+    getConfig(type: string): RecordConfig;
+    getMap(): Map<string, RecordConfig>;
 }

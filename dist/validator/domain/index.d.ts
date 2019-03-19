@@ -25,5 +25,5 @@ export declare class DomainValidator extends BaseValidator {
     }): Promise<RecordValidatorCname[]>;
     protected validateMx(): Promise<RecordValidatorMx[]>;
     protected validateTxt(): Promise<RecordValidatorTxt[]>;
-    protected verifyRecordCounts(records: any): Promise<number>;
+    protected verifyRecordCounts(config: Config): Promise<number>;
 }

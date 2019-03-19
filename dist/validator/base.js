@@ -14,7 +14,7 @@ class BaseValidator {
     toJSON() {
         return lodash_1.default.omit(this, ["config"]);
     }
-    async validate({}) {
+    async validate(config) {
         if (this.errors) {
             this.valid = false;
             return this.errors.length;
