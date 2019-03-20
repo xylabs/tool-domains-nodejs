@@ -25,6 +25,16 @@
                     "type": "array",
                     "items": {}
                 },
+                "expected": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "required": { "type": "boolean" },
+                            "value": { "type": "string" }
+                        }
+                    }
+                },
                 "addresses": {
                     "type": "object",
                     "properties": {

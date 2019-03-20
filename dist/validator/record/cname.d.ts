@@ -1,11 +1,7 @@
 import { RecordValidator } from './base';
+import { Config } from '../../config';
 export declare class RecordValidatorCname extends RecordValidator {
     value: string;
-    constructor(config: {
-        name: string;
-        value: string;
-        resolve: boolean;
-        timeout: number;
-    });
-    validate(): Promise<number>;
+    constructor(config: Config, name: string, value: string);
+    validate(resolve?: boolean): Promise<number>;
 }

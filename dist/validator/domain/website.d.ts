@@ -1,9 +1,7 @@
 import { Config } from '../../config';
 import { DomainValidator } from '.';
 export declare class DomainValidatorWebsite extends DomainValidator {
-    constructor(config: {
-        name: string;
-    });
-    validate(config: Config): Promise<number>;
+    constructor(config: Config, name: string);
+    validate(): Promise<number>;
     protected validateDomainRules(): Promise<void>;
 }

@@ -2,20 +2,25 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
 class RecordValidatorA extends base_1.RecordValidator {
-    constructor(config) {
-        super({ name: config.name, type: "A" });
-        this.value = config.value;
+    constructor(config, name, value) {
+        super(config, name, "A");
+        this.value = value;
     }
-    async validate(config) {
+    async validate() {
         try {
-            this.http = await this.checkHttp(this.value, this.name, config.timeout);
-            this.https = await this.checkHttps(this.value, this.name, config.timeout);
-            this.reverseDns = await this.reverseLookup(this.value, this.name, config.timeout);
+            const domainConfig = this.config.getDomainConfig(this.name);
+            const recordConfig = this.getRecordConfig();
+            const timeout = domainConfig.getTimeout();
+            this.http = await this.checkHttp(this.value, this.name, timeout);
+            this.https = await this.checkHttps(this.value, this.name, timeout);
+            if (recordConfig.reverseDNS) {
+                this.reverseDns = await this.reverseLookup(this.value, this.name, timeout);
+            }
         }
         catch (ex) {
             this.addError("validate", `Unexpected Error[${this.name}]: ${ex}`);
         }
-        return super.validate(config);
+        return super.validate();
     }
 }
 exports.RecordValidatorA = RecordValidatorA;

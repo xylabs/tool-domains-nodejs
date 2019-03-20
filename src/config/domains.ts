@@ -12,11 +12,9 @@ export class DomainsConfig extends Array<DomainConfig> {
     return this
   }
 
-  public getConfig(domain: string, serverType?: string): DomainConfig {
-    const result = new DomainConfig(domain)
+  public getConfig(domain: string): DomainConfig {
     const map = this.getMap()
-    Object.assign(result, map.get("default"))
-    Object.assign(result, map.get(domain))
+    const result = new DomainConfig(domain, [map.get("default"), map.get(domain)])
     result.name = domain
     return result
   }

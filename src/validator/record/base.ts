@@ -4,6 +4,7 @@ import { DNS } from '../../dns'
 import http, { IncomingMessage } from 'http'
 import https from 'https'
 import chalk from 'chalk'
+import { RecordConfig } from '../../config/record'
 export class RecordValidator extends BaseValidator {
 
   public type: string
@@ -12,9 +13,13 @@ export class RecordValidator extends BaseValidator {
   public https?: any
   public reverseDns?: any
 
-  constructor(config: { name: string, type: string }) {
-    super(config)
-    this.type = config.type
+  constructor(config: Config, name: string, type: string) {
+    super(config, name)
+    this.type = type
+  }
+
+  public getRecordConfig() {
+    return this.config.getRecordConfig(this.name, this.type)
   }
 
   protected async checkHttp(ip: string, hostname: string, timeout: number) {

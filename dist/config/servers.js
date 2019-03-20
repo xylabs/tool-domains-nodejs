@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("./server");
+const records_1 = require("./records");
 class ServersConfig extends Array {
     concat(servers) {
         for (const server of servers) {
@@ -15,6 +16,10 @@ class ServersConfig extends Array {
         Object.assign(result, map.get("default"));
         Object.assign(result, map.get(serverType));
         result.name = serverType;
+        // make sure it is a full object
+        const records = new records_1.RecordsConfig();
+        Object.assign(records, result.records);
+        result.records = records;
         return result;
     }
     getMap() {

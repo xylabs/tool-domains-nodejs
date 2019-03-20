@@ -1,23 +1,29 @@
 import { RecordValidator } from './base'
 import { Config } from '../../config'
+import { RecordConfig } from '../../config/record'
 
 export class RecordValidatorA extends RecordValidator {
 
   public value: string
 
-  constructor(config: { name: string, value: string }) {
-    super({ name: config.name, type: "A" })
-    this.value = config.value
+  constructor(config: Config, name: string, value: string) {
+    super(config, name, "A")
+    this.value = value
   }
 
-  public async validate(config: { timeout: number }) {
+  public async validate() {
     try {
-      this.http = await this.checkHttp(this.value, this.name, config.timeout)
-      this.https = await this.checkHttps(this.value, this.name, config.timeout)
-      this.reverseDns = await this.reverseLookup(this.value, this.name, config.timeout)
+      const domainConfig = this.config.getDomainConfig(this.name)
+      const recordConfig = this.getRecordConfig()
+      const timeout = domainConfig.getTimeout()
+      this.http = await this.checkHttp(this.value, this.name, timeout)
+      this.https = await this.checkHttps(this.value, this.name, timeout)
+      if (recordConfig.reverseDNS) {
+        this.reverseDns = await this.reverseLookup(this.value, this.name, timeout)
+      }
     } catch (ex) {
       this.addError("validate", `Unexpected Error[${this.name}]: ${ex}`)
     }
-    return super.validate(config)
+    return super.validate()
   }
 }

@@ -1,4 +1,5 @@
 import { AWS } from './aws';
+import { DomainConfig } from './domain';
 import { DomainsConfig } from './domains';
 import { ServersConfig } from './servers';
 import { RecordConfig } from './record';
@@ -8,5 +9,9 @@ export declare class Config {
     domains?: DomainsConfig;
     servers?: ServersConfig;
     constructor(config?: any);
-    getRecordConfig(serverType: string, domainName: string, recordType: string): RecordConfig;
+    getDomains(): DomainsConfig;
+    getServers(): ServersConfig;
+    getRecordConfig(domain: string, recordType: string): RecordConfig;
+    getDomainConfig(domain: string): DomainConfig;
+    getServerType(domain: string): string;
 }

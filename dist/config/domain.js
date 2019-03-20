@@ -1,11 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const records_1 = require("./records");
 class DomainConfig {
     constructor(name) {
-        this.records = undefined;
-        this.enabled = true;
-        this.timeout = 1000;
         this.name = name;
+        this.records = new records_1.RecordsConfig().concat(this.records || []);
+    }
+    getTimeout() {
+        return this.timeout || 1000;
     }
     isRecordEnabled(type) {
         if (!this.enabled) {

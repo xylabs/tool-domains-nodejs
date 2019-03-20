@@ -2,17 +2,18 @@ import { RecordValidator } from './base'
 import { Config } from '../../config'
 import { DNS } from '../../dns'
 import { MxRecord } from 'dns'
+import { RecordConfig } from '../../config/record'
 
 export class RecordValidatorMx extends RecordValidator {
 
   public value: MxRecord
 
-  constructor(config: {name: string, value: MxRecord}) {
-    super({ name: config.name, type:"MX" })
-    this.value = config.value
+  constructor(config: Config, name: string, value: MxRecord) {
+    super(config, name, "MX")
+    this.value = value
   }
 
-  public async validate(config: { timeout: number }) {
+  public async validate() {
     try {
       switch (this.value.exchange) {
         case "aspmx.l.google.com": {
@@ -62,6 +63,6 @@ export class RecordValidatorMx extends RecordValidator {
     } catch (ex) {
       this.addError("RecordValidatorMx.validate", `Unexpected Error [${this.name}]: ${ex}`)
     }
-    return super.validate(config)
+    return super.validate()
   }
 }
