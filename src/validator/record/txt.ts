@@ -1,6 +1,5 @@
 import { RecordValidator } from './base'
 import { Config } from '../../config'
-import { DNS } from '../../dns'
 import { RecordValidatorSpf } from './spf'
 import chalk from 'chalk'
 import { RecordValidatorDmarc } from './dmarc'

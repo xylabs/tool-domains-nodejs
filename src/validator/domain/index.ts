@@ -2,14 +2,12 @@ import { RecordValidatorA } from '../record/a'
 import { RecordValidatorCname } from '../record/cname'
 import { RecordValidator } from '../record/base'
 import { BaseValidator } from '../base'
-import { DNS } from '../../dns'
 import chalk from 'chalk'
 import { Config } from '../../config'
 import { RecordValidatorMx } from '../record/mx'
 import { RecordValidatorTxt } from '../record/txt'
 import _ from 'lodash'
-import { RecordConfig } from '../../config/record'
-import { DomainConfig } from '../../config/domain'
+import { Dns } from '../../dns'
 
 export class DomainValidator extends BaseValidator {
   public records: RecordValidator[] = []
@@ -74,7 +72,7 @@ export class DomainValidator extends BaseValidator {
     const subTypes = type.split('|')
     let count = 0
     for (const subType of subTypes) {
-      count += (await DNS.resolve(this.name, type)).length
+      count += (await Dns.resolve(this.name, type)).length
     }
     return count
   }
@@ -89,7 +87,7 @@ export class DomainValidator extends BaseValidator {
   protected async validateA() {
     const validators: RecordValidatorA[] = []
     try {
-      const records = await DNS.resolve4(this.name)
+      const records = await Dns.resolve4(this.name)
       for (const record of records) {
         const validator = new RecordValidatorA(this.config, this.name, record)
         validators.push(validator)
@@ -103,7 +101,7 @@ export class DomainValidator extends BaseValidator {
   protected async validateCname() {
     const validators: RecordValidatorCname[] = []
     try {
-      const records = await DNS.resolveCname(this.name)
+      const records = await Dns.resolveCname(this.name)
       for (const record of records) {
         const validator = new RecordValidatorCname(this.config, this.name, record)
         validators.push(validator)
@@ -117,7 +115,7 @@ export class DomainValidator extends BaseValidator {
   protected async validateMx() {
     const validators: RecordValidatorMx[] = []
     try {
-      const records = await DNS.resolveMx(this.name)
+      const records = await Dns.resolveMx(this.name)
       for (const record of records) {
         const validator = new RecordValidatorMx(this.config, this.name, record)
         validators.push(validator)
@@ -131,7 +129,7 @@ export class DomainValidator extends BaseValidator {
   protected async validateTxt() {
     const validators: RecordValidatorTxt[] = []
     try {
-      const records = await DNS.resolveTxt(this.name)
+      const records = await Dns.resolveTxt(this.name)
       for (const record of records) {
         const validator = new RecordValidatorTxt(this.config, this.name, record)
         validators.push(validator)

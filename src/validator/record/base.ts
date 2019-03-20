@@ -1,6 +1,6 @@
 import { BaseValidator } from '../base'
 import { Config } from '../../config'
-import { DNS } from '../../dns'
+import { Dns } from '../../dns'
 import http, { IncomingMessage } from 'http'
 import https from 'https'
 import chalk from 'chalk'
@@ -47,7 +47,7 @@ export class RecordValidator extends BaseValidator {
   protected async reverseLookup(ip: string, hostname: string, timeout: number) {
     // right now we only check for cloudfront
     try {
-      const names = await DNS.reverse(ip)
+      const names = await Dns.reverse(ip)
       let found = false
       for (const name of names) {
         if (name.endsWith('.r.cloudfront.net')) {

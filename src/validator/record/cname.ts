@@ -1,7 +1,6 @@
 import { RecordValidator } from './base'
 import { Config } from '../../config'
-import { DNS } from '../../dns'
-import { RecordConfig } from '../../config/record'
+import { Dns } from '../../dns'
 
 export class RecordValidatorCname extends RecordValidator {
 
@@ -17,7 +16,7 @@ export class RecordValidatorCname extends RecordValidator {
       const domainConfig = this.config.getDomainConfig(this.name)
       const recordConfig = this.getRecordConfig()
       const timeout = domainConfig.getTimeout()
-      const ip = await DNS.lookup(this.value)
+      const ip = await Dns.lookup(this.value)
       if (ip && resolve) {
         this.http = await this.checkHttp(ip, this.name, timeout)
         this.https = await this.checkHttps(ip, this.name, timeout)

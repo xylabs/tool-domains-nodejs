@@ -1,8 +1,6 @@
 import { RecordValidator } from './base'
 import { Config } from '../../config'
-import { DNS } from '../../dns'
 import { MxRecord } from 'dns'
-import { RecordConfig } from '../../config/record'
 
 export class RecordValidatorMx extends RecordValidator {
 

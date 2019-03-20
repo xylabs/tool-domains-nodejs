@@ -1,8 +1,5 @@
 import { RecordValidator } from './base'
 import { Config } from '../../config'
-import { DNS } from '../../dns'
-import { RecordValidatorTxt } from './txt'
-import { RecordConfig } from '../../config/record'
 
 export class RecordValidatorDmarc extends RecordValidator {
 

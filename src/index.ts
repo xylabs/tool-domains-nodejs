@@ -1,15 +1,12 @@
 import { AWS } from './aws'
 import fs from 'fs'
 import { Config } from './config'
-import { DomainConfig } from './config/domain'
-import { RecordValidator, DomainValidator } from './validator'
 import { oc } from 'ts-optchain'
-import { DNS } from './dns'
 import { DomainValidatorWebsite } from './validator/domain/website'
 import { DomainValidatorDomainKey } from './validator/domain/domainkey'
 import { DomainValidatorApi } from './validator/domain/api'
 import chalk from 'chalk'
-import { DomainsConfig } from './config/domains'
+import { DomainValidator } from './validator'
 
 export class XyDomainScan {
 
@@ -52,6 +49,11 @@ export class XyDomainScan {
 
     console.log(`Saving to File: output.json`)
     this.saveToFile("output.json", result)
+    if (result.errorCount === 0) {
+      console.log(chalk.green("Congratulations, all tests passed!"))
+    } else {
+      console.error(chalk.red(`Total Errors Found: ${result.errorCount}`))
+    }
     return result
   }
 
