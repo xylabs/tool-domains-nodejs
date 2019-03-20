@@ -65,7 +65,7 @@ class XyDomainScan {
             const awsDomains = await this.aws.getDomains();
             console.log(chalk_1.default.gray(`AWS Domains Found: ${awsDomains.length}`));
             for (const domain of awsDomains) {
-                domains.set(domain, this.createDomainValidator(name));
+                domains.set(domain, this.createDomainValidator(domain));
             }
         }
         catch (ex) {

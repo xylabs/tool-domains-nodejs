@@ -4,7 +4,7 @@ export declare class DomainConfig {
     records?: RecordsConfig;
     enabled?: boolean;
     timeout?: number;
-    constructor(name: string);
+    constructor(name: string, init?: any[]);
     getTimeout(): number;
     isRecordEnabled(type: string): boolean;
     isReverseDNSEnabled(type: string): boolean;

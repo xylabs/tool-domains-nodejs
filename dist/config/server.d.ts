@@ -5,5 +5,5 @@ export declare class ServerConfig {
     include?: string[];
     exclude?: string[];
     records?: RecordsConfig;
-    constructor(name: string);
+    constructor(name: string, init?: any[]);
 }
