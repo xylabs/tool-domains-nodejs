@@ -60,7 +60,8 @@
         {
             "name": "api",
             "include": [
-                "^api\\."
+                "^api\\.",
+                "^devapi\\."
             ],
             "records": [
                 {
@@ -84,12 +85,18 @@
         {
             "name": "domainkey",
             "include": [
-                "\\._domainkey\\."
+                "._domainkey."
             ],
             "records": [
                 {
                     "type": "txt",
-                    "allowed": [1]
+                    "allowed": [1],
+                    "expected": [
+                        {
+                            "required": true,
+                            "value": "^v=DKIM1; k=rsa; "
+                        }
+                    ]
                 }
             ]
         },

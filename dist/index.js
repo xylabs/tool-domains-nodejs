@@ -36,7 +36,7 @@ class XyDomainScan {
                 completedDomains++;
                 result.domains.push(domain);
                 console.log(`Domain:[${completedDomains}/${domains.size}]: ${domain.name} [${domain.serverType}]`);
-                result.errorCount += await domain.validate(this.config);
+                result.errorCount += await domain.validate();
             }
             catch (ex) {
                 result.errorCount++;
@@ -48,35 +48,16 @@ class XyDomainScan {
         this.saveToFile("output.json", result);
         return result;
     }
-    getServerType(domain) {
-        let defaultName = "unknown";
-        if (this.config.servers) {
-            for (const server of this.config.servers) {
-                const include = server.include;
-                if (include) {
-                    for (const filter of include) {
-                        if (domain.match(filter)) {
-                            return server.name;
-                        }
-                        if (server.default) {
-                            defaultName = server.name;
-                        }
-                    }
-                }
-            }
-        }
-        return defaultName;
-    }
-    createValidator(domain) {
-        switch (this.getServerType(domain)) {
+    createDomainValidator(name) {
+        switch (this.config.getServerType(name)) {
             case "website":
-                return new website_1.DomainValidatorWebsite({ name: domain });
+                return new website_1.DomainValidatorWebsite(this.config, name);
             case "api":
-                return new api_1.DomainValidatorApi({ name: domain });
+                return new api_1.DomainValidatorApi(this.config, name);
             case "domainkey":
-                return new domainkey_1.DomainValidatorDomainKey({ name: domain });
+                return new domainkey_1.DomainValidatorDomainKey(this.config, name);
         }
-        return new website_1.DomainValidatorWebsite({ name: domain });
+        return new website_1.DomainValidatorWebsite(this.config, name);
     }
     async addAWSDomains(domains) {
         console.log(chalk_1.default.gray("Getting AWS Domains"));
@@ -84,7 +65,7 @@ class XyDomainScan {
             const awsDomains = await this.aws.getDomains();
             console.log(chalk_1.default.gray(`AWS Domains Found: ${awsDomains.length}`));
             for (const domain of awsDomains) {
-                domains.set(domain, this.createValidator(domain));
+                domains.set(domain, this.createDomainValidator(domain));
             }
         }
         catch (ex) {
@@ -97,7 +78,7 @@ class XyDomainScan {
         if (domainList) {
             for (const domain of domainList) {
                 if (domain.name !== "default") {
-                    domains.set(domain.name, this.createValidator(domain.name));
+                    domains.set(domain.name, this.createDomainValidator(domain.name));
                 }
             }
         }

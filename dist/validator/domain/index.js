@@ -10,54 +10,62 @@ const dns_1 = require("../../dns");
 const chalk_1 = __importDefault(require("chalk"));
 const mx_1 = require("../record/mx");
 const txt_1 = require("../record/txt");
-const lodash_1 = __importDefault(require("lodash"));
 class DomainValidator extends base_1.BaseValidator {
-    constructor(config) {
-        super({ name: config.name });
+    constructor(config, name, serverType) {
+        super(config, name);
         this.records = [];
-        this.serverType = config.serverType;
+        this.name = name;
+        this.serverType = serverType;
     }
-    async validate(config) {
-        let errorCount = 0;
-        const recordConfigA = config.getRecordConfig(this.serverType, this.name, "A");
-        const recordConfigCname = config.getRecordConfig(this.serverType, this.name, "CNAME");
-        const recordConfigMx = config.getRecordConfig(this.serverType, this.name, "MX");
-        const recordConfigTxt = config.getRecordConfig(this.serverType, this.name, "TXT");
+    async validate() {
+        const recordConfigA = this.config.getRecordConfig(this.name, "A");
+        const recordConfigMx = this.config.getRecordConfig(this.name, "MX");
+        const recordConfigTxt = this.config.getRecordConfig(this.name, "TXT");
         try {
             if (recordConfigA.isEnabled()) {
-                this.records = this.records.concat(await this.validateA({ resolve: true, timeout: recordConfigA.getTimeout() }));
+                const record = await this.validateA();
+                this.records = this.records.concat(record);
+                for (const item of record) {
+                    this.errorCount += await item.validate();
+                }
             }
+            const recordConfigCname = this.config.getRecordConfig(this.name, "CNAME");
             if (recordConfigCname.isEnabled()) {
-                this.records = this.records.concat(await this.validateCname({ resolve: false, timeout: recordConfigCname.getTimeout() }));
+                const record = await this.validateCname();
+                this.records = this.records.concat(record);
+                for (const item of record) {
+                    this.errorCount += await item.validate();
+                }
             }
             if (recordConfigMx.isEnabled()) {
-                this.records = this.records.concat(await this.validateMx());
+                const record = await this.validateMx();
+                this.records = this.records.concat(record);
+                for (const item of record) {
+                    this.errorCount += await item.validate();
+                }
             }
             if (recordConfigTxt.isEnabled()) {
-                this.records = this.records.concat(await this.validateTxt());
-            }
-            for (const record of this.records) {
-                errorCount += await record.validate(config);
+                const record = await this.validateTxt();
+                this.records = this.records.concat(record);
+                for (const item of record) {
+                    this.errorCount += await item.validate();
+                }
             }
             await this.validateDomainRules();
             if (this.errors) {
-                errorCount += this.errors.length;
+                this.errorCount += this.errors.length;
             }
-            if (errorCount === 0) {
+            if (this.errorCount === 0) {
                 console.log(chalk_1.default.green(`${this.name}: OK`));
             }
             else {
-                this.addError("validate", `Errors Detected[${this.name}]: ${errorCount}`);
-                console.error(chalk_1.default.red(`${this.name}: ${errorCount} Errors`));
+                console.error(chalk_1.default.red(`${this.name}: ${this.errorCount} Errors`));
             }
         }
         catch (ex) {
             this.addError("domain", ex);
         }
-        if (this.errors) {
-            return this.errors.length + errorCount;
-        }
-        return super.validate(config);
+        return super.validate();
     }
     async getRecordTypeCount(type) {
         const subTypes = type.split('|');
@@ -73,12 +81,12 @@ class DomainValidator extends base_1.BaseValidator {
             this.addError("domain", `Conflict: Has both A and CNAME records [${this.name}]`);
         }
     }
-    async validateA(config) {
+    async validateA() {
         const validators = [];
         try {
             const records = await dns_1.DNS.resolve4(this.name);
             for (const record of records) {
-                const validator = new a_1.RecordValidatorA(lodash_1.default.merge({ name: this.name, value: record }, this.config));
+                const validator = new a_1.RecordValidatorA(this.config, this.name, record);
                 validators.push(validator);
             }
         }
@@ -87,12 +95,12 @@ class DomainValidator extends base_1.BaseValidator {
         }
         return validators;
     }
-    async validateCname(config) {
+    async validateCname() {
         const validators = [];
         try {
             const records = await dns_1.DNS.resolveCname(this.name);
             for (const record of records) {
-                const validator = new cname_1.RecordValidatorCname(lodash_1.default.merge({ name: this.name, value: record }, this.config));
+                const validator = new cname_1.RecordValidatorCname(this.config, this.name, record);
                 validators.push(validator);
             }
         }
@@ -106,7 +114,7 @@ class DomainValidator extends base_1.BaseValidator {
         try {
             const records = await dns_1.DNS.resolveMx(this.name);
             for (const record of records) {
-                const validator = new mx_1.RecordValidatorMx({ name: this.name, value: record });
+                const validator = new mx_1.RecordValidatorMx(this.config, this.name, record);
                 validators.push(validator);
             }
         }
@@ -120,7 +128,7 @@ class DomainValidator extends base_1.BaseValidator {
         try {
             const records = await dns_1.DNS.resolveTxt(this.name);
             for (const record of records) {
-                const validator = new txt_1.RecordValidatorTxt({ name: this.name, value: record });
+                const validator = new txt_1.RecordValidatorTxt(this.config, this.name, record);
                 validators.push(validator);
             }
         }

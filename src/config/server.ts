@@ -1,4 +1,5 @@
 import { RecordsConfig } from "./records"
+import _ from 'lodash'
 
 export class ServerConfig {
   public name: string
@@ -7,7 +8,13 @@ export class ServerConfig {
   public exclude?: string[]
   public records?: RecordsConfig
 
-  constructor(name: string) {
+  constructor(name: string, init?: any[]) {
     this.name = name
+    if (init) {
+      for (const obj of init) {
+        _.merge(this, obj)
+      }
+    }
+    this.records = new RecordsConfig().concat(this.records || [])
   }
 }

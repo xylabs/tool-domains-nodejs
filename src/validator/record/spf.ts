@@ -2,20 +2,28 @@ import { RecordValidator } from './base'
 import { Config } from '../../config'
 import { DNS } from '../../dns'
 import { RecordValidatorTxt } from './txt'
+import { RecordConfig } from '../../config/record'
 
 export class RecordValidatorSpf extends RecordValidator {
 
   public value: string[]
-  public missing: string[]
+  public missing: string[] = []
   public found: string[] = []
 
-  constructor(config: {name: string, value: string[], expected: string[]}) {
-    super({ name: config.name, type: "TXT(SPF)" })
-    this.value = config.value
-    this.missing = config.expected
+  constructor(config: Config, name: string, value: string[]) {
+    super(config, name, "TXT(SPF)")
+    this.value = value
+    const recordConfig = this.getRecordConfig()
+    if (recordConfig.expected) {
+      for (const exp of recordConfig.expected) {
+        if (exp.required) {
+          this.missing.push(exp.value)
+        }
+      }
+    }
   }
 
-  public async validate(config: {timeout: number}) {
+  public async validate() {
     try {
       for (let i = 1; i < this.value.length; i++) {
         const missing = this.getMissing(this.value[i])
@@ -38,7 +46,7 @@ export class RecordValidatorSpf extends RecordValidator {
     } catch (ex) {
       this.addError("RecordValidatorSpf.validate", `Unexpected Error[${this.name}]: ${ex}`)
     }
-    return super.validate(config)
+    return super.validate()
   }
 
   private getMissing(value: string) {

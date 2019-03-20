@@ -1,4 +1,5 @@
 import { ServerConfig } from "./server"
+import { RecordsConfig } from "./records"
 
 export class ServersConfig extends Array <ServerConfig> {
 
@@ -16,6 +17,11 @@ export class ServersConfig extends Array <ServerConfig> {
     Object.assign(result, map.get("default"))
     Object.assign(result, map.get(serverType))
     result.name = serverType
+
+    // make sure it is a full object
+    const records = new RecordsConfig()
+    Object.assign(records, result.records)
+    result.records = records
     return result
   }
 

@@ -2,6 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const record_1 = require("./record");
 class RecordsConfig extends Array {
+    concat(records) {
+        for (const record of records) {
+            const recordsConfig = Object.assign(new record_1.RecordConfig(record.name), record);
+            this.push(recordsConfig);
+        }
+        return this;
+    }
     isEnabled(type) {
         const map = this.getMap();
         let value = true;

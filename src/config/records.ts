@@ -2,6 +2,14 @@ import { RecordConfig } from './record'
 
 export class RecordsConfig extends Array <RecordConfig> {
 
+  public concat(records: RecordConfig[]): RecordsConfig {
+    for (const record of records) {
+      const recordsConfig = Object.assign(new RecordConfig(record.name), record)
+      this.push(recordsConfig)
+    }
+    return this
+  }
+
   public isEnabled(type: string): boolean {
     const map = this.getMap()
     let value = true

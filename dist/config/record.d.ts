@@ -1,12 +1,12 @@
 export declare class RecordConfig {
     name: string;
+    type?: string;
     enabled?: boolean;
-    timeout?: number;
     reverseDNS?: {
         "enabled": true;
     };
     allowed?: number[];
+    expected?: any[];
     constructor(name: string);
-    getTimeout(): number;
     isEnabled(): boolean;
 }

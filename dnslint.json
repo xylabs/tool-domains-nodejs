@@ -7,7 +7,7 @@
     {
       "name": "default",
       "reverseDNS": {
-        "enabled": false
+        "enabled": true
       }
     },
     {

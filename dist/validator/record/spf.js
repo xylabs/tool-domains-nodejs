@@ -2,13 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
 class RecordValidatorSpf extends base_1.RecordValidator {
-    constructor(config) {
-        super({ name: config.name, type: "TXT(SPF)" });
+    constructor(config, name, value) {
+        super(config, name, "TXT(SPF)");
+        this.missing = [];
         this.found = [];
-        this.value = config.value;
-        this.missing = config.expected;
+        this.value = value;
+        const recordConfig = this.getRecordConfig();
+        if (recordConfig.expected) {
+            for (const exp of recordConfig.expected) {
+                if (exp.required) {
+                    this.missing.push(exp.value);
+                }
+            }
+        }
     }
-    async validate(config) {
+    async validate() {
         try {
             for (let i = 1; i < this.value.length; i++) {
                 const missing = this.getMissing(this.value[i]);
@@ -35,7 +43,7 @@ class RecordValidatorSpf extends base_1.RecordValidator {
         catch (ex) {
             this.addError("RecordValidatorSpf.validate", `Unexpected Error[${this.name}]: ${ex}`);
         }
-        return super.validate(config);
+        return super.validate();
     }
     getMissing(value) {
         for (let i = 0; i < this.missing.length; i++) {

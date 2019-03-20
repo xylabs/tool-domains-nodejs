@@ -3,21 +3,18 @@ import { DomainConfig } from "./domain"
 export class RecordConfig {
 
   public name: string
+  public type?: string
   public enabled?: boolean
-  public timeout?: number
 
   public reverseDNS?: {
     "enabled": true
   }
 
   public allowed?: number[]
+  public expected?: any[]
 
   constructor(name: string) {
     this.name = name
-  }
-
-  public getTimeout() {
-    return this.timeout || 1000
   }
 
   public isEnabled() {

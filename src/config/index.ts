@@ -4,7 +4,7 @@ import { DomainConfig } from './domain'
 import chalk from 'chalk'
 import { DomainsConfig } from './domains'
 import defaultConfig from './default.json'
-import merge from 'merge'
+import _ from 'lodash'
 import { ServersConfig } from './servers'
 import Ajv from 'ajv'
 import schema from '../schema/dnslint.schema.json'
@@ -14,23 +14,27 @@ export class Config {
 
   public static async load(filename: string = './dnslint.json'): Promise<Config> {
     try {
-      const defaultJson = await loadJsonFile(`${__dirname}/default.json`)
       const ajv = new Ajv({ schemaId: 'id' })
       const validate = ajv.compile(schema)
-      if (!validate(defaultJson)) {
+      if (!validate(defaultConfig)) {
         console.error(chalk.red(`${validate.errors}`))
       } else {
         console.log(chalk.green("Default Config Validated"))
       }
       try {
-        const userJson = await loadJsonFile(filename)
+        const userJson: object = await loadJsonFile(filename)
         if (!validate(userJson)) {
           console.error(chalk.red(`${validate.errors}`))
         } else {
           console.log(chalk.green("User Config Validated"))
         }
         console.log(chalk.gray("Loaded User Config"))
-        return new Config(merge.recursive(true, defaultConfig, userJson))
+        const result = new Config(_.mergeWith(defaultConfig, userJson,
+          (objValue: any, srcValue: any, key: any, object: any, source: any, stack: any) => {
+            return undefined
+          }
+        ))
+        return result
       } catch (ex) {
         console.log(chalk.yellow("No dnslint.json config file found.  Using defaults."))
         return new Config(defaultConfig)
@@ -42,8 +46,8 @@ export class Config {
   }
 
   public aws ?: AWS = undefined
-  public domains ?: DomainsConfig
-  public servers ?: ServersConfig
+  public domains?: DomainsConfig
+  public servers?: ServersConfig
 
   constructor(config?: any) {
     if (config) {
@@ -53,14 +57,63 @@ export class Config {
     this.servers = new ServersConfig().concat(this.servers || [])
   }
 
-  public getRecordConfig(serverType: string, domainName: string, recordType: string) {
+  public getDomains() {
+    if (!this.domains) {
+      this.domains = new DomainsConfig()
+    }
+    return this.domains
+  }
+
+  public getServers() {
+    if (!this.servers) {
+      this.servers = new ServersConfig()
+    }
+    return this.servers
+  }
+
+  public getRecordConfig(domain: string, recordType: string) {
+    const serverType = this.getServerType(domain)
     const result = new RecordConfig(recordType)
     if (this.servers !== undefined) {
-      Object.assign(result, this.servers.getConfig(serverType))
+      const records = this.servers.getConfig(serverType).records
+      if (records) {
+        Object.assign(result, records.getConfig(recordType))
+      }
     }
     if (this.domains !== undefined) {
-      Object.assign(result, this.domains.getConfig(domainName))
+      const records = this.domains.getConfig(domain).records
+      if (records) {
+        Object.assign(result, records.getConfig(recordType))
+      }
     }
     return result
+  }
+
+  public getDomainConfig(domain: string) {
+    const result = new DomainConfig(domain)
+    if (this.domains !== undefined) {
+      Object.assign(result, this.domains.getConfig(domain))
+    }
+    return result
+  }
+
+  public getServerType(domain: string) {
+    let defaultName = "unknown"
+    if (this.servers) {
+      for (const server of this.servers) {
+        const include = server.include
+        if (include) {
+          for (const filter of include) {
+            if (domain.match(filter)) {
+              return server.name
+            }
+            if (server.default) {
+              defaultName = server.name
+            }
+          }
+        }
+      }
+    }
+    return defaultName
   }
 }

@@ -8,72 +8,66 @@ import { Config } from '../../config'
 import { RecordValidatorMx } from '../record/mx'
 import { RecordValidatorTxt } from '../record/txt'
 import _ from 'lodash'
+import { RecordConfig } from '../../config/record'
+import { DomainConfig } from '../../config/domain'
 
 export class DomainValidator extends BaseValidator {
   public records: RecordValidator[] = []
   public serverType: string
 
-  constructor(config: {name: string, serverType: string}) {
-    super({ name: config.name })
-    this.serverType = config.serverType
+  constructor(config: Config, name: string, serverType: string) {
+    super(config, name)
+    this.name = name
+    this.serverType = serverType
   }
 
-  public async validate(config: Config): Promise<number> {
-    let errorCount = 0
-    const recordConfigA = config.getRecordConfig(this.serverType, this.name, "A")
-    const recordConfigMx = config.getRecordConfig(this.serverType, this.name, "MX")
-    const recordConfigTxt = config.getRecordConfig(this.serverType, this.name, "TXT")
+  public async validate(): Promise<number> {
+    const recordConfigA = this.config.getRecordConfig(this.name, "A")
+    const recordConfigMx = this.config.getRecordConfig(this.name, "MX")
+    const recordConfigTxt = this.config.getRecordConfig(this.name, "TXT")
     try {
       if (recordConfigA.isEnabled()) {
-        const record = await this.validateA(
-          { resolve: true, timeout: recordConfigA.getTimeout() }
-        )
+        const record = await this.validateA()
         this.records = this.records.concat(record)
         for (const item of record) {
-          errorCount += await item.validate({ timeout: recordConfigA.getTimeout() })
+          this.errorCount += await item.validate()
         }
       }
-      const recordConfigCname = config.getRecordConfig(this.serverType, this.name, "CNAME")
+      const recordConfigCname = this.config.getRecordConfig(this.name, "CNAME")
       if (recordConfigCname.isEnabled()) {
-        const record = await this.validateCname(
-          { resolve: true, timeout: recordConfigCname.getTimeout() }
-        )
+        const record = await this.validateCname()
         this.records = this.records.concat(record)
         for (const item of record) {
-          errorCount += await item.validate({ timeout: recordConfigCname.getTimeout() })
+          this.errorCount += await item.validate()
         }
       }
       if (recordConfigMx.isEnabled()) {
         const record = await this.validateMx()
         this.records = this.records.concat(record)
         for (const item of record) {
-          errorCount += await item.validate({ timeout: recordConfigMx.getTimeout() })
+          this.errorCount += await item.validate()
         }
       }
       if (recordConfigTxt.isEnabled()) {
         const record = await this.validateTxt()
         this.records = this.records.concat(record)
         for (const item of record) {
-          errorCount += await item.validate({ timeout: recordConfigTxt.getTimeout() })
+          this.errorCount += await item.validate()
         }
       }
       await this.validateDomainRules()
       if (this.errors) {
-        errorCount += this.errors.length
+        this.errorCount += this.errors.length
       }
-      if (errorCount === 0) {
+      if (this.errorCount === 0) {
         console.log(chalk.green(`${this.name}: OK`))
       } else {
-        this.addError("validate", `Errors Detected[${this.name}]: ${errorCount}`)
-        console.error(chalk.red(`${this.name}: ${errorCount} Errors`))
+        console.error(chalk.red(`${this.name}: ${this.errorCount} Errors`))
       }
     } catch (ex) {
       this.addError("domain", ex)
     }
-    if (this.errors) {
-      return this.errors.length + errorCount
-    }
-    return super.validate(config)
+    return super.validate()
   }
 
   protected async getRecordTypeCount(type: string) {
@@ -92,12 +86,12 @@ export class DomainValidator extends BaseValidator {
     }
   }
 
-  protected async validateA(config: {resolve: boolean, timeout: number}) {
+  protected async validateA() {
     const validators: RecordValidatorA[] = []
     try {
       const records = await DNS.resolve4(this.name)
       for (const record of records) {
-        const validator = new RecordValidatorA(_.merge({ name: this.name, value: record }, this.config))
+        const validator = new RecordValidatorA(this.config, this.name, record)
         validators.push(validator)
       }
     } catch (ex) {
@@ -106,12 +100,12 @@ export class DomainValidator extends BaseValidator {
     return validators
   }
 
-  protected async validateCname(config: {resolve: boolean, timeout: number}) {
+  protected async validateCname() {
     const validators: RecordValidatorCname[] = []
     try {
       const records = await DNS.resolveCname(this.name)
       for (const record of records) {
-        const validator = new RecordValidatorCname(_.merge({ name: this.name, value: record }, this.config))
+        const validator = new RecordValidatorCname(this.config, this.name, record)
         validators.push(validator)
       }
     } catch (ex) {
@@ -125,7 +119,7 @@ export class DomainValidator extends BaseValidator {
     try {
       const records = await DNS.resolveMx(this.name)
       for (const record of records) {
-        const validator = new RecordValidatorMx({ name: this.name, value: record })
+        const validator = new RecordValidatorMx(this.config, this.name, record)
         validators.push(validator)
       }
     } catch (ex) {
@@ -139,7 +133,7 @@ export class DomainValidator extends BaseValidator {
     try {
       const records = await DNS.resolveTxt(this.name)
       for (const record of records) {
-        const validator = new RecordValidatorTxt({ name: this.name, value: record })
+        const validator = new RecordValidatorTxt(this.config, this.name, record)
         validators.push(validator)
       }
     } catch (ex) {

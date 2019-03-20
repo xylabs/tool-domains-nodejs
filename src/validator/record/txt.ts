@@ -4,6 +4,7 @@ import { DNS } from '../../dns'
 import { RecordValidatorSpf } from './spf'
 import chalk from 'chalk'
 import { RecordValidatorDmarc } from './dmarc'
+import { RecordConfig } from '../../config/record'
 
 export class RecordValidatorTxt extends RecordValidator {
 
@@ -12,42 +13,31 @@ export class RecordValidatorTxt extends RecordValidator {
   public googleVerification?: string
   public facebookVerification?: string
 
-  constructor(config: {name: string, value: string[]}) {
-    super({ name: config.name, type: "TXT" })
-    this.value = config.value
+  constructor(config: Config, name: string, value: string[]) {
+    super(config, name, "TXT")
+    this.value = value
   }
 
-  public async validate(config: {timeout: number}) {
+  public async validate() {
     try {
       const spaceSplit = this.value[0].split(" ")
       if (spaceSplit.length > 1) {
         switch (spaceSplit[0]) {
           case "v=DMARC1;": {
-            const validateDmarc = new RecordValidatorDmarc({name: this.name, value: this.value, expected: [
-              "p=none;",
-              "adkim=r;",
-              "aspf=r;",
-              "pct=100;",
-              "sp=none;"
-            ]})
-            await validateDmarc.validate(config)
+            const validateDmarc = new RecordValidatorDmarc(this.config, this.name, this.value)
+            await validateDmarc.validate()
             this.addErrors(validateDmarc.errors)
             break
           }
           case "k=rsa;": {
-            const validateDmarc = new RecordValidatorDmarc({name: this.name, value: this.value, expected: [
-              "t=s;"
-            ]})
-            await validateDmarc.validate(config)
+            const validateDmarc = new RecordValidatorDmarc(this.config, this.name, this.value)
+            await validateDmarc.validate()
             this.addErrors(validateDmarc.errors)
             break
           }
           case "v=spf1": {
-            const validateSpf = new RecordValidatorSpf({name: this.name, value: this.value, expected: [
-              "include:mail.zendesk.com",
-              "include:_spf.google.com"
-            ]})
-            await validateSpf.validate(config)
+            const validateSpf = new RecordValidatorSpf(this.config, this.name, this.value)
+            await validateSpf.validate()
             this.addErrors(validateSpf.errors)
             break
           }
@@ -80,6 +70,6 @@ export class RecordValidatorTxt extends RecordValidator {
     } catch (ex) {
       this.addError("RecordValidatorTxt.validate", `Unexpected Error[${this.name}]: ${ex}`)
     }
-    return super.validate(config)
+    return super.validate()
   }
 }

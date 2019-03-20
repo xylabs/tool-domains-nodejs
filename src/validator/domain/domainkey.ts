@@ -1,29 +1,28 @@
 import { Config } from '../../config'
 import { DomainValidator } from '.'
+import { DomainConfig } from '../../config/domain'
 
 export class DomainValidatorDomainKey extends DomainValidator {
 
-  constructor(config: {name: string}) {
-    super({ name: config.name, serverType: "domainkey" })
+  constructor(config: Config, name: string) {
+    super(config, name, "domainkey")
   }
 
-  public async validate(config: Config): Promise<number> {
-    const recordConfigA = config.getRecordConfig(this.serverType, this.name, "A")
-    const recordConfigCname = config.getRecordConfig(this.serverType, this.name, "CNAME")
-    const recordConfigMx = config.getRecordConfig(this.serverType, this.name, "MX")
-    const recordConfigTxt = config.getRecordConfig(this.serverType, this.name, "TXT")
+  public async validate(): Promise<number> {
+    const recordConfigA = this.config.getRecordConfig(this.name, "A")
+    const recordConfigCname = this.config.getRecordConfig(this.name, "CNAME")
+    const recordConfigMx = this.config.getRecordConfig(this.name, "MX")
+    const recordConfigTxt = this.config.getRecordConfig(this.name, "TXT")
 
     if (recordConfigA.isEnabled()) {
       this.records = this.records.concat(
-        await this.validateA(
-          { resolve: true, timeout: recordConfigA.getTimeout() }
-        ))
+        await this.validateA()
+      )
     }
     if (recordConfigCname.isEnabled()) {
       this.records = this.records.concat(
-        await this.validateCname(
-          { resolve: false, timeout: recordConfigCname.getTimeout() }
-        ))
+        await this.validateCname()
+      )
     }
     if (recordConfigMx.isEnabled()) {
       this.records = this.records.concat(await this.validateMx())
@@ -31,7 +30,7 @@ export class DomainValidatorDomainKey extends DomainValidator {
     if (recordConfigTxt.isEnabled()) {
       this.records = this.records.concat(await this.validateTxt())
     }
-    return super.validate(config)
+    return super.validate()
   }
 
   protected validateDomainRules() {

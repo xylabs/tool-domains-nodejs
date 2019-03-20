@@ -9,11 +9,9 @@ class DomainsConfig extends Array {
         }
         return this;
     }
-    getConfig(domain, serverType) {
-        const result = new domain_1.DomainConfig(domain);
+    getConfig(domain) {
         const map = this.getMap();
-        Object.assign(result, map.get("default"));
-        Object.assign(result, map.get(domain));
+        const result = new domain_1.DomainConfig(domain, [map.get("default"), map.get(domain)]);
         result.name = domain;
         return result;
     }

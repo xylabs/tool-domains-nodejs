@@ -1,15 +1,26 @@
 import { RecordsConfig } from "./records"
 import { RecordConfig } from "./record"
 import { stringify } from "querystring"
+import _ from 'lodash'
 
 export class DomainConfig {
   public name: string
-  public records?: RecordsConfig = undefined
-  public enabled = true
-  public timeout = 1000
+  public records?: RecordsConfig
+  public enabled?: boolean
+  public timeout?: number
 
-  constructor(name: string) {
+  constructor(name: string, init?: any[]) {
     this.name = name
+    if (init) {
+      for (const obj of init) {
+        _.merge(this, obj)
+      }
+    }
+    this.records = new RecordsConfig().concat(this.records || [])
+  }
+
+  public getTimeout() {
+    return this.timeout || 1000
   }
 
   public isRecordEnabled(type: string): boolean {
