@@ -7,19 +7,19 @@ import chalk from 'chalk'
 import { RecordConfig } from '../../config/record'
 export class RecordValidator extends BaseValidator {
 
-  public type: string
+  public type?: string
   public records?: any
   public http?: any
   public https?: any
   public reverseDns?: any
 
-  constructor(config: Config, name: string, type: string) {
+  constructor(name: string, config: RecordConfig) {
     super(config, name)
-    this.type = type
+    this.type = config.type
   }
 
-  public getRecordConfig() {
-    return this.config.getRecordConfig(this.name, this.type)
+  public async validate() {
+    return super.validate()
   }
 
   protected async checkHttp(ip: string, hostname: string, timeout: number) {

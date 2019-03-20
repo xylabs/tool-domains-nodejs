@@ -14,20 +14,21 @@ export class Config {
 
   public static async load(filename: string = './dnslint.json'): Promise<Config> {
     try {
-      const ajv = new Ajv({ schemaId: 'id' })
+      /*const ajv = new Ajv({ schemaId: 'id' })
       const validate = ajv.compile(schema)
       if (!validate(defaultConfig)) {
         console.error(chalk.red(`${validate.errors}`))
       } else {
         console.log(chalk.green("Default Config Validated"))
-      }
+      }*/
+      console.log(chalk.gray("Loaded Default Config"))
       try {
         const userJson: object = await loadJsonFile(filename)
-        if (!validate(userJson)) {
+        /*if (!validate(userJson)) {
           console.error(chalk.red(`${validate.errors}`))
         } else {
           console.log(chalk.green("User Config Validated"))
-        }
+        }*/
         console.log(chalk.gray("Loaded User Config"))
         const result = new Config(_.mergeWith(defaultConfig, userJson,
           (objValue: any, srcValue: any, key: any, object: any, source: any, stack: any) => {
@@ -84,6 +85,37 @@ export class Config {
       const records = this.domains.getConfig(domain).records
       if (records) {
         Object.assign(result, records.getConfig(recordType))
+      }
+    }
+    return result
+  }
+
+  public getRecordConfigs(domain: string): Map<string, RecordConfig> {
+
+    const serverType = this.getServerType(domain)
+    const result = new Map <string, RecordConfig>()
+    if (this.servers !== undefined) {
+      const records = this.servers.getConfig(serverType).records
+      if (records) {
+        for (const record of records) {
+          if (record.type) {
+            result.set(record.type, records.getConfig(record.type))
+          }
+        }
+      }
+    }
+    if (this.domains !== undefined) {
+      const records = this.domains.getConfig(domain).records
+      if (records) {
+        for (const record of records) {
+          if (record.type) {
+            const newItem = _.merge(
+              result.get(record.type) || new RecordConfig(record.type),
+              records.getConfig(record.type)
+            )
+            result.set(record.type, newItem)
+          }
+        }
       }
     }
     return result

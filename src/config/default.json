@@ -16,7 +16,7 @@
           }
         },
         {
-          "type": "a",
+          "type": "A",
           "enabled": true,
           "http": {
             "code": 301
@@ -26,7 +26,7 @@
           }
         },
         {
-          "type": "aaaa",
+          "type": "AAAA",
           "enabled": true,
           "http": {
             "code": 301
@@ -36,7 +36,7 @@
           }
         },
         {
-          "type": "cname",
+          "type": "CNAME",
           "enabled": true,
           "http": {
             "code": 301
@@ -46,11 +46,11 @@
           }
         },
         {
-          "type": "mx",
+          "type": "MX",
           "enabled": true
         },
         {
-          "type": "txt",
+          "type": "TXT",
           "enabled": true
         }
       ]
@@ -65,19 +65,19 @@
       ],
       "records": [
         {
-          "type": "a|cname",
+          "type": "A|CNAME",
           "allowed": [1]
         },
         {
-          "type": "a",
+          "type": "A",
           "allowed": [0, 4]
         },
         {
-          "type": "cname",
+          "type": "CNAME",
           "allowed": [0, 1]
         },
         {
-          "type": "txt",
+          "type": "TXT",
           "allowed": [0, 1, 2, 3]
         }
       ]
@@ -89,12 +89,30 @@
       ],
       "records": [
         {
-          "type": "txt",
+          "type": "TXT",
           "allowed": [1],
           "expected": [
             {
               "required": true,
               "value": "^v=DKIM1; k=rsa; "
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dmarc",
+      "include": [
+        "._dmarc."
+      ],
+      "records": [
+        {
+          "type": "TXT",
+          "allowed": [1],
+          "expected": [
+            {
+              "required": true,
+              "value": "v=DMARC1; "
             }
           ]
         }
@@ -108,24 +126,26 @@
       ],
       "records": [
         {
-          "type": "a|cname",
+          "type": "A|CNAME",
           "allowed": [1]
         },
         {
-          "type": "a",
-          "allowed": [0, 4]
-        },
-        {
-          "type": "cname",
+          "type": "A",
           "allowed": [0, 1]
         },
         {
-          "type": "mx",
+          "type": "CNAME",
+          "allowed": [0, 1]
+        },
+        {
+          "type": "MX",
           "allowed": [0, 5]
         },
         {
-          "type": "txt",
-          "allowed": [0, 1, 2, 3]
+          "type": "TXT",
+          "expected": [
+
+          ]
         }
       ]
     }

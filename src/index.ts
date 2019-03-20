@@ -2,9 +2,6 @@ import { AWS } from './aws'
 import fs from 'fs'
 import { Config } from './config'
 import { oc } from 'ts-optchain'
-import { DomainValidatorWebsite } from './validator/domain/website'
-import { DomainValidatorDomainKey } from './validator/domain/domainkey'
-import { DomainValidatorApi } from './validator/domain/api'
 import chalk from 'chalk'
 import { DomainValidator } from './validator'
 
@@ -57,25 +54,13 @@ export class XyDomainScan {
     return result
   }
 
-  private createDomainValidator(name: string) {
-    switch (this.config.getServerType(name)) {
-      case "website":
-        return new DomainValidatorWebsite(this.config, name)
-      case "api":
-        return new DomainValidatorApi(this.config, name)
-      case "domainkey":
-        return new DomainValidatorDomainKey(this.config, name)
-    }
-    return new DomainValidatorWebsite(this.config, name)
-  }
-
   private async addAWSDomains(domains: Map<string, DomainValidator>) {
     console.log(chalk.gray("Getting AWS Domains"))
     try {
       const awsDomains = await this.aws.getDomains()
       console.log(chalk.gray(`AWS Domains Found: ${awsDomains.length}`))
       for (const domain of awsDomains) {
-        domains.set(domain, this.createDomainValidator(domain))
+        domains.set(domain, new DomainValidator(this.config, domain))
       }
     } catch (ex) {
       console.error(chalk.red(`AWS Domains Error: ${ex.message}`))
@@ -88,7 +73,7 @@ export class XyDomainScan {
     if (domainList) {
       for (const domain of domainList) {
         if (domain.name !== "default") {
-          domains.set(domain.name, this.createDomainValidator(domain.name))
+          domains.set(domain.name, new DomainValidator(this.config, domain.name))
         }
       }
     }

@@ -1,13 +1,13 @@
 {
   "$schema": "./src/schema/dnslint.schema.json#",
   "aws": {
-    "enabled": true
+    "enabled": false
   },
   "domains": [
     {
       "name": "default",
       "reverseDNS": {
-        "enabled": true
+        "enabled": false
       }
     },
     {
