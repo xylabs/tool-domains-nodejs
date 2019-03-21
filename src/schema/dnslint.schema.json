@@ -25,13 +25,26 @@
             "type": "array",
             "items": {}
         },
-        "expected": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "required": {"type": "boolean"},
-              "value": {"type": "string"}
+        "values": {
+          "type": "object",
+          "properties": {
+            "optional": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "required": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "notallowed": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           }
         },

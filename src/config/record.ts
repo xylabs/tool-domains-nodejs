@@ -11,7 +11,7 @@ export class RecordConfig {
   }
 
   public allowed?: number[]
-  public expected?: any[]
+  public values?: any[]
   public http?: any
   public https?: any
 

@@ -224,12 +224,11 @@
         {
           "type": "TXT",
           "allowed": [1],
-          "expected": [
-            {
-              "required": true,
-              "value": "^v=DKIM1; k=rsa; "
-            }
-          ]
+          "values": {
+            "required": [
+              "^v=DKIM1; k=rsa; "
+            ]
+          }
         }
       ]
     },
@@ -242,12 +241,11 @@
         {
           "type": "TXT",
           "allowed": [1],
-          "expected": [
-            {
-              "required": true,
-              "value": "v=DMARC1; "
-            }
-          ]
+          "values": {
+            "required": [
+              "^v=DMARC1; "
+            ]
+          }
         }
       ]
     },
@@ -272,13 +270,21 @@
         },
         {
           "type": "MX",
-          "allowed": [0, 5]
+          "allowed": [0, 5],
+          "values": {
+            "optional": [
+              "google"
+            ],
+            "required": [
+              "google"
+            ],
+            "notallowed": [
+              "ms"
+            ]
+          }
         },
         {
-          "type": "TXT",
-          "expected": [
-
-          ]
+          "type": "TXT"
         }
       ]
     }

@@ -14,6 +14,7 @@ export class RecordValidator extends BaseValidator {
   public http?: any[]
   public https?: any[]
   public reverseDns?: any
+  public values?: any
   public config: RecordConfig
 
   constructor(name: string, config: RecordConfig) {
@@ -38,6 +39,12 @@ export class RecordValidator extends BaseValidator {
           this.reverseDns = await this.reverseLookup(this.config.reverseDNS.value)
         }
       }
+      /*if (this.config.values) {
+        this.expected =
+        for (const record of this.records) {
+
+        }
+      }*/
     }
     return super.validate()
   }

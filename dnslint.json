@@ -12,19 +12,19 @@
     },
     {
       "name": "xyo.network",
-      "enabled": false
+      "enabled": true
     },
     {
       "name": "s1._domainkey.xyo.network",
-      "enabled": false
+      "enabled": true
     },
     {
       "name": "coinworldtour.com",
-      "enabled": false
+      "enabled": true
     },
     {
       "name": "api.xyfindit.com",
-      "enabled": false
+      "enabled": true
     }
   ]
 }
