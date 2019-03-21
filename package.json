@@ -1,15 +1,15 @@
 {
   "name": "dnslint",
-  "version": "1.1.33",
+  "version": "1.1.34",
   "description": "XYO Internal Domain Tool",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "install": "npm tsc",
+    "install": "npm run tsc",
     "pretest": "yarn install",
     "lint": "yarn tslint --config tslint.json src/**/*.ts",
     "test": "yarn lint",
-    "build": "yarn tsc",
+    "build": "yarn run tsc",
     "cli": "node dist/cli.js",
     "develop": "yarn ts-node --files src/cli.ts",
     "publish-npm": "yarn publish . --new-version $npm_package_version"
