@@ -1,15 +1,9 @@
 import { AWS } from './aws'
 import fs from 'fs'
 import { Config } from './config'
-import { DomainConfig } from './config/domain'
-import { RecordValidator, DomainValidator } from './validator'
 import { oc } from 'ts-optchain'
-import { DNS } from './dns'
-import { DomainValidatorWebsite } from './validator/domain/website'
-import { DomainValidatorDomainKey } from './validator/domain/domainkey'
-import { DomainValidatorApi } from './validator/domain/api'
 import chalk from 'chalk'
-import { DomainsConfig } from './config/domains'
+import { DomainValidator } from './validator'
 
 export class XyDomainScan {
 
@@ -52,19 +46,12 @@ export class XyDomainScan {
 
     console.log(`Saving to File: output.json`)
     this.saveToFile("output.json", result)
-    return result
-  }
-
-  private createDomainValidator(name: string) {
-    switch (this.config.getServerType(name)) {
-      case "website":
-        return new DomainValidatorWebsite(this.config, name)
-      case "api":
-        return new DomainValidatorApi(this.config, name)
-      case "domainkey":
-        return new DomainValidatorDomainKey(this.config, name)
+    if (result.errorCount === 0) {
+      console.log(chalk.green("Congratulations, all tests passed!"))
+    } else {
+      console.error(chalk.red(`Total Errors Found: ${result.errorCount}`))
     }
-    return new DomainValidatorWebsite(this.config, name)
+    return result
   }
 
   private async addAWSDomains(domains: Map<string, DomainValidator>) {
@@ -73,7 +60,7 @@ export class XyDomainScan {
       const awsDomains = await this.aws.getDomains()
       console.log(chalk.gray(`AWS Domains Found: ${awsDomains.length}`))
       for (const domain of awsDomains) {
-        domains.set(domain, this.createDomainValidator(domain))
+        domains.set(domain, new DomainValidator(domain, this.config))
       }
     } catch (ex) {
       console.error(chalk.red(`AWS Domains Error: ${ex.message}`))
@@ -85,8 +72,8 @@ export class XyDomainScan {
     const domainList = this.config.domains
     if (domainList) {
       for (const domain of domainList) {
-        if (domain.name !== "default") {
-          domains.set(domain.name, this.createDomainValidator(domain.name))
+        if ((domain.name !== "default") && (domain.enabled === undefined || domain.enabled)) {
+          domains.set(domain.name, new DomainValidator(domain.name, this.config))
         }
       }
     }

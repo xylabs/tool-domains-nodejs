@@ -8,6 +8,7 @@ export class DomainConfig {
   public records?: RecordsConfig
   public enabled?: boolean
   public timeout?: number
+  public serverType?: string
 
   constructor(name: string, init?: any[]) {
     this.name = name

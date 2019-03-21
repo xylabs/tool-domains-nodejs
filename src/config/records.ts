@@ -1,10 +1,11 @@
 import { RecordConfig } from './record'
+import _ from 'lodash'
 
 export class RecordsConfig extends Array <RecordConfig> {
 
   public concat(records: RecordConfig[]): RecordsConfig {
     for (const record of records) {
-      const recordsConfig = Object.assign(new RecordConfig(record.name), record)
+      const recordsConfig = _.merge(new RecordConfig(record.type), record)
       this.push(recordsConfig)
     }
     return this
@@ -27,17 +28,16 @@ export class RecordsConfig extends Array <RecordConfig> {
   }
 
   public getConfig(type: string) {
-    const result = new RecordConfig(type)
+    let result = new RecordConfig(type)
     const map = this.getMap()
-    Object.assign(result, map.get("default"))
-    Object.assign(result, map.get(type))
+    result = _.merge(result, map.get("default"), map.get(type))
     return result
   }
 
   public getMap() {
     const map = new Map<string, RecordConfig>()
     for (const record of this) {
-      map.set(record.name, record)
+      map.set(record.type, record)
     }
     return map
   }

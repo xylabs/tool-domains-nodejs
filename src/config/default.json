@@ -16,41 +16,156 @@
           }
         },
         {
-          "type": "a",
+          "type": "A",
           "enabled": true,
+          "reverseDNS": {
+            "enabled": true,
+            "value": ".r.cloudfront.net$"
+          },
           "http": {
-            "code": 301
+            "statusCode": 301,
+            "headers": [
+              {
+                "required": true,
+                "name": "location"
+              }
+            ]
           },
           "https": {
-            "code": 200
+            "statusCode": 200,
+            "headers": [
+              {
+                "required": true,
+                "name": "content-type"
+              },
+              {
+                "required": true,
+                "name": "content-security-policy",
+                "value": "object-src 'none'"
+              },
+              {
+                "required": true,
+                "name": "x-content-type-options",
+                "value": "nosniff"
+              },
+              {
+                "required": true,
+                "name": "x-frame-options",
+                "value": "DENY"
+              },
+              {
+                "required": true,
+                "name": "x-xss-protection",
+                "value": "1; mode=block"
+              },
+              {
+                "required": true,
+                "name": "referrer-policy",
+                "value": "same-origin"
+              }
+            ]
           }
         },
         {
-          "type": "aaaa",
+          "type": "AAAA",
           "enabled": true,
           "http": {
-            "code": 301
+            "statusCode": 301,
+            "headers": [
+              {
+                "required": true,
+                "name": "location"
+              }
+            ]
           },
           "https": {
-            "code": 200
+            "statusCode": 200,
+            "headers": [
+              {
+                "required": true,
+                "name": "content-type"
+              },
+              {
+                "required": true,
+                "name": "content-security-policy",
+                "value": "object-src 'none'"
+              },
+              {
+                "required": true,
+                "name": "x-content-type-options",
+                "value": "nosniff"
+              },
+              {
+                "required": true,
+                "name": "x-frame-options",
+                "value": "DENY"
+              },
+              {
+                "required": true,
+                "name": "x-xss-protection",
+                "value": "1; mode=block"
+              },
+              {
+                "required": true,
+                "name": "referrer-policy",
+                "value": "same-origin"
+              }
+            ]
           }
         },
         {
-          "type": "cname",
+          "type": "CNAME",
           "enabled": true,
           "http": {
-            "code": 301
+            "statusCode": 301,
+            "headers": [
+              {
+                "required": true,
+                "name": "location"
+              }
+            ]
           },
           "https": {
-            "code": 200
+            "statusCode": 200,
+            "headers": [
+              {
+                "required": true,
+                "name": "content-type"
+              },
+              {
+                "required": true,
+                "name": "content-security-policy",
+                "value": "object-src 'none'"
+              },
+              {
+                "required": true,
+                "name": "x-content-type-options",
+                "value": "nosniff"
+              },
+              {
+                "required": true,
+                "name": "x-frame-options",
+                "value": "DENY"
+              },
+              {
+                "required": true,
+                "name": "x-xss-protection",
+                "value": "1; mode=block"
+              },
+              {
+                "required": true,
+                "name": "referrer-policy",
+                "value": "same-origin"
+              }
+            ]
           }
         },
         {
-          "type": "mx",
+          "type": "MX",
           "enabled": true
         },
         {
-          "type": "txt",
+          "type": "TXT",
           "enabled": true
         }
       ]
@@ -65,19 +180,19 @@
       ],
       "records": [
         {
-          "type": "a|cname",
+          "type": "A|CNAME",
           "allowed": [1]
         },
         {
-          "type": "a",
+          "type": "A",
           "allowed": [0, 4]
         },
         {
-          "type": "cname",
+          "type": "CNAME",
           "allowed": [0, 1]
         },
         {
-          "type": "txt",
+          "type": "TXT",
           "allowed": [0, 1, 2, 3]
         }
       ]
@@ -89,14 +204,48 @@
       ],
       "records": [
         {
-          "type": "txt",
+          "type": "A",
+          "http": {
+            "enabled": false
+          }
+        },
+        {
+          "type": "AAAA",
+          "http": {
+            "enabled": false
+          }
+        },
+        {
+          "type": "CNAME",
+          "http": {
+            "enabled": false
+          }
+        },
+        {
+          "type": "TXT",
           "allowed": [1],
-          "expected": [
-            {
-              "required": true,
-              "value": "^v=DKIM1; k=rsa; "
-            }
-          ]
+          "values": {
+            "required": [
+              "^v=DKIM1; k=rsa; "
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "dmarc",
+      "include": [
+        "._dmarc."
+      ],
+      "records": [
+        {
+          "type": "TXT",
+          "allowed": [1],
+          "values": {
+            "required": [
+              "^v=DMARC1; "
+            ]
+          }
         }
       ]
     },
@@ -108,24 +257,34 @@
       ],
       "records": [
         {
-          "type": "a|cname",
+          "type": "A|CNAME",
           "allowed": [1]
         },
         {
-          "type": "a",
-          "allowed": [0, 4]
-        },
-        {
-          "type": "cname",
+          "type": "A",
           "allowed": [0, 1]
         },
         {
-          "type": "mx",
-          "allowed": [0, 5]
+          "type": "CNAME",
+          "allowed": [0, 1]
         },
         {
-          "type": "txt",
-          "allowed": [0, 1, 2, 3]
+          "type": "MX",
+          "allowed": [0, 5],
+          "values": {
+            "optional": [
+              "google"
+            ],
+            "required": [
+              "google"
+            ],
+            "notallowed": [
+              "ms"
+            ]
+          }
+        },
+        {
+          "type": "TXT"
         }
       ]
     }

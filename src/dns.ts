@@ -1,6 +1,6 @@
 import dns, { MxRecord, AnyTxtRecord } from 'dns'
 
-export class DNS {
+export class Dns {
 
   public static async lookup(name: string): Promise < string > {
     return new Promise((resolve, reject) => {

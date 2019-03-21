@@ -1,2 +1,2 @@
-export { RecordValidator } from './record/base'
+export { RecordValidator } from './record'
 export { DomainValidator } from './domain'
