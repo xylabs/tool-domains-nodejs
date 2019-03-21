@@ -1,6 +1,6 @@
-[logo]: https://cdn.xy.company/img/brand/XYPersistentCompany_Logo_Full.svg?region=us-east-2&tab=overview
+[logo]: https://cdn.xy.company/img/brand/XYPersistentCompany_Logo_Full.svg
 
-![logo]
+[![logo]](https://xy.company)
 
 # DNSLint (tool-domains-nodejs)
 
