@@ -21,6 +21,7 @@
       "properties": {
         "type": {"type": "string"},
         "enabled": {"type": "boolean"},
+        "timeout": {"type": "number"},
         "allowed": {
             "type": "array",
             "items": {}
@@ -110,7 +111,6 @@
       "properties": {
         "name": {"type": "string"},
         "enabled": {"type": "boolean"},
-        "timeout": {"type": "number"},
         "reverseDNS": {
           "enabled": "boolean"
         },

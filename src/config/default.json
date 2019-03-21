@@ -7,10 +7,10 @@
     {
       "name": "default",
       "enabled": true,
-      "timeout": 500,
       "records": [
         {
           "type": "default",
+          "timeout": 500,
           "reverseDNS": {
             "enabled": false
           }

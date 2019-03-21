@@ -82,7 +82,7 @@ export class RecordValidator extends BaseValidator {
   }
 
   protected async checkHttp(value: any) {
-    const timeout = 1000
+    const timeout = this.config.timeout || 1000
     let result: any
     try {
       console.log(chalk.gray(`checkHttp: ${value}`))
@@ -104,7 +104,7 @@ export class RecordValidator extends BaseValidator {
   }
 
   protected async checkHttps(value: any) {
-    const timeout = 1000
+    const timeout = this.config.timeout || 1000
     let result: any
     try {
       console.log(chalk.gray(`checkHttps: ${value}`))
