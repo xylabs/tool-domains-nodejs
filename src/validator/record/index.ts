@@ -83,7 +83,9 @@ export class RecordValidator extends BaseValidator {
 
   protected async checkHttp(value: any) {
     const timeout = this.config.timeout || 1000
-    let result: any
+    let result: any = {
+      ip: value
+    }
     try {
       console.log(chalk.gray(`checkHttp: ${value}`))
       this.http = this.http || []
@@ -105,7 +107,9 @@ export class RecordValidator extends BaseValidator {
 
   protected async checkHttps(value: any) {
     const timeout = this.config.timeout || 1000
-    let result: any
+    let result: any = {
+      ip: value
+    }
     try {
       console.log(chalk.gray(`checkHttps: ${value}`))
       this.https = this.https || []
@@ -135,7 +139,7 @@ export class RecordValidator extends BaseValidator {
           for (const domain of domains) {
             if (!domain.match(value)) {
               valid = false
-              this.addError("reverse", `Unexpected Domain: ${domain}`)
+              this.addError("reverse", `Unexpected Domain: ${domain} [Expected: ${value}]`)
             }
           }
         }
