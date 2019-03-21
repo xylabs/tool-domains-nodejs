@@ -1,4 +1,4 @@
-[logo]: https://www.xy.company/img/home/logo_xy.png
+[logo]: https://cdn.xy.company/img/brand/XYPersistentCompany_Logo_Full.svg?region=us-east-2&tab=overview
 
 ![logo]
 
