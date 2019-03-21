@@ -1,16 +1,18 @@
 {
   "name": "dnslint",
-  "version": "1.1.26",
+  "version": "1.1.27",
   "description": "XYO Internal Domain Tool",
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "pretest": "yarn install",
-    "test": "yarn tslint --config tslint.json src/*",
-    "build": "yarn tsc",
+    "prepare": "npm run build",
+    "pretest": "npm install",
+    "test": "npm run tslint --config tslint.json src/*",
+    "build": "tsc",
     "cli": "node dist/cli.js",
     "ajv": "ajv validate -s ./src/schema/dnslint.schema.json -d ./src/config/default.json",
-    "develop": "yarn ts-node --files src/cli.ts",
-    "publish-npm": "yarn publish . --new-version $npm_package_version"
+    "develop": "npm run ts-node --files src/cli.ts",
+    "publish-npm": "npm run publish . --new-version $npm_package_version"
   },
   "bin": {
     "dnslint": "bin/dnslint"
