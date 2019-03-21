@@ -49,7 +49,7 @@ export class XyDomainScan {
     if (result.errorCount === 0) {
       console.log(chalk.green("Congratulations, all tests passed!"))
     } else {
-      console.error(chalk.red(`Total Errors Found: ${result.errorCount}`))
+      console.error(chalk.yellow(`Total Errors Found: ${result.errorCount}`))
     }
     return result
   }
