@@ -75,6 +75,5 @@ typings/
 # FuseBox cache
 .fusebox/
 
-
 output.json
 dist/
