@@ -1,0 +1,292 @@
+{
+    "$schema": "../schema/dnslint.schema.json#",
+    "aws": {
+        "enabled": true
+    },
+    "domains": [
+        {
+            "name": "default",
+            "enabled": true,
+            "records": [
+                {
+                    "type": "default",
+                    "timeout": 500,
+                    "reverseDNS": {
+                        "enabled": false
+                    }
+                },
+                {
+                    "type": "A",
+                    "enabled": true,
+                    "reverseDNS": {
+                        "enabled": true,
+                        "value": ".r.cloudfront.net$"
+                    },
+                    "http": {
+                        "statusCode": 301,
+                        "headers": [
+                            {
+                                "required": true,
+                                "name": "location"
+                            }
+                        ]
+                    },
+                    "https": {
+                        "statusCode": 200,
+                        "headers": [
+                            {
+                                "required": true,
+                                "name": "content-type"
+                            },
+                            {
+                                "required": true,
+                                "name": "content-security-policy",
+                                "value": "object-src 'none'"
+                            },
+                            {
+                                "required": true,
+                                "name": "x-content-type-options",
+                                "value": "nosniff"
+                            },
+                            {
+                                "required": true,
+                                "name": "x-frame-options",
+                                "value": "DENY"
+                            },
+                            {
+                                "required": true,
+                                "name": "x-xss-protection",
+                                "value": "1; mode=block"
+                            },
+                            {
+                                "required": true,
+                                "name": "referrer-policy",
+                                "value": "same-origin"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": "AAAA",
+                    "enabled": true,
+                    "http": {
+                        "statusCode": 301,
+                        "headers": [
+                            {
+                                "required": true,
+                                "name": "location"
+                            }
+                        ]
+                    },
+                    "https": {
+                        "statusCode": 200,
+                        "headers": [
+                            {
+                                "required": true,
+                                "name": "content-type"
+                            },
+                            {
+                                "required": true,
+                                "name": "content-security-policy",
+                                "value": "object-src 'none'"
+                            },
+                            {
+                                "required": true,
+                                "name": "x-content-type-options",
+                                "value": "nosniff"
+                            },
+                            {
+                                "required": true,
+                                "name": "x-frame-options",
+                                "value": "DENY"
+                            },
+                            {
+                                "required": true,
+                                "name": "x-xss-protection",
+                                "value": "1; mode=block"
+                            },
+                            {
+                                "required": true,
+                                "name": "referrer-policy",
+                                "value": "same-origin"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": "CNAME",
+                    "enabled": true,
+                    "http": {
+                        "statusCode": 301,
+                        "headers": [
+                            {
+                                "required": true,
+                                "name": "location"
+                            }
+                        ]
+                    },
+                    "https": {
+                        "statusCode": 200,
+                        "headers": [
+                            {
+                                "required": true,
+                                "name": "content-type"
+                            },
+                            {
+                                "required": true,
+                                "name": "content-security-policy",
+                                "value": "object-src 'none'"
+                            },
+                            {
+                                "required": true,
+                                "name": "x-content-type-options",
+                                "value": "nosniff"
+                            },
+                            {
+                                "required": true,
+                                "name": "x-frame-options",
+                                "value": "DENY"
+                            },
+                            {
+                                "required": true,
+                                "name": "x-xss-protection",
+                                "value": "1; mode=block"
+                            },
+                            {
+                                "required": true,
+                                "name": "referrer-policy",
+                                "value": "same-origin"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": "MX",
+                    "enabled": true
+                },
+                {
+                    "type": "TXT",
+                    "enabled": true
+                }
+            ]
+        }
+    ],
+    "servers": [
+        {
+            "name": "api",
+            "include": [
+                "^api\\.",
+                "^devapi\\."
+            ],
+            "records": [
+                {
+                    "type": "A|CNAME",
+                    "allowed": [1]
+                },
+                {
+                    "type": "A",
+                    "allowed": [0, 4]
+                },
+                {
+                    "type": "CNAME",
+                    "allowed": [0, 1]
+                },
+                {
+                    "type": "TXT",
+                    "allowed": [0, 1, 2, 3]
+                }
+            ]
+        },
+        {
+            "name": "domainkey",
+            "include": [
+                "._domainkey."
+            ],
+            "records": [
+                {
+                    "type": "A",
+                    "http": {
+                        "enabled": false
+                    }
+                },
+                {
+                    "type": "AAAA",
+                    "http": {
+                        "enabled": false
+                    }
+                },
+                {
+                    "type": "CNAME",
+                    "http": {
+                        "enabled": false
+                    }
+                },
+                {
+                    "type": "TXT",
+                    "allowed": [1],
+                    "values": {
+                        "required": [
+                            "^v=DKIM1; k=rsa; "
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "dmarc",
+            "include": [
+                "._dmarc."
+            ],
+            "records": [
+                {
+                    "type": "TXT",
+                    "allowed": [1],
+                    "values": {
+                        "required": [
+                            "^v=DMARC1; "
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "website",
+            "default": true,
+            "include": [
+                "^www\\."
+            ],
+            "records": [
+                {
+                    "type": "A|CNAME",
+                    "allowed": [1]
+                },
+                {
+                    "type": "A",
+                    "allowed": [0, 1]
+                },
+                {
+                    "type": "CNAME",
+                    "allowed": [0, 1]
+                },
+                {
+                    "type": "MX",
+                    "allowed": [0, 5],
+                    "values": {
+                        "optional": [
+                            "google"
+                        ],
+                        "required": [
+                            "google"
+                        ],
+                        "notallowed": [
+                            "ms"
+                        ]
+                    }
+                },
+                {
+                    "type": "TXT"
+                }
+            ]
+        }
+    ]
+}
