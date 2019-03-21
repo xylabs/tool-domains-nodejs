@@ -1,18 +1,18 @@
 {
   "name": "dnslint",
-  "version": "1.1.27",
+  "version": "1.1.28",
   "description": "XYO Internal Domain Tool",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepare": "npm run build",
-    "pretest": "npm install",
+    "prepare": "yarn build",
+    "pretest": "yarn install",
     "test": "npm run tslint --config tslint.json src/*",
     "build": "tsc",
     "cli": "node dist/cli.js",
     "ajv": "ajv validate -s ./src/schema/dnslint.schema.json -d ./src/config/default.json",
-    "develop": "npm run ts-node --files src/cli.ts",
-    "publish-npm": "npm run publish . --new-version $npm_package_version"
+    "develop": "yarn ts-node --files src/cli.ts",
+    "publish-npm": "yarn publish . --new-version $npm_package_version"
   },
   "bin": {
     "dnslint": "bin/dnslint"
@@ -44,6 +44,7 @@
     "ts-node": "^8.0.3",
     "tslint": "^5.13.0",
     "tslint-config-airbnb": "^5.11.1",
-    "typescript": "^3.3.3"
+    "typescript": "^3.3.3",
+    "yarn": "^1.13.0"
   }
 }
