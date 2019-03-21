@@ -1,0 +1,1 @@
+{"version":3,"file":"record.js","sourceRoot":"","sources":["../../src/config/record.ts"],"names":[],"mappings":";;AAEA,MAAa,YAAY;IAiBvB,YAAY,IAAY;QACtB,IAAI,CAAC,IAAI,GAAG,IAAI,CAAA;IAClB,CAAC;IAEM,SAAS;QACd,IAAI,IAAI,CAAC,OAAO,KAAK,SAAS,EAAE;YAC9B,OAAO,IAAI,CAAC,OAAO,CAAA;SACpB;QACD,OAAO,IAAI,CAAA;IACb,CAAC;CACF;AA3BD,oCA2BC"}
