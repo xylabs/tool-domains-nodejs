@@ -1,4 +1,4 @@
-[logo]: https://cdn.xy.company/img/brand/XYPersistentCompany_Logo_Full.svg
+[logo]: https://cdn.xy.company/img/brand/XY_Logo_GitHub.png
 
 [![logo]](https://xy.company)
 
