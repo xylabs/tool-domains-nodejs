@@ -94,12 +94,26 @@ export class Config {
 
     const serverType = this.getServerType(domain)
     const result = new Map <string, RecordConfig>()
+    if (this.domains !== undefined) {
+      const records = this.domains.getConfig("default").records
+      if (records) {
+        for (const record of records) {
+          if (record.type) {
+            result.set(record.type, records.getConfig(record.type))
+          }
+        }
+      }
+    }
     if (this.servers !== undefined) {
       const records = this.servers.getConfig(serverType).records
       if (records) {
         for (const record of records) {
           if (record.type) {
-            result.set(record.type, records.getConfig(record.type))
+            const newItem = _.merge(
+              result.get(record.type) || new RecordConfig(record.type),
+              records.getConfig(record.type)
+            )
+            result.set(record.type, newItem)
           }
         }
       }

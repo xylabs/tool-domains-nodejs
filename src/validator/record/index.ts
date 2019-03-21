@@ -5,110 +5,176 @@ import http, { IncomingMessage } from 'http'
 import https from 'https'
 import chalk from 'chalk'
 import { RecordConfig } from '../../config/record'
+import assert from 'assert'
+import { inspect } from 'util'
 export class RecordValidator extends BaseValidator {
 
-  public type?: string
-  public records?: any
-  public http?: any
-  public https?: any
+  public type: string
+  public records: any[] = []
+  public http?: any[]
+  public https?: any[]
   public reverseDns?: any
+  public config: RecordConfig
 
   constructor(name: string, config: RecordConfig) {
-    super(config, name)
+    super(name)
+    this.config = config
     this.type = config.type
   }
 
   public async validate() {
+    if (this.type.split('|').length === 1) {
+      this.records = await this.resolve()
+      if (this.config.http) {
+        if (((this.config.http.enabled === undefined) && true) || this.config.http.enabled) {
+          this.http = await this.checkAllHttp(this.config.http)
+        }
+        if (((this.config.https.enabled === undefined) && true) || this.config.https.enabled) {
+          this.http = await this.checkAllHttps(this.config.https)
+        }
+      }
+      if (this.config.reverseDNS) {
+        if (((this.config.reverseDNS.enabled === undefined) && true) || this.config.reverseDNS.enabled) {
+          this.reverseDns = await this.reverseLookup(this.config.reverseDNS.value)
+        }
+      }
+    }
     return super.validate()
   }
 
-  protected async checkHttp(ip: string, hostname: string, timeout: number) {
-    try {
-      const result = await this.getHttpResponse(ip, hostname, timeout, false)
-      this.validateHttpHeaders(result.headers, ip)
-      console.log(chalk.gray(`http[${timeout}]: ${ip}: ${result.statusCode}`))
-      return result
-    } catch (ex) {
-      this.addError("http", ex)
-    }
-  }
-
-  protected async checkHttps(ip: string, hostname: string, timeout: number) {
-    try {
-      const result = await this.getHttpResponse(ip, hostname, timeout, true)
-      this.validateHttpsHeaders(result.headers, ip)
-      console.log(chalk.gray(`https[${timeout}]: ${ip}: ${result.statusCode}`))
-      return result
-    } catch (ex) {
-      this.addError("https", ex)
-    }
-  }
-
-  protected async reverseLookup(ip: string, hostname: string, timeout: number) {
-    // right now we only check for cloudfront
-    try {
-      const names = await Dns.reverse(ip)
-      let found = false
-      for (const name of names) {
-        if (name.endsWith('.r.cloudfront.net')) {
-          found = true
-          break
-        }
+  protected async checkAllHttp(config?: any) {
+    const result = []
+    if (config) {
+      let enabled = true
+      if (config.enabled !== undefined) {
+        enabled = config.enabled
       }
-      if (!found) {
-        this.addError("reverseLookup", `ReverseDNS Mismatch ${names.join(',')} [Expected: '*.r.cloudfront.net']`)
-      }
-    } catch (ex) {
-      this.addError("reverseLookup", `${ex}`)
-    }
-  }
-
-  private validateHttpHeaders(headers: any, ip: string) {
-    let errorCount = 0
-    if (headers.location === undefined) {
-      errorCount += this.validateHeader("http", ip, headers, "location", true)
-    }
-    return errorCount
-  }
-
-  // if value is undefined, we assume that it is a wildcard
-  private validateHeader(
-      action: string,
-      ip: string,
-      headers: any,
-      headerName: string,
-      required: boolean,
-      value ?: string) {
-    if (headers[headerName] === undefined) {
-      if (required) {
-        this.addError(action, `Missing header [${this.name}/${ip}]: ${headerName}`)
-        return 1
-      }
-    } else {
-      if (value) {
-        if (headers[headerName] !== value) {
-          this.addError(
-            action,
-            `Incorrect header value [${this.name}/${ip}]: [${headerName}]: ${headers[headerName]} [Expected: ${value}]`)
-          return 1
+      if (enabled) {
+        for (const record of this.records) {
+          result.push(await this.checkHttp(record))
         }
       }
     }
-    return 0
+    return result
   }
 
-  private validateHttpsHeaders(headers: any, ip: string) {
-    let errorCount = 0
+  protected async checkAllHttps(config?: any) {
+    const result = []
+    if (config) {
+      let enabled = true
+      if (config.enabled !== undefined) {
+        enabled = config.enabled
+      }
+      if (enabled) {
+        for (const record of this.records) {
+          result.push(await this.checkHttps(record))
+        }
+      }
+    }
+    return result
+  }
 
-    errorCount += this.validateHeader("https", ip, headers, "content-type", true)
+  protected async checkHttp(value: any) {
+    const timeout = 1000
+    let result: any
+    try {
+      console.log(chalk.gray(`checkHttp: ${value}`))
+      this.http = this.http || []
+      assert(value !== undefined)
+      result = await this.getHttpResponse(value, this.name, timeout, false)
+      await this.validateHeaders(this.config.http.headers, result.headers)
+      this.http.push(result)
+      const expectedCode = this.config.http.statusCode || 200
+      if (result.statusCode !== expectedCode) {
+        this.addError("http", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
+      }
+      console.log(chalk.gray(`http[${timeout}]: ${value}: ${result.statusCode}`))
+    } catch (ex) {
+      this.addError("RecordValidator.checkHttp", ex)
+      console.error(ex.stack)
+    }
+    return result
+  }
 
-    errorCount += this.validateHeader("https", ip, headers, "content-security-policy", true, "object-src 'none'")
-    errorCount += this.validateHeader("https", ip, headers, "x-content-type-options", true, "nosniff")
-    errorCount += this.validateHeader("https", ip, headers, "x-frame-options", true, "DENY")
-    errorCount += this.validateHeader("https", ip, headers, "x-xss-protection", true, "1; mode=block")
-    errorCount += this.validateHeader("https", ip, headers, "referrer-policy", true, "same-origin")
+  protected async checkHttps(value: any) {
+    const timeout = 1000
+    let result: any
+    try {
+      console.log(chalk.gray(`checkHttps: ${value}`))
+      this.https = this.https || []
+      assert(value !== undefined)
+      result = await this.getHttpResponse(value, this.name, timeout, true)
+      await this.validateHeaders(this.config.https.headers, result.headers)
+      this.https.push(result)
+      const expectedCode = this.config.https.statusCode || 200
+      if (result.statusCode !== expectedCode) {
+        this.addError("https", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
+      }
+      console.log(chalk.gray(`https[${timeout}]: ${value}: ${result.statusCode}`))
+    } catch (ex) {
+      this.addError("RecordValidator.checkHttps", ex)
+      console.error(chalk.red(ex.stack))
+    }
+    return result
+  }
 
-    return errorCount
+  protected async reverseLookup(value?: string) {
+    const result: any[] = []
+    try {
+      for (const record of this.records) {
+        const domains = await Dns.reverse(record)
+        let valid = true
+        if (value) {
+          for (const domain of domains) {
+            if (!domain.match(value)) {
+              valid = false
+              this.addError("reverse", `Unexpected Domain: ${domain}`)
+            }
+          }
+        }
+        result.push({
+          ip: record,
+          domains,
+          valid
+        })
+      }
+    } catch (ex) {
+      this.addError("RecordValidator.reverseLookup", ex.message)
+      console.error(chalk.red(ex.stack))
+    }
+    return result
+  }
+
+  private async resolve() {
+    try {
+      if (this.type) {
+        return await Dns.resolve(this.name, this.type)
+      }
+      this.addError("RecordValidator.resolve", "Missing Type")
+    } catch (ex) {
+      this.addError("RecordValidator.resolve", ex.message)
+      console.error(chalk.red(ex.stack))
+    }
+    return []
+  }
+
+  private validateHeaders(expected: any[], actual: any) {
+    if (Array.isArray(expected)) {
+      for (const item of expected) {
+        const value = actual[item.name]
+        if (item.required && value === undefined) {
+          this.addError("headers", `Missing: ${item.name}`)
+        } else if (value === undefined) {
+          if (item.value === undefined) {
+            this.addError("headers", `Invalid Value Configured: ${item.name}`)
+          } else {
+            if (!item.value.match(actual[item.name])) {
+              this.addError("headers", `Invalid Value [${item.name}]: ${actual[item.name]} [Expected: ${item.value}]`)
+            }
+          }
+        }
+      }
+    }
   }
 
   private sanitizeResponse(res: any, callTime: number) {
@@ -144,7 +210,7 @@ export class RecordValidator extends BaseValidator {
           reject(`Timeout [${this.name}]: ${timeout}`)
         })
       } catch (ex) {
-        this.addError("getHttpResponse", `[${this.name}]: ${ex}`)
+        this.addError("getHttpResponse", `[${this.name}]: ${ex.message}`)
         reject(ex)
       }
     })

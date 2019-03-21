@@ -52,22 +52,42 @@
         }
       }
     },
+    "header": {
+      "$id": "#definitions/header",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": {"type": "boolean"},
+        "name": {"type": "string"},
+        "value": {"type": "string"}
+      }
+    },
     "http": {
       "$id": "#definitions/http",
-      "additionalProperties": false,
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "enabled": {"type": "boolean"},
-        "code": {"type": "number"}
+        "statusCode": {"type": "number"},
+        "httpVersion": {"type": "string"},
+        "headers": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/header"}
+        }
       }
     },
     "https": {
       "$id": "#definitions/https",
+      "type": "object",
       "additionalProperties": false,
       "properties": {
         "enabled": {"type": "boolean"},
-        "code": {"type": "number"},
-        "version": {"type": "string"}
+        "statusCode": {"type": "number"},
+        "httpVersion": {"type": "string"},
+        "headers": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/header"}
+        }
       }
     },
     "domain": {

@@ -7,11 +7,9 @@ export class BaseValidator {
   public name: string
   public errors?: ValidationError[]
   public errorCount = 0
-  protected config: Config
 
-  constructor(config: any, name: string) {
+  constructor(name: string) {
     this.name = name
-    this.config = config
   }
 
   public toJSON () {
@@ -29,12 +27,14 @@ export class BaseValidator {
     this.errors = this.errors || []
     this.errors.push(new ValidationError(action, error))
     console.error(chalk.red(`${action}: ${error}`))
+    this.errorCount++
   }
 
   public addErrors(errors: ValidationError[] | undefined) {
     if (errors) {
       this.errors = this.errors || []
       this.errors = this.errors.concat(errors)
+      this.errorCount += errors.length
     }
   }
 

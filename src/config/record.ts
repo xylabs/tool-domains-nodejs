@@ -6,11 +6,14 @@ export class RecordConfig {
   public enabled?: boolean
 
   public reverseDNS?: {
-    "enabled": true
+    "enabled": true,
+    "value": string
   }
 
   public allowed?: number[]
   public expected?: any[]
+  public http?: any
+  public https?: any
 
   constructor(type: string) {
     this.type = type
