@@ -21,7 +21,7 @@ Note: Make sure you have your AWS credatials configured
 
 ```sh
 # Start check
-dnslint start
+dnslint
 ```
 
 This will scan your entire AWS Route53 and output results in output.json
