@@ -5,6 +5,7 @@ export class RecordConfig {
   public type: string
   public enabled?: boolean
   public timeout?: number
+  public html?: boolean
 
   public reverseDNS?: {
     "enabled": true,

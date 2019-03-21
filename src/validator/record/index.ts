@@ -1,12 +1,11 @@
 import { BaseValidator } from '../base'
-import { Config } from '../../config'
 import { Dns } from '../../dns'
 import http, { IncomingMessage } from 'http'
 import https from 'https'
 import chalk from 'chalk'
 import { RecordConfig } from '../../config/record'
 import assert from 'assert'
-import { inspect } from 'util'
+import htmlValidator from 'html-validator'
 export class RecordValidator extends BaseValidator {
 
   public type: string
@@ -81,6 +80,14 @@ export class RecordValidator extends BaseValidator {
     return result
   }
 
+  protected async validateHtml(data: string) {
+    const results = await htmlValidator({
+      data,
+      format: 'json'
+    })
+    return results.messages
+  }
+
   protected async checkHttp(value: any) {
     const timeout = this.config.timeout || 1000
     let result: any = {
@@ -90,13 +97,26 @@ export class RecordValidator extends BaseValidator {
       console.log(chalk.gray(`checkHttp: ${value}`))
       this.http = this.http || []
       assert(value !== undefined)
-      result = await this.getHttpResponse(value, this.name, timeout, false)
+      const response = await this.getHttpResponse(value, this.name, timeout, false)
+      result = response.result
       await this.validateHeaders(this.config.http.headers, result.headers)
       this.http.push(result)
       const expectedCode = this.config.http.statusCode || 200
       if (result.statusCode !== expectedCode) {
         this.addError("http", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
+      } else {
+        if (this.config.html) {
+          if (result.statusCode === 200) {
+            const results = await this.validateHtml(response.rawData)
+            if (results && results.length > 0) {
+              for (const item of results) {
+                this.addError("html", item)
+              }
+            }
+          }
+        }
       }
+      result.data = undefined
       console.log(chalk.gray(`http[${timeout}]: ${value}: ${result.statusCode}`))
     } catch (ex) {
       this.addError("RecordValidator.checkHttp", ex)
@@ -114,12 +134,24 @@ export class RecordValidator extends BaseValidator {
       console.log(chalk.gray(`checkHttps: ${value}`))
       this.https = this.https || []
       assert(value !== undefined)
-      result = await this.getHttpResponse(value, this.name, timeout, true)
+      const response = await this.getHttpResponse(value, this.name, timeout, true)
+      result = response.result
       await this.validateHeaders(this.config.https.headers, result.headers)
       this.https.push(result)
       const expectedCode = this.config.https.statusCode || 200
       if (result.statusCode !== expectedCode) {
         this.addError("https", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
+      } else {
+        if (result.statusCode === 200) {
+          if (this.config.html) {
+            const results = await this.validateHtml(response.rawData)
+            if (results && results.length > 0) {
+              for (const item of results) {
+                this.addError("html", item)
+              }
+            }
+          }
+        }
       }
       console.log(chalk.gray(`https[${timeout}]: ${value}: ${result.statusCode}`))
     } catch (ex) {
@@ -202,21 +234,22 @@ export class RecordValidator extends BaseValidator {
     const prefix = ssl ? "https" : "http"
     const func = ssl ? https : http
     const startTime = Date.now()
-    let bytesRead = 0
+    let rawData = ''
     let result: any = {}
     return new Promise<any>((resolve, reject) => {
       try {
+        const bytes = new Buffer(1)
         const req = func.get(`${prefix}://${ip}`, { hostname, timeout }, (res) => {
           result = this.sanitizeResponse(res, Date.now() - startTime)
           result.port = res.socket.remotePort
-          res.on('data', (data) => {
-            bytesRead += data.length
+          res.on('data', (chunk) => {
+            rawData += chunk
           })
         }).on('error', (e) => {
           reject(e.message)
         }).on('close', () => {
-          result.bytesRead = bytesRead
-          resolve(result)
+          result.bytesRead = rawData.length
+          resolve({ result, rawData })
         }).setTimeout(timeout, () => {
           reject(`Timeout [${this.name}]: ${timeout}`)
         })
