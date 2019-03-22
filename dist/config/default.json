@@ -10,7 +10,7 @@
             "records": [
                 {
                     "type": "default",
-                    "timeout": 500,
+                    "timeout": 1000,
                     "reverseDNS": {
                         "enabled": false
                     }
@@ -24,6 +24,7 @@
                     },
                     "http": {
                         "statusCode": 301,
+                        "callTimeMax": 200,
                         "headers": [
                             {
                                 "required": true,
@@ -33,6 +34,7 @@
                     },
                     "https": {
                         "statusCode": 200,
+                        "callTimeMax": 200,
                         "headers": [
                             {
                                 "required": true,

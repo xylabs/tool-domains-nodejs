@@ -99,6 +99,11 @@ export class RecordValidator extends BaseValidator {
       assert(value !== undefined)
       const response = await this.getHttpResponse(value, this.name, timeout, false)
       result = response.result
+      if (this.config.http.callTimeMax) {
+        if (result.callTime > this.config.http.callTimeMax) {
+          this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`)
+        }
+      }
       await this.validateHeaders(this.config.http.headers, result.headers)
       this.http.push(result)
       const expectedCode = this.config.http.statusCode || 200
@@ -136,6 +141,11 @@ export class RecordValidator extends BaseValidator {
       assert(value !== undefined)
       const response = await this.getHttpResponse(value, this.name, timeout, true)
       result = response.result
+      if (this.config.https.callTimeMax) {
+        if (result.callTime > this.config.https.callTimeMax) {
+          this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
+        }
+      }
       await this.validateHeaders(this.config.https.headers, result.headers)
       this.https.push(result)
       const expectedCode = this.config.https.statusCode || 200
@@ -220,13 +230,12 @@ export class RecordValidator extends BaseValidator {
     }
   }
 
-  private sanitizeResponse(res: any, callTime: number) {
+  private sanitizeResponse(res: any) {
     return {
       httpVersion: res.httpVersion,
       statusCode: res.statusCode,
       statusMessage: res.statusMessage,
-      headers: res.headers,
-      callTime
+      headers: res.headers
     }
   }
 
@@ -239,7 +248,7 @@ export class RecordValidator extends BaseValidator {
     return new Promise<any>((resolve, reject) => {
       try {
         func.get(`${prefix}://${ip}`, { hostname, timeout }, (res) => {
-          result = this.sanitizeResponse(res, Date.now() - startTime)
+          result = this.sanitizeResponse(res)
           result.port = res.socket.remotePort
           res.on('data', (chunk) => {
             rawData += chunk
@@ -248,6 +257,7 @@ export class RecordValidator extends BaseValidator {
           reject(e.message)
         }).on('close', () => {
           result.bytesRead = rawData.length
+          result.callTime = Date.now() - startTime
           resolve({ result, rawData })
         }).setTimeout(timeout, () => {
           reject(`Timeout [${this.name}]: ${timeout}`)

@@ -59,7 +59,7 @@ class XyDomainScan {
                     console.error(chalk_1.default.red(ex.stack));
                 }
             }
-            console.log(`Saving to File: output.json`);
+            console.log(`Saving to File: ${output}`);
             this.saveToFile(output, result);
             if (result.errorCount === 0) {
                 console.log(chalk_1.default.green("Congratulations, all tests passed!"));

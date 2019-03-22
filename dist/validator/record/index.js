@@ -110,6 +110,11 @@ class RecordValidator extends base_1.BaseValidator {
                 assert_1.default(value !== undefined);
                 const response = yield this.getHttpResponse(value, this.name, timeout, false);
                 result = response.result;
+                if (this.config.callTimeMax) {
+                    if (result.callTime > this.config.callTimeMax) {
+                        this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.callTimeMax}ms]`);
+                    }
+                }
                 yield this.validateHeaders(this.config.http.headers, result.headers);
                 this.http.push(result);
                 const expectedCode = this.config.http.statusCode || 200;
@@ -150,6 +155,11 @@ class RecordValidator extends base_1.BaseValidator {
                 assert_1.default(value !== undefined);
                 const response = yield this.getHttpResponse(value, this.name, timeout, true);
                 result = response.result;
+                if (this.config.callTimeMax) {
+                    if (result.callTime > this.config.callTimeMax) {
+                        this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.callTimeMax}ms]`);
+                    }
+                }
                 yield this.validateHeaders(this.config.https.headers, result.headers);
                 this.https.push(result);
                 const expectedCode = this.config.https.statusCode || 200;
@@ -241,13 +251,12 @@ class RecordValidator extends base_1.BaseValidator {
             }
         }
     }
-    sanitizeResponse(res, callTime) {
+    sanitizeResponse(res) {
         return {
             httpVersion: res.httpVersion,
             statusCode: res.statusCode,
             statusMessage: res.statusMessage,
-            headers: res.headers,
-            callTime
+            headers: res.headers
         };
     }
     getHttpResponse(ip, hostname, timeout, ssl = false) {
@@ -260,7 +269,7 @@ class RecordValidator extends base_1.BaseValidator {
             return new Promise((resolve, reject) => {
                 try {
                     func.get(`${prefix}://${ip}`, { hostname, timeout }, (res) => {
-                        result = this.sanitizeResponse(res, Date.now() - startTime);
+                        result = this.sanitizeResponse(res);
                         result.port = res.socket.remotePort;
                         res.on('data', (chunk) => {
                             rawData += chunk;
@@ -269,6 +278,7 @@ class RecordValidator extends base_1.BaseValidator {
                         reject(e.message);
                     }).on('close', () => {
                         result.bytesRead = rawData.length;
+                        result.callTime = Date.now() - startTime;
                         resolve({ result, rawData });
                     }).setTimeout(timeout, () => {
                         reject(`Timeout [${this.name}]: ${timeout}`);
