@@ -7,6 +7,7 @@ import { RecordConfig } from '../../config/record'
 import assert from 'assert'
 import htmlValidator from 'html-validator'
 import axios from 'axios'
+import { inspect } from 'util'
 
 export class RecordValidator extends BaseValidator {
 
@@ -97,44 +98,61 @@ export class RecordValidator extends BaseValidator {
     return results.messages
   }
 
+  protected async get(prefix: string, ip: string) {
+    const timeout = this.config.timeout || 1000
+    let response: any
+    try {
+      response = await axios.get(`${prefix}${ip}`, { responseType: 'text', timeout, headers: {
+        Host: this.name}})
+      // console.log(chalk.magenta(inspect(response)))
+    } catch (ex) {
+      response = (ex.response) ?
+        ex.response : ex
+    }
+    return response
+  }
+
   protected async checkHttp(value: any) {
     const timeout = this.config.timeout || 1000
     const result: any = {
       ip: value
     }
     try {
-      console.log(chalk.gray(`checkHttp: ${value}`))
+      console.log(chalk.gray(`checkHttp[${this.name}]: ${value}`))
       this.http = this.http || []
       assert(value !== undefined)
       let callTime = Date.now()
-      const response = await axios.get(`https://${value}`, { responseType: 'text', timeout, headers: {
-        Host: this.name
-      }
-      })
+      const response: any = await this.get("http://", value)
       callTime = Date.now() - callTime
-      result.headers = response.headers
-      result.statusCode = response.status
-      result.statusMessage = response.statusText
-      if (this.config.http.callTimeMax) {
-        if (result.callTime > this.config.http.callTimeMax) {
-          this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`)
-        }
-      }
-      await this.validateHeaders(this.config.http.headers, result.headers)
-      result.ip = value
-      this.http.push(result)
-      const expectedCode = this.config.http.statusCode || 200
-      if (result.statusCode !== expectedCode) {
-        this.addError("http", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
-      } else {
-        if (this.config.html || this.config.html === undefined) {
-          if (result.statusCode === 200) {
-            const results = await this.validateHtml(response.data, value)
+      if (response.status) {
+        result.headers = response.headers
+        result.statusCode = response.status
+        result.statusMessage = response.statusText
+        if (this.config.http.callTimeMax) {
+          if (result.callTime > this.config.http.callTimeMax) {
+            this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`)
           }
         }
+        if (result.headers) {
+          await this.validateHeaders(this.config.http.headers, result.headers)
+        }
+        result.ip = value
+        this.http.push(result)
+        const expectedCode = this.config.http.statusCode || 200
+        if (result.statusCode !== expectedCode) {
+          this.addError("http", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
+        } else {
+          if (this.config.html || this.config.html === undefined) {
+            if (result.statusCode === 200) {
+              const results = await this.validateHtml(response.data, value)
+            }
+          }
+        }
+        result.data = undefined
+        console.log(chalk.gray(`http: ${value}: ${result.statusCode}`))
+      } else {
+        this.addError("http", `Failed to get Response [${response.code}]: ${response.message}`)
       }
-      result.data = undefined
-      console.log(chalk.gray(`http[${timeout}]: ${value}: ${result.statusCode}`))
     } catch (ex) {
       this.addError("RecordValidator.checkHttp", ex)
       console.error(ex.stack)
@@ -148,39 +166,44 @@ export class RecordValidator extends BaseValidator {
       ip: value
     }
     try {
-      console.log(chalk.gray(`checkHttps: ${value}`))
+      console.log(chalk.gray(`checkHttps[${this.name}]: ${value}`))
       this.https = this.https || []
       assert(value !== undefined)
       let callTime = Date.now()
-      const response = await axios.request({baseURL: `https://${value}`, responseType: 'text', timeout, headers: {
-        Host: this.name
-      }})
+      const response = await this.get("https://", value)
       callTime = Date.now() - callTime
-      result.headers = response.headers
-      result.statusCode = response.status
-      result.statusMessage = response.statusText
-      if (this.config.https.callTimeMax) {
-        if (callTime > this.config.https.callTimeMax) {
-          this.addError("https", `Call too slow: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
-        }
-      }
-      await this.validateHeaders(this.config.https.headers, result.headers)
-      result.ip = value
-      this.https.push(result)
-      const expectedCode = this.config.https.statusCode || 200
-      if (result.statusCode !== expectedCode) {
-        this.addError("https", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
-      } else {
-        if (result.statusCode === 200) {
-          if (this.config.html || this.config.html === undefined) {
-            await this.validateHtml(response.data, value)
+      if (response.status) {
+        result.headers = response.headers
+        result.statusCode = response.status
+        result.statusMessage = response.statusText
+        if (this.config.https.callTimeMax) {
+          if (callTime > this.config.https.callTimeMax) {
+            this.addError("https", `Call too slow: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
           }
         }
+        if (result.headers) {
+          await this.validateHeaders(this.config.https.headers, result.headers)
+        }
+        result.ip = value
+        this.https.push(result)
+        const expectedCode = this.config.https.statusCode || 200
+        if (result.statusCode !== expectedCode) {
+          this.addError("https", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
+        } else {
+          if (result.statusCode === 200) {
+            if (this.config.html || this.config.html === undefined) {
+              await this.validateHtml(response.data, value)
+            }
+          }
+        }
+        result.data = undefined
+        console.log(chalk.gray(`https[${timeout}]: ${value}: ${result.statusCode}`))
+      } else {
+        this.addError("https", `Failed to get Response [${response.code}]: ${response.message}`)
       }
-      console.log(chalk.gray(`https[${timeout}]: ${value}: ${result.statusCode}`))
     } catch (ex) {
       this.addError("RecordValidator.checkHttps", ex)
-      console.error(ex.stack)
+      // console.error(ex.stack)
     }
     return result
   }
@@ -241,15 +264,6 @@ export class RecordValidator extends BaseValidator {
           }
         }
       }
-    }
-  }
-
-  private sanitizeResponse(res: any) {
-    return {
-      httpVersion: res.httpVersion,
-      statusCode: res.statusCode,
-      statusMessage: res.statusMessage,
-      headers: res.headers
     }
   }
 

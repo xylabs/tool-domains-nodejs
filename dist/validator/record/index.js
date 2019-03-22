@@ -102,9 +102,23 @@ class RecordValidator extends base_1.BaseValidator {
             return results.messages;
         });
     }
-    checkHttp(value) {
+    get(url) {
         return __awaiter(this, void 0, void 0, function* () {
             const timeout = this.config.timeout || 1000;
+            let response;
+            try {
+                response = yield axios_1.default.get(url, { responseType: 'text', timeout, headers: {
+                        Host: this.name
+                    } });
+            }
+            catch (ex) {
+                response = { status: ex.code, headers: [] };
+            }
+            return response;
+        });
+    }
+    checkHttp(value) {
+        return __awaiter(this, void 0, void 0, function* () {
             const result = {
                 ip: value
             };
@@ -113,10 +127,7 @@ class RecordValidator extends base_1.BaseValidator {
                 this.http = this.http || [];
                 assert_1.default(value !== undefined);
                 let callTime = Date.now();
-                const response = yield axios_1.default.get(`https://${value}`, { responseType: 'text', timeout, headers: {
-                        Host: value
-                    }
-                });
+                const response = yield this.get(`https://${value}`);
                 callTime = Date.now() - callTime;
                 result.headers = response.headers;
                 result.statusCode = response.status;
@@ -141,7 +152,7 @@ class RecordValidator extends base_1.BaseValidator {
                     }
                 }
                 result.data = undefined;
-                console.log(chalk_1.default.gray(`http[${timeout}]: ${value}: ${result.statusCode}`));
+                console.log(chalk_1.default.gray(`http: ${value}: ${result.statusCode}`));
             }
             catch (ex) {
                 this.addError("RecordValidator.checkHttp", ex);
@@ -161,10 +172,7 @@ class RecordValidator extends base_1.BaseValidator {
                 this.https = this.https || [];
                 assert_1.default(value !== undefined);
                 let callTime = Date.now();
-                const response = yield axios_1.default.get(`https://${value}`, { responseType: 'text', timeout, headers: {
-                        Host: value
-                    }
-                });
+                const response = yield this.get(`https://${value}`);
                 callTime = Date.now() - callTime;
                 result.headers = response.headers;
                 result.statusCode = response.status;
@@ -192,7 +200,7 @@ class RecordValidator extends base_1.BaseValidator {
             }
             catch (ex) {
                 this.addError("RecordValidator.checkHttps", ex);
-                console.error(chalk_1.default.red(ex.stack));
+                // console.error(ex.stack)
             }
             return result;
         });
@@ -260,14 +268,6 @@ class RecordValidator extends base_1.BaseValidator {
                 }
             }
         }
-    }
-    sanitizeResponse(res) {
-        return {
-            httpVersion: res.httpVersion,
-            statusCode: res.statusCode,
-            statusMessage: res.statusMessage,
-            headers: res.headers
-        };
     }
 }
 exports.RecordValidator = RecordValidator;

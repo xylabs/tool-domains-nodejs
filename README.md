@@ -26,7 +26,38 @@ dnslint
 
 This will scan your entire AWS Route53 and output results in output.json
 
-### CLI options
+## CLI options
+
+## Config File [dnslint.json]
+
+Make sure you put the config file in the same folder from where you are running the tool.
+
+```json
+{
+  "$schema": "./src/schema/dnslint.schema.json#",
+  "aws": {
+    "enabled": true
+  },
+  "domains": [
+    {
+      "name": "default",
+      "reverseDNS": {
+        "enabled": false
+      },
+      "records": [
+        {
+          "type": "default",
+          "html": true
+        }
+      ]
+    },
+    {
+      "name": "xy.company",
+      "enabled": true
+    }
+  ]
+}
+```
 
 ## Developer Guide
 
