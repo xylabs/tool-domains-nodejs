@@ -11,7 +11,7 @@ export class XyDomainScan {
   private aws = new AWS()
   private config = new Config()
 
-  public async start(singleDomain?: string, config?: Config) {
+  public async start(output: string, singleDomain?: string, config?: Config) {
     this.config = await Config.load({ config })
     const domains = new Map<string, DomainValidator>()
     const result: any = {
@@ -52,8 +52,8 @@ export class XyDomainScan {
       }
     }
 
-    console.log(`Saving to File: output.json`)
-    this.saveToFile("output.json", result)
+    console.log(`Saving to File: ${output}`)
+    this.saveToFile(output, result)
     if (result.errorCount === 0) {
       console.log(chalk.green("Congratulations, all tests passed!"))
     } else {

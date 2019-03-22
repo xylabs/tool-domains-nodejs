@@ -22,7 +22,7 @@ class XyDomainScan {
         this.aws = new aws_1.AWS();
         this.config = new config_1.Config();
     }
-    start(config) {
+    start(output, singleDomain, config) {
         return __awaiter(this, void 0, void 0, function* () {
             this.config = yield config_1.Config.load({ config });
             const domains = new Map();
@@ -31,8 +31,8 @@ class XyDomainScan {
                 errorCount: 0
             };
             // special case if domain specified
-            if (config && config.domains) {
-                yield this.addDomains(domains, config.domains);
+            if (singleDomain) {
+                domains.set(singleDomain, new validator_1.DomainValidator(singleDomain, this.config));
             }
             else {
                 console.log(chalk_1.default.gray("Getting Domains"));
@@ -60,7 +60,7 @@ class XyDomainScan {
                 }
             }
             console.log(`Saving to File: output.json`);
-            this.saveToFile("output.json", result);
+            this.saveToFile(output, result);
             if (result.errorCount === 0) {
                 console.log(chalk_1.default.green("Congratulations, all tests passed!"));
             }
