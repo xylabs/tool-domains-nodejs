@@ -11,6 +11,7 @@
                 {
                     "type": "default",
                     "timeout": 1000,
+                    "html": false,
                     "reverseDNS": {
                         "enabled": false
                     }

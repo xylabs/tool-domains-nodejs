@@ -3,7 +3,7 @@ import { AWS } from './aws'
 import { DomainConfig } from './domain'
 import chalk from 'chalk'
 import { DomainsConfig } from './domains'
-import defaultConfig from './default.json'
+import defaultConfigJson from './default.json'
 import _ from 'lodash'
 import { ServersConfig } from './servers'
 import Ajv from 'ajv'
@@ -22,6 +22,7 @@ export class Config {
       } else {
         console.log(chalk.green("Default Config Validated"))
       }*/
+      const defaultConfig = defaultConfigJson
       console.log(chalk.gray("Loaded Default Config"))
       try {
         const userJson: object = await loadJsonFile(params.filename)
@@ -84,20 +85,17 @@ export class Config {
 
   public getRecordConfig(domain: string, recordType: string) {
     const serverType = this.getServerType(domain)
-    const result = new RecordConfig(recordType)
+    let serverRecord = new RecordConfig(recordType)
+    let domainRecord = new RecordConfig(recordType)
+
     if (this.servers !== undefined) {
-      const records = this.servers.getConfig(serverType).records
-      if (records) {
-        Object.assign(result, records.getConfig(recordType))
-      }
+      serverRecord = this.servers.getRecordConfig(serverType, recordType)
     }
+
     if (this.domains !== undefined) {
-      const records = this.domains.getConfig(domain).records
-      if (records) {
-        Object.assign(result, records.getConfig(recordType))
-      }
+      domainRecord = this.domains.getRecordConfig(serverType, recordType)
     }
-    return result
+    return _.merge(serverRecord, domainRecord)
   }
 
   public getRecordConfigs(domain: string): Map<string, RecordConfig> {
@@ -109,7 +107,9 @@ export class Config {
       if (records) {
         for (const record of records) {
           if (record.type) {
-            result.set(record.type, records.getConfig(record.type))
+            if (result.get(record.type) === undefined) {
+              result.set(record.type, this.getRecordConfig(domain, record.type))
+            }
           }
         }
       }
@@ -118,12 +118,8 @@ export class Config {
       const records = this.servers.getConfig(serverType).records
       if (records) {
         for (const record of records) {
-          if (record.type) {
-            const newItem = _.merge(
-              result.get(record.type) || new RecordConfig(record.type),
-              records.getConfig(record.type)
-            )
-            result.set(record.type, newItem)
+          if (result.get(record.type) === undefined) {
+            result.set(record.type, this.getRecordConfig(domain, record.type))
           }
         }
       }
@@ -132,12 +128,8 @@ export class Config {
       const records = this.domains.getConfig(domain).records
       if (records) {
         for (const record of records) {
-          if (record.type) {
-            const newItem = _.merge(
-              result.get(record.type) || new RecordConfig(record.type),
-              records.getConfig(record.type)
-            )
-            result.set(record.type, newItem)
+          if (result.get(record.type) === undefined) {
+            result.set(record.type, this.getRecordConfig(domain, record.type))
           }
         }
       }
