@@ -31,6 +31,4 @@ program
 
 program.parse(process.argv)
 
-console.log(inspect(program))
-
 start(program.output, program.domainToCheck)
