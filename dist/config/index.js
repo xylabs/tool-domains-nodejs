@@ -39,6 +39,7 @@ class Config {
                 } else {
                   console.log(chalk.green("Default Config Validated"))
                 }*/
+                const defaultConfig = default_json_1.default;
                 console.log(chalk_1.default.gray("Loaded Default Config"));
                 try {
                     const userJson = yield load_json_file_1.default(params.filename);
@@ -50,12 +51,12 @@ class Config {
                     console.log(chalk_1.default.gray("Loaded User Config"));
                     let result;
                     if (params.config) {
-                        result = new Config(lodash_1.default.mergeWith(params.config, default_json_1.default, userJson, (objValue, srcValue, key, object, source, stack) => {
+                        result = new Config(lodash_1.default.mergeWith(params.config, defaultConfig, userJson, (objValue, srcValue, key, object, source, stack) => {
                             return undefined;
                         }));
                     }
                     else {
-                        result = new Config(lodash_1.default.mergeWith(default_json_1.default, userJson, (objValue, srcValue, key, object, source, stack) => {
+                        result = new Config(lodash_1.default.mergeWith(defaultConfig, userJson, (objValue, srcValue, key, object, source, stack) => {
                             return undefined;
                         }));
                     }
@@ -63,7 +64,7 @@ class Config {
                 }
                 catch (ex) {
                     console.log(chalk_1.default.yellow("No dnslint.json config file found.  Using defaults."));
-                    return new Config(default_json_1.default);
+                    return new Config(defaultConfig);
                 }
             }
             catch (ex) {
@@ -90,13 +91,13 @@ class Config {
         if (this.servers !== undefined) {
             const records = this.servers.getConfig(serverType).records;
             if (records) {
-                Object.assign(result, records.getConfig(recordType));
+                lodash_1.default.merge(result, records.getConfig(recordType));
             }
         }
         if (this.domains !== undefined) {
             const records = this.domains.getConfig(domain).records;
             if (records) {
-                Object.assign(result, records.getConfig(recordType));
+                lodash_1.default.merge(result, records.getConfig(recordType));
             }
         }
         return result;

@@ -1,4 +1,6 @@
 import { DomainConfig } from "./domain"
+import { RecordConfig } from "./record"
+import _ from "lodash"
 
 export class DomainsConfig extends Array<DomainConfig> {
 
@@ -17,6 +19,20 @@ export class DomainsConfig extends Array<DomainConfig> {
     const result = new DomainConfig(domain, [map.get("default"), map.get(domain)])
     result.name = domain
     return result
+  }
+
+  public getRecordConfig(serverType: string, recordType: string) {
+    let defaultRecordConfig = new RecordConfig(recordType)
+    let serverRecordConfig = new RecordConfig(recordType)
+    const defaultConfig = this.getConfig("default")
+    const serverConfig = this.getConfig(serverType)
+    if (defaultConfig && defaultConfig.records) {
+      defaultRecordConfig = defaultConfig.records.getConfig(recordType)
+    }
+    if (serverConfig && serverConfig.records) {
+      serverRecordConfig = serverConfig.records.getConfig(recordType)
+    }
+    return _.merge(defaultRecordConfig, serverRecordConfig)
   }
 
   public getMap() {

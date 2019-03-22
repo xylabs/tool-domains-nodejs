@@ -9,16 +9,24 @@
       "reverseDNS": {
         "enabled": false
       },
+      "records": [{
+        "type": "default"
+      }]
+    },
+    {
+      "name": "xy.company",
+      "enabled": true
+    }
+  ],
+  "servers": [
+    {
+      "name": "website",
       "records": [
         {
           "type": "default",
           "html": true
         }
       ]
-    },
-    {
-      "name": "xy.company",
-      "enabled": true
     }
   ]
 }
