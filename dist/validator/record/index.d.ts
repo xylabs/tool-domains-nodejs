@@ -12,12 +12,11 @@ export declare class RecordValidator extends BaseValidator {
     validate(): Promise<number>;
     protected checkAllHttp(config?: any): Promise<any[]>;
     protected checkAllHttps(config?: any): Promise<any[]>;
-    protected validateHtml(data: string): Promise<any>;
+    protected validateHtml(data: string, ip: string): Promise<any>;
+    protected get(url: string): Promise<any>;
     protected checkHttp(value: any): Promise<any>;
     protected checkHttps(value: any): Promise<any>;
     protected reverseLookup(value?: string): Promise<any[]>;
     private resolve;
     private validateHeaders;
-    private sanitizeResponse;
-    private getHttpResponse;
 }

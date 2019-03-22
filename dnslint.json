@@ -8,22 +8,16 @@
       "name": "default",
       "reverseDNS": {
         "enabled": false
-      }
+      },
+      "records": [
+        {
+          "type": "default",
+          "html": true
+        }
+      ]
     },
     {
-      "name": "xyo.network",
-      "enabled": true
-    },
-    {
-      "name": "s1._domainkey.xyo.network",
-      "enabled": true
-    },
-    {
-      "name": "coinworldtour.com",
-      "enabled": true
-    },
-    {
-      "name": "api.xyfindit.com",
+      "name": "xy.company",
       "enabled": true
     }
   ]

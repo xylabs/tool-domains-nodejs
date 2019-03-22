@@ -3,6 +3,7 @@ export declare class RecordConfig {
     enabled?: boolean;
     timeout?: number;
     html?: boolean;
+    callTimeMax?: number;
     reverseDNS?: {
         "enabled": true;
         "value": string;

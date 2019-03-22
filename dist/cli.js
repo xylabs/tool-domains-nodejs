@@ -14,7 +14,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = __importDefault(require("commander"));
 const dotenv_expand_1 = __importDefault(require("dotenv-expand"));
 const _1 = require("./");
-const util_1 = require("util");
 const getVersion = () => {
     dotenv_expand_1.default({
         parsed: {
@@ -33,9 +32,8 @@ const start = (output, domain) => __awaiter(this, void 0, void 0, function* () {
 const program = commander_1.default;
 program
     .version(getVersion())
-    .option("-o, --output [value]", "Output file path")
+    .option("-o, --output [value]", "Output file path", "dnslint-report.json")
     .option("-d, --domainToCheck [value]", "Domain to Check");
 program.parse(process.argv);
-console.log(util_1.inspect(program));
 start(program.output, program.domainToCheck);
 //# sourceMappingURL=cli.js.map
