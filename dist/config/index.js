@@ -28,9 +28,10 @@ class Config {
         this.domains = new domains_1.DomainsConfig().concat(this.domains || []);
         this.servers = new servers_1.ServersConfig().concat(this.servers || []);
     }
-    static load(filename = './dnslint.json') {
+    static load(params) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                params.filename = params.filename || './dnslint.json';
                 /*const ajv = new Ajv({ schemaId: 'id' })
                 const validate = ajv.compile(schema)
                 if (!validate(defaultConfig)) {
@@ -40,16 +41,24 @@ class Config {
                 }*/
                 console.log(chalk_1.default.gray("Loaded Default Config"));
                 try {
-                    const userJson = yield load_json_file_1.default(filename);
+                    const userJson = yield load_json_file_1.default(params.filename);
                     /*if (!validate(userJson)) {
                       console.error(chalk.red(`${validate.errors}`))
                     } else {
                       console.log(chalk.green("User Config Validated"))
                     }*/
                     console.log(chalk_1.default.gray("Loaded User Config"));
-                    const result = new Config(lodash_1.default.mergeWith(default_json_1.default, userJson, (objValue, srcValue, key, object, source, stack) => {
-                        return undefined;
-                    }));
+                    let result;
+                    if (params.config) {
+                        result = new Config(lodash_1.default.mergeWith(params.config, default_json_1.default, userJson, (objValue, srcValue, key, object, source, stack) => {
+                            return undefined;
+                        }));
+                    }
+                    else {
+                        result = new Config(lodash_1.default.mergeWith(default_json_1.default, userJson, (objValue, srcValue, key, object, source, stack) => {
+                            return undefined;
+                        }));
+                    }
                     return result;
                 }
                 catch (ex) {

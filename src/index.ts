@@ -4,29 +4,37 @@ import { Config } from './config'
 import { oc } from 'ts-optchain'
 import chalk from 'chalk'
 import { DomainValidator } from './validator'
+import { DomainsConfig } from './config/domains'
 
 export class XyDomainScan {
 
   private aws = new AWS()
   private config = new Config()
 
-  public async start() {
-    this.config = await Config.load()
+  public async start(output: string, singleDomain?: string, config?: Config) {
+    this.config = await Config.load({ config })
     const domains = new Map<string, DomainValidator>()
     const result: any = {
       domains: [],
       errorCount: 0
     }
 
-    console.log(chalk.gray("Getting Domains"))
+    // special case if domain specified
+    if (singleDomain) {
+      domains.set(singleDomain, new DomainValidator(singleDomain, this.config))
+    } else {
 
-    if (oc(this.config).aws.enabled(true)) {
-      await this.addAWSDomains(domains)
+      console.log(chalk.gray("Getting Domains"))
+
+      if (oc(this.config).aws.enabled(true)) {
+        await this.addAWSDomains(domains)
+      }
+
+      console.log(chalk.gray("Getting Config Domains"))
+      if (this.config.domains) {
+        await this.addDomains(domains, this.config.domains)
+      }
     }
-
-    console.log(chalk.gray("Getting Config Domains"))
-
-    await this.addConfigDomains(domains)
 
     console.log(`Domains Found: ${domains.size}`)
 
@@ -44,8 +52,8 @@ export class XyDomainScan {
       }
     }
 
-    console.log(`Saving to File: output.json`)
-    this.saveToFile("output.json", result)
+    console.log(`Saving to File: ${output}`)
+    this.saveToFile(output, result)
     if (result.errorCount === 0) {
       console.log(chalk.green("Congratulations, all tests passed!"))
     } else {
@@ -68,10 +76,9 @@ export class XyDomainScan {
     return domains
   }
 
-  private async addConfigDomains(domains: Map<string, DomainValidator>) {
-    const domainList = this.config.domains
-    if (domainList) {
-      for (const domain of domainList) {
+  private async addDomains(domains: Map<string, DomainValidator>, domainsConfig: DomainsConfig) {
+    if (domainsConfig) {
+      for (const domain of domainsConfig) {
         if ((domain.name !== "default") && (domain.enabled === undefined || domain.enabled)) {
           domains.set(domain.name, new DomainValidator(domain.name, this.config))
         }

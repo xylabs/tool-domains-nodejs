@@ -12,8 +12,9 @@ import { RecordConfig } from './record'
 
 export class Config {
 
-  public static async load(filename: string = './dnslint.json'): Promise<Config> {
+  public static async load(params: {config?: Config, filename?: string}): Promise<Config> {
     try {
+      params.filename = params.filename || './dnslint.json'
       /*const ajv = new Ajv({ schemaId: 'id' })
       const validate = ajv.compile(schema)
       if (!validate(defaultConfig)) {
@@ -23,18 +24,27 @@ export class Config {
       }*/
       console.log(chalk.gray("Loaded Default Config"))
       try {
-        const userJson: object = await loadJsonFile(filename)
+        const userJson: object = await loadJsonFile(params.filename)
         /*if (!validate(userJson)) {
           console.error(chalk.red(`${validate.errors}`))
         } else {
           console.log(chalk.green("User Config Validated"))
         }*/
         console.log(chalk.gray("Loaded User Config"))
-        const result = new Config(_.mergeWith(defaultConfig, userJson,
-          (objValue: any, srcValue: any, key: any, object: any, source: any, stack: any) => {
-            return undefined
-          }
-        ))
+        let result: any
+        if (params.config) {
+          result = new Config(_.mergeWith(params.config, defaultConfig, userJson,
+            (objValue: any, srcValue: any, key: any, object: any, source: any, stack: any) => {
+              return undefined
+            }
+          ))
+        } else {
+          result = new Config(_.mergeWith(defaultConfig, userJson,
+            (objValue: any, srcValue: any, key: any, object: any, source: any, stack: any) => {
+              return undefined
+            }
+          ))
+        }
         return result
       } catch (ex) {
         console.log(chalk.yellow("No dnslint.json config file found.  Using defaults."))

@@ -22,20 +22,28 @@ class XyDomainScan {
         this.aws = new aws_1.AWS();
         this.config = new config_1.Config();
     }
-    start() {
+    start(output, singleDomain, config) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.config = yield config_1.Config.load();
+            this.config = yield config_1.Config.load({ config });
             const domains = new Map();
             const result = {
                 domains: [],
                 errorCount: 0
             };
-            console.log(chalk_1.default.gray("Getting Domains"));
-            if (ts_optchain_1.oc(this.config).aws.enabled(true)) {
-                yield this.addAWSDomains(domains);
+            // special case if domain specified
+            if (singleDomain) {
+                domains.set(singleDomain, new validator_1.DomainValidator(singleDomain, this.config));
             }
-            console.log(chalk_1.default.gray("Getting Config Domains"));
-            yield this.addConfigDomains(domains);
+            else {
+                console.log(chalk_1.default.gray("Getting Domains"));
+                if (ts_optchain_1.oc(this.config).aws.enabled(true)) {
+                    yield this.addAWSDomains(domains);
+                }
+                console.log(chalk_1.default.gray("Getting Config Domains"));
+                if (this.config.domains) {
+                    yield this.addDomains(domains, this.config.domains);
+                }
+            }
             console.log(`Domains Found: ${domains.size}`);
             let completedDomains = 0;
             for (const domain of domains.values()) {
@@ -52,7 +60,7 @@ class XyDomainScan {
                 }
             }
             console.log(`Saving to File: output.json`);
-            this.saveToFile("output.json", result);
+            this.saveToFile(output, result);
             if (result.errorCount === 0) {
                 console.log(chalk_1.default.green("Congratulations, all tests passed!"));
             }
@@ -78,11 +86,10 @@ class XyDomainScan {
             return domains;
         });
     }
-    addConfigDomains(domains) {
+    addDomains(domains, domainsConfig) {
         return __awaiter(this, void 0, void 0, function* () {
-            const domainList = this.config.domains;
-            if (domainList) {
-                for (const domain of domainList) {
+            if (domainsConfig) {
+                for (const domain of domainsConfig) {
                     if ((domain.name !== "default") && (domain.enabled === undefined || domain.enabled)) {
                         domains.set(domain.name, new validator_1.DomainValidator(domain.name, this.config));
                     }

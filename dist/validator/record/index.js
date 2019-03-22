@@ -259,8 +259,7 @@ class RecordValidator extends base_1.BaseValidator {
             let result = {};
             return new Promise((resolve, reject) => {
                 try {
-                    const bytes = new Buffer(1);
-                    const req = func.get(`${prefix}://${ip}`, { hostname, timeout }, (res) => {
+                    func.get(`${prefix}://${ip}`, { hostname, timeout }, (res) => {
                         result = this.sanitizeResponse(res, Date.now() - startTime);
                         result.port = res.socket.remotePort;
                         res.on('data', (chunk) => {

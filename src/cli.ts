@@ -1,7 +1,8 @@
-import program from 'commander'
+import commander from 'commander'
 import dotenvExpand from 'dotenv-expand'
 import { XyDomainScan } from './'
 import { inspect } from 'util'
+import { Config } from './config'
 
 const getVersion = (): string => {
   dotenvExpand({
@@ -14,32 +15,22 @@ const getVersion = (): string => {
   return process.env.APP_VERSION || 'Unknown'
 }
 
-const start = async () => {
+const start = async (output: string, domain?: string) => {
   const tool = new XyDomainScan()
-  const result = await tool.start()
+  const result = await tool.start(output, domain)
   console.log("==== Finished ====")
   return result
 }
 
+const program = commander
+
 program
   .version(getVersion())
-
-program
-  .command('start')
-  .description('Start the Scanner (Default)')
-  .action(start)
-
-program
-  .command('config <provider>')
-  .description('Configure a part of the system')
-  .action(async(provider) => {
-    console.log(provider)
-    return 0
-  })
+  .option("-o, --output [value]", "Output file path", "dnslint-report.json")
+  .option("-d, --domainToCheck [value]", "Domain to Check")
 
 program.parse(process.argv)
 
-// if no args, then default to start
-if (program.args.length < 1) {
-  start()
-}
+console.log(inspect(program))
+
+start(program.output, program.domainToCheck)

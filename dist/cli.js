@@ -14,6 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = __importDefault(require("commander"));
 const dotenv_expand_1 = __importDefault(require("dotenv-expand"));
 const _1 = require("./");
+const util_1 = require("util");
 const getVersion = () => {
     dotenv_expand_1.default({
         parsed: {
@@ -23,28 +24,18 @@ const getVersion = () => {
     });
     return process.env.APP_VERSION || 'Unknown';
 };
-const start = () => __awaiter(this, void 0, void 0, function* () {
+const start = (output, domain) => __awaiter(this, void 0, void 0, function* () {
     const tool = new _1.XyDomainScan();
-    const result = yield tool.start();
+    const result = yield tool.start(output, domain);
     console.log("==== Finished ====");
     return result;
 });
-commander_1.default
-    .version(getVersion());
-commander_1.default
-    .command('start')
-    .description('Start the Scanner (Default)')
-    .action(start);
-commander_1.default
-    .command('config <provider>')
-    .description('Configure a part of the system')
-    .action((provider) => __awaiter(this, void 0, void 0, function* () {
-    console.log(provider);
-    return 0;
-}));
-commander_1.default.parse(process.argv);
-// if no args, then default to start
-if (commander_1.default.args.length < 1) {
-    start();
-}
+const program = commander_1.default;
+program
+    .version(getVersion())
+    .option("-o, --output [value]", "Output file path")
+    .option("-d, --domainToCheck [value]", "Domain to Check");
+program.parse(process.argv);
+console.log(util_1.inspect(program));
+start(program.output, program.domainToCheck);
 //# sourceMappingURL=cli.js.map
