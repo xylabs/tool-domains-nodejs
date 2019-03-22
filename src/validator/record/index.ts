@@ -1,11 +1,13 @@
 import { BaseValidator } from '../base'
 import { Dns } from '../../dns'
 import http, { IncomingMessage } from 'http'
-import https from 'https'
+import https, { Agent } from 'https'
 import chalk from 'chalk'
 import { RecordConfig } from '../../config/record'
 import assert from 'assert'
 import htmlValidator from 'html-validator'
+import axios from 'axios'
+
 export class RecordValidator extends BaseValidator {
 
   public type: string
@@ -80,44 +82,54 @@ export class RecordValidator extends BaseValidator {
     return result
   }
 
-  protected async validateHtml(data: string) {
+  protected async validateHtml(data: string, ip: string) {
     const results = await htmlValidator({
       data,
       format: 'json'
     })
+    for (const item of results.messages) {
+      if (item.type === "error") {
+        this.addError(
+          "html",
+          `[L:${item.lastLine}, C:${item.lastColumn}, ${ip}]: ${item.message}`)
+      }
+    }
     return results.messages
   }
 
   protected async checkHttp(value: any) {
     const timeout = this.config.timeout || 1000
-    let result: any = {
+    const result: any = {
       ip: value
     }
     try {
       console.log(chalk.gray(`checkHttp: ${value}`))
       this.http = this.http || []
       assert(value !== undefined)
-      const response = await this.getHttpResponse(value, this.name, timeout, false)
-      result = response.result
+      let callTime = Date.now()
+      const response = await axios.get(`https://${value}`, { responseType: 'text', timeout, headers: {
+        Host: this.name
+      }
+      })
+      callTime = Date.now() - callTime
+      result.headers = response.headers
+      result.statusCode = response.status
+      result.statusMessage = response.statusText
       if (this.config.http.callTimeMax) {
         if (result.callTime > this.config.http.callTimeMax) {
           this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`)
         }
       }
       await this.validateHeaders(this.config.http.headers, result.headers)
+      result.ip = value
       this.http.push(result)
       const expectedCode = this.config.http.statusCode || 200
       if (result.statusCode !== expectedCode) {
         this.addError("http", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
       } else {
-        if (this.config.html) {
+        if (this.config.html || this.config.html === undefined) {
           if (result.statusCode === 200) {
-            const results = await this.validateHtml(response.rawData)
-            if (results && results.length > 0) {
-              for (const item of results) {
-                this.addError("html", item)
-              }
-            }
+            const results = await this.validateHtml(response.data, value)
           }
         }
       }
@@ -132,46 +144,48 @@ export class RecordValidator extends BaseValidator {
 
   protected async checkHttps(value: any) {
     const timeout = this.config.timeout || 1000
-    let result: any = {
+    const result: any = {
       ip: value
     }
     try {
       console.log(chalk.gray(`checkHttps: ${value}`))
       this.https = this.https || []
       assert(value !== undefined)
-      const response = await this.getHttpResponse(value, this.name, timeout, true)
-      result = response.result
+      let callTime = Date.now()
+      const response = await axios.request({baseURL: `https://${value}`, responseType: 'text', timeout, headers: {
+        Host: this.name
+      }})
+      callTime = Date.now() - callTime
+      result.headers = response.headers
+      result.statusCode = response.status
+      result.statusMessage = response.statusText
       if (this.config.https.callTimeMax) {
-        if (result.callTime > this.config.https.callTimeMax) {
-          this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
+        if (callTime > this.config.https.callTimeMax) {
+          this.addError("https", `Call too slow: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
         }
       }
       await this.validateHeaders(this.config.https.headers, result.headers)
+      result.ip = value
       this.https.push(result)
       const expectedCode = this.config.https.statusCode || 200
       if (result.statusCode !== expectedCode) {
         this.addError("https", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
       } else {
         if (result.statusCode === 200) {
-          if (this.config.html) {
-            const results = await this.validateHtml(response.rawData)
-            if (results && results.length > 0) {
-              for (const item of results) {
-                this.addError("html", item)
-              }
-            }
+          if (this.config.html || this.config.html === undefined) {
+            await this.validateHtml(response.data, value)
           }
         }
       }
       console.log(chalk.gray(`https[${timeout}]: ${value}: ${result.statusCode}`))
     } catch (ex) {
       this.addError("RecordValidator.checkHttps", ex)
-      console.error(chalk.red(ex.stack))
+      console.error(ex.stack)
     }
     return result
   }
 
-  protected async reverseLookup(value?: string) {
+  protected async reverseLookup(value ?: string) {
     const result: any[] = []
     try {
       for (const record of this.records) {
@@ -237,36 +251,6 @@ export class RecordValidator extends BaseValidator {
       statusMessage: res.statusMessage,
       headers: res.headers
     }
-  }
-
-  private async getHttpResponse(ip: string, hostname: string, timeout: number, ssl = false): Promise < any > {
-    const prefix = ssl ? "https" : "http"
-    const func = ssl ? https : http
-    const startTime = Date.now()
-    let rawData = ''
-    let result: any = {}
-    return new Promise<any>((resolve, reject) => {
-      try {
-        func.get(`${prefix}://${ip}`, { hostname, timeout }, (res) => {
-          result = this.sanitizeResponse(res)
-          result.port = res.socket.remotePort
-          res.on('data', (chunk) => {
-            rawData += chunk
-          })
-        }).on('error', (e) => {
-          reject(e.message)
-        }).on('close', () => {
-          result.bytesRead = rawData.length
-          result.callTime = Date.now() - startTime
-          resolve({ result, rawData })
-        }).setTimeout(timeout, () => {
-          reject(`Timeout [${this.name}]: ${timeout}`)
-        })
-      } catch (ex) {
-        this.addError("getHttpResponse", `[${this.name}]: ${ex.message}`)
-        reject(ex)
-      }
-    })
   }
 
 }

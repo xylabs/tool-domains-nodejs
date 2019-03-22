@@ -56,8 +56,8 @@
             "minimum": {"type": "number"}
           }
         },
-        "http": {"$ref": "#/definitions/http"},
-        "https": {"$ref": "#/definitions/https"},
+        "http": {"$ref": "#/definitions/webcall"},
+        "https": {"$ref": "#/definitions/webcall"},
         "reverseDNS": {
           "type": "object",
           "properties": {
@@ -76,7 +76,7 @@
         "value": {"type": "string"}
       }
     },
-    "http": {
+    "webcall": {
       "$id": "#definitions/http",
       "type": "object",
       "additionalProperties": false,
@@ -84,20 +84,7 @@
         "enabled": {"type": "boolean"},
         "statusCode": {"type": "number"},
         "httpVersion": {"type": "string"},
-        "headers": {
-          "type": "array",
-          "items": {"$ref": "#/definitions/header"}
-        }
-      }
-    },
-    "https": {
-      "$id": "#definitions/https",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "enabled": {"type": "boolean"},
-        "statusCode": {"type": "number"},
-        "httpVersion": {"type": "string"},
+        "callTimeMax": {"type": "number"},
         "headers": {
           "type": "array",
           "items": {"$ref": "#/definitions/header"}

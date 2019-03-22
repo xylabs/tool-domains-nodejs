@@ -13,11 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("../base");
 const dns_1 = require("../../dns");
-const http_1 = __importDefault(require("http"));
-const https_1 = __importDefault(require("https"));
 const chalk_1 = __importDefault(require("chalk"));
 const assert_1 = __importDefault(require("assert"));
 const html_validator_1 = __importDefault(require("html-validator"));
+const axios_1 = __importDefault(require("axios"));
 class RecordValidator extends base_1.BaseValidator {
     constructor(name, config) {
         super(name);
@@ -89,47 +88,55 @@ class RecordValidator extends base_1.BaseValidator {
             return result;
         });
     }
-    validateHtml(data) {
+    validateHtml(data, ip) {
         return __awaiter(this, void 0, void 0, function* () {
             const results = yield html_validator_1.default({
                 data,
                 format: 'json'
             });
+            for (const item of results.messages) {
+                if (item.type === "error") {
+                    this.addError("html", `[L:${item.lastLine}, C:${item.lastColumn}, ${ip}]: ${item.message}`);
+                }
+            }
             return results.messages;
         });
     }
     checkHttp(value) {
         return __awaiter(this, void 0, void 0, function* () {
             const timeout = this.config.timeout || 1000;
-            let result = {
+            const result = {
                 ip: value
             };
             try {
                 console.log(chalk_1.default.gray(`checkHttp: ${value}`));
                 this.http = this.http || [];
                 assert_1.default(value !== undefined);
-                const response = yield this.getHttpResponse(value, this.name, timeout, false);
-                result = response.result;
-                if (this.config.callTimeMax) {
-                    if (result.callTime > this.config.callTimeMax) {
-                        this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.callTimeMax}ms]`);
+                let callTime = Date.now();
+                const response = yield axios_1.default.get(`https://${value}`, { responseType: 'text', timeout, headers: {
+                        Host: value
+                    }
+                });
+                callTime = Date.now() - callTime;
+                result.headers = response.headers;
+                result.statusCode = response.status;
+                result.statusMessage = response.statusText;
+                if (this.config.http.callTimeMax) {
+                    if (result.callTime > this.config.http.callTimeMax) {
+                        this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`);
                     }
                 }
                 yield this.validateHeaders(this.config.http.headers, result.headers);
+                result.ip = value;
                 this.http.push(result);
                 const expectedCode = this.config.http.statusCode || 200;
                 if (result.statusCode !== expectedCode) {
                     this.addError("http", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`);
                 }
                 else {
-                    if (this.config.html) {
+                    if (this.config.html || this.config.html === undefined) {
                         if (result.statusCode === 200) {
-                            const results = yield this.validateHtml(response.rawData);
-                            if (results && results.length > 0) {
-                                for (const item of results) {
-                                    this.addError("html", item);
-                                }
-                            }
+                            const results = yield this.validateHtml(response.data, value);
                         }
                     }
                 }
@@ -146,21 +153,29 @@ class RecordValidator extends base_1.BaseValidator {
     checkHttps(value) {
         return __awaiter(this, void 0, void 0, function* () {
             const timeout = this.config.timeout || 1000;
-            let result = {
+            const result = {
                 ip: value
             };
             try {
                 console.log(chalk_1.default.gray(`checkHttps: ${value}`));
                 this.https = this.https || [];
                 assert_1.default(value !== undefined);
-                const response = yield this.getHttpResponse(value, this.name, timeout, true);
-                result = response.result;
-                if (this.config.callTimeMax) {
-                    if (result.callTime > this.config.callTimeMax) {
-                        this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.callTimeMax}ms]`);
+                let callTime = Date.now();
+                const response = yield axios_1.default.get(`https://${value}`, { responseType: 'text', timeout, headers: {
+                        Host: value
+                    }
+                });
+                callTime = Date.now() - callTime;
+                result.headers = response.headers;
+                result.statusCode = response.status;
+                result.statusMessage = response.statusText;
+                if (this.config.https.callTimeMax) {
+                    if (callTime > this.config.https.callTimeMax) {
+                        this.addError("https", `Call too slow: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`);
                     }
                 }
                 yield this.validateHeaders(this.config.https.headers, result.headers);
+                result.ip = value;
                 this.https.push(result);
                 const expectedCode = this.config.https.statusCode || 200;
                 if (result.statusCode !== expectedCode) {
@@ -168,13 +183,8 @@ class RecordValidator extends base_1.BaseValidator {
                 }
                 else {
                     if (result.statusCode === 200) {
-                        if (this.config.html) {
-                            const results = yield this.validateHtml(response.rawData);
-                            if (results && results.length > 0) {
-                                for (const item of results) {
-                                    this.addError("html", item);
-                                }
-                            }
+                        if (this.config.html || this.config.html === undefined) {
+                            yield this.validateHtml(response.data, value);
                         }
                     }
                 }
@@ -258,38 +268,6 @@ class RecordValidator extends base_1.BaseValidator {
             statusMessage: res.statusMessage,
             headers: res.headers
         };
-    }
-    getHttpResponse(ip, hostname, timeout, ssl = false) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const prefix = ssl ? "https" : "http";
-            const func = ssl ? https_1.default : http_1.default;
-            const startTime = Date.now();
-            let rawData = '';
-            let result = {};
-            return new Promise((resolve, reject) => {
-                try {
-                    func.get(`${prefix}://${ip}`, { hostname, timeout }, (res) => {
-                        result = this.sanitizeResponse(res);
-                        result.port = res.socket.remotePort;
-                        res.on('data', (chunk) => {
-                            rawData += chunk;
-                        });
-                    }).on('error', (e) => {
-                        reject(e.message);
-                    }).on('close', () => {
-                        result.bytesRead = rawData.length;
-                        result.callTime = Date.now() - startTime;
-                        resolve({ result, rawData });
-                    }).setTimeout(timeout, () => {
-                        reject(`Timeout [${this.name}]: ${timeout}`);
-                    });
-                }
-                catch (ex) {
-                    this.addError("getHttpResponse", `[${this.name}]: ${ex.message}`);
-                    reject(ex);
-                }
-            });
-        });
     }
 }
 exports.RecordValidator = RecordValidator;

@@ -42,6 +42,11 @@
                             },
                             {
                                 "required": true,
+                                "name": "content-encoding",
+                                "value": "gzip"
+                            },
+                            {
+                                "required": true,
                                 "name": "content-security-policy",
                                 "value": "object-src 'none'"
                             },
