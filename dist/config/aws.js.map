@@ -1,1 +1,1 @@
-{"version":3,"file":"aws.js","sourceRoot":"","sources":["../../src/config/aws.ts"],"names":[],"mappings":";;AAEA,MAAa,GAAG;IAAhB;QACS,YAAO,GAAG,IAAI,CAAA;IACvB,CAAC;CAAA;AAFD,kBAEC"}
+{"version":3,"file":"aws.js","sourceRoot":"","sources":["../../src/config/aws.ts"],"names":[],"mappings":";;AAAA,iCAA6B;AAE7B,MAAa,GAAI,SAAQ,WAAI;IAA7B;;QACS,YAAO,GAAG,IAAI,CAAA;IAKvB,CAAC;IAHQ,KAAK,CAAC,MAAW;QACtB,IAAI,CAAC,OAAO,GAAG,MAAM,CAAC,OAAO,CAAA;IAC/B,CAAC;CACF;AAND,kBAMC"}

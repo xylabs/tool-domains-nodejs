@@ -7,6 +7,19 @@ const domain_1 = require("./domain");
 const record_1 = require("./record");
 const lodash_1 = __importDefault(require("lodash"));
 class DomainsConfig extends Array {
+    merge(items) {
+        const map = this.getMap();
+        this.mapCache = undefined;
+        for (const item of items) {
+            const newItem = map.get(item.name) || new domain_1.DomainConfig(item.name);
+            map.set(item.name, newItem.merge(item));
+        }
+        const result = new DomainsConfig();
+        for (const item of map) {
+            result.push(item[1]);
+        }
+        return result;
+    }
     concat(domains) {
         for (const domain of domains) {
             const domainConfig = Object.assign(new domain_1.DomainConfig(domain.name), domain);
@@ -16,8 +29,9 @@ class DomainsConfig extends Array {
     }
     getConfig(domain) {
         const map = this.getMap();
-        const result = new domain_1.DomainConfig(domain, [map.get("default"), map.get(domain)]);
-        result.name = domain;
+        let result = new domain_1.DomainConfig(domain);
+        result = result.merge(map.get("default"));
+        result = result.merge(map.get(domain));
         return result;
     }
     getRecordConfig(serverType, recordType) {

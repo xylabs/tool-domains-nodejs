@@ -5,8 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const records_1 = require("./records");
 const lodash_1 = __importDefault(require("lodash"));
-class ServerConfig {
+const base_1 = require("./base");
+class ServerConfig extends base_1.Base {
     constructor(name, init) {
+        super();
         this.name = name;
         if (init) {
             for (const obj of init) {

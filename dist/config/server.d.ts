@@ -1,5 +1,6 @@
 import { RecordsConfig } from "./records";
-export declare class ServerConfig {
+import { Base } from "./base";
+export declare class ServerConfig extends Base {
     name: string;
     default?: boolean;
     include?: string[];

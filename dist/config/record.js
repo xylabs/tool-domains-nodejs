@@ -1,7 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class RecordConfig {
+const base_1 = require("./base");
+class RecordConfig extends base_1.Base {
     constructor(type) {
+        super();
         this.type = type;
     }
     isEnabled() {

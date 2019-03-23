@@ -1,4 +1,5 @@
-export declare class RecordConfig {
+import { Base } from "./base";
+export declare class RecordConfig extends Base {
     type: string;
     enabled?: boolean;
     timeout?: number;

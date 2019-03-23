@@ -15,6 +15,19 @@ class ServersConfig extends Array {
         }
         return this;
     }
+    merge(items) {
+        const map = this.getMap();
+        this.mapCache = undefined;
+        for (const item of items) {
+            const newItem = map.get(item.name) || new server_1.ServerConfig(item.name);
+            map.set(item.name, newItem.merge(item));
+        }
+        const result = new ServersConfig();
+        for (const item of map) {
+            result.push(item[1]);
+        }
+        return result;
+    }
     getConfig(serverType) {
         let result = new server_1.ServerConfig(serverType);
         const map = this.getMap();
@@ -40,11 +53,14 @@ class ServersConfig extends Array {
         return lodash_1.default.merge(defaultRecordConfig, serverRecordConfig);
     }
     getMap() {
-        const map = new Map();
-        for (const server of this) {
-            map.set(server.name, server);
+        if (this.mapCache) {
+            return this.mapCache;
         }
-        return map;
+        this.mapCache = new Map();
+        for (const domain of this) {
+            this.mapCache.set(domain.name, domain);
+        }
+        return this.mapCache;
     }
 }
 exports.ServersConfig = ServersConfig;
