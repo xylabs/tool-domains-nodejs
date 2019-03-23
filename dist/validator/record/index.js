@@ -117,7 +117,7 @@ class RecordValidator extends base_1.BaseValidator {
                 });
             }
             catch (ex) {
-                this.addError("get", `Failed [${prefix}${ip}]:${response.code}`);
+                this.addError("get", `Failed [${prefix}${ip}]:${ex.code}`);
                 response = {
                     code: ex.code,
                     message: ex.message
