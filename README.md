@@ -30,13 +30,21 @@ This will scan your entire AWS Route53 and output results in output.json
 
 ## CLI options
 
+```sh
+Options:
+  -V, --version                output the version number
+  -o, --output [value]         Output file path (default: "dnslint-report.json")
+  -d, --domainToCheck [value]  Domain to Check
+  -h, --help                   output usage information
+```
+
 ## Config File [dnslint.json]
 
 Make sure you put the config file in the same folder from where you are running the tool.
 
 ```json
 {
-  "$schema": "./src/schema/dnslint.schema.json#",
+  "$schema": "https://raw.githubusercontent.com/XYOracleNetwork/tool-domains-nodejs/master/dist/schema/dnslint.schema.json#",
   "aws": {
     "enabled": true
   },
