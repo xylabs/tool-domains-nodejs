@@ -1,7 +1,6 @@
 import { AWS } from './aws'
 import fs from 'fs'
 import { Config } from './config'
-import { oc } from 'ts-optchain'
 import chalk from 'chalk'
 import { DomainValidator } from './validator'
 import { DomainsConfig } from './config/domains'
@@ -26,8 +25,10 @@ export class XyDomainScan {
 
       console.log(chalk.gray("Getting Domains"))
 
-      if (oc(this.config).aws.enabled(true)) {
-        await this.addAWSDomains(domains)
+      if (this.config.aws) {
+        if (this.config.aws.enabled) {
+          await this.addAWSDomains(domains)
+        }
       }
 
       console.log(chalk.gray("Getting Config Domains"))

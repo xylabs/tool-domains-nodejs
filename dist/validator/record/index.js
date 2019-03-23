@@ -107,9 +107,14 @@ class RecordValidator extends base_1.BaseValidator {
             const timeout = this.config.timeout || 1000;
             let response;
             try {
-                response = yield axios_1.default.get(`${prefix}${ip}`, { responseType: 'text', timeout, headers: {
+                response = yield axios_1.default.get(`${prefix}${ip}`, {
+                    responseType: 'text',
+                    validateStatus: (status) => true,
+                    transformResponse: (data) => data,
+                    timeout, headers: {
                         Host: this.name
-                    } });
+                    }
+                });
                 // console.log(chalk.magenta(inspect(response)))
             }
             catch (ex) {
@@ -138,7 +143,7 @@ class RecordValidator extends base_1.BaseValidator {
                     result.statusMessage = response.statusText;
                     if (this.config.http.callTimeMax) {
                         if (result.callTime > this.config.http.callTimeMax) {
-                            this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`);
+                            this.addError("https", `Call too slow [${value}]: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`);
                         }
                     }
                     if (result.headers) {
@@ -148,7 +153,7 @@ class RecordValidator extends base_1.BaseValidator {
                     this.http.push(result);
                     const expectedCode = this.config.http.statusCode || 200;
                     if (result.statusCode !== expectedCode) {
-                        this.addError("http", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`);
+                        this.addError("http", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`);
                     }
                     else {
                         if (this.config.html || this.config.html === undefined) {
@@ -161,7 +166,7 @@ class RecordValidator extends base_1.BaseValidator {
                     console.log(chalk_1.default.gray(`http: ${value}: ${result.statusCode}`));
                 }
                 else {
-                    this.addError("http", `Failed to get Response [${response.code}]: ${response.message}`);
+                    this.addError("http", `Failed to get Response [${value}]: ${response.code}: ${response.message}`);
                 }
             }
             catch (ex) {
@@ -190,7 +195,7 @@ class RecordValidator extends base_1.BaseValidator {
                     result.statusMessage = response.statusText;
                     if (this.config.https.callTimeMax) {
                         if (callTime > this.config.https.callTimeMax) {
-                            this.addError("https", `Call too slow: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`);
+                            this.addError("https", `Call too slow [${value}]: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`);
                         }
                     }
                     if (result.headers) {
@@ -200,7 +205,7 @@ class RecordValidator extends base_1.BaseValidator {
                     this.https.push(result);
                     const expectedCode = this.config.https.statusCode || 200;
                     if (result.statusCode !== expectedCode) {
-                        this.addError("https", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`);
+                        this.addError("https", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`);
                     }
                     else {
                         if (result.statusCode === 200) {
@@ -213,7 +218,7 @@ class RecordValidator extends base_1.BaseValidator {
                     console.log(chalk_1.default.gray(`https[${timeout}]: ${value}: ${result.statusCode}`));
                 }
                 else {
-                    this.addError("https", `Failed to get Response [${response.code}]: ${response.message}`);
+                    this.addError("https", `Failed to get Response [${value}]: ${response.code}: ${response.message}`);
                 }
             }
             catch (ex) {
