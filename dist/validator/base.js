@@ -14,6 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = __importDefault(require("chalk"));
 const error_1 = require("./error");
 const lodash_1 = __importDefault(require("lodash"));
+const is_circular_1 = __importDefault(require("is-circular"));
 class BaseValidator {
     constructor(name) {
         this.errorCount = 0;
@@ -24,6 +25,9 @@ class BaseValidator {
     }
     validate() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (is_circular_1.default(this)) {
+                this.addError("base", "CIRCULAR");
+            }
             if (this.errors) {
                 this.errorCount += this.addErrors.length;
             }

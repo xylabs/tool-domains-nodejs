@@ -96,7 +96,9 @@ class XyDomainScan {
                 const awsDomains = yield this.aws.getDomains();
                 console.log(chalk_1.default.gray(`AWS Domains Found: ${awsDomains.length}`));
                 for (const domain of awsDomains) {
-                    domains.set(domain, new validator_1.DomainValidator(domain, this.config));
+                    // remove trailing '.'
+                    const cleanDomain = domain.slice(0, domain.length - 1);
+                    domains.set(cleanDomain, new validator_1.DomainValidator(cleanDomain, this.config));
                 }
             }
             catch (ex) {

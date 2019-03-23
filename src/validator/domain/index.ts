@@ -73,7 +73,7 @@ export class DomainValidator extends BaseValidator {
           try {
             scannedUrls[res.options.uri] = true
             if (error) {
-              this.addError("getDomainUrls", error)
+              this.addError("getDomainUrls", error.message)
             } else {
               const $ = res.$
               if ($) {

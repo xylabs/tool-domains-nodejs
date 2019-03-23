@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import { ValidationError } from './error'
 import _ from 'lodash'
-import { Config } from '../config'
+import isCircular from 'is-circular'
 
 export class BaseValidator {
   public name: string
@@ -17,9 +17,14 @@ export class BaseValidator {
   }
 
   public async validate() {
+    if (isCircular(this)) {
+      this.addError("base", `CIRCULAR: ${this.name}`)
+    }
+
     if (this.errors) {
       this.errorCount += this.addErrors.length
     }
+
     return this.errorCount
   }
 

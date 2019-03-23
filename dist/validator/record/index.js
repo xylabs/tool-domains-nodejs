@@ -109,6 +109,7 @@ class RecordValidator extends base_1.BaseValidator {
             try {
                 response = yield axios_1.default.get(`${prefix}${ip}`, {
                     responseType: 'text',
+                    maxRedirects: 0,
                     validateStatus: (status) => true,
                     transformResponse: (data) => data,
                     timeout, headers: {
@@ -133,7 +134,6 @@ class RecordValidator extends base_1.BaseValidator {
                 ip: value
             };
             try {
-                console.log(chalk_1.default.gray(`checkHttp[${this.name}]: ${value}`));
                 this.http = this.http || [];
                 assert_1.default(value !== undefined);
                 let callTime = Date.now();
@@ -164,8 +164,8 @@ class RecordValidator extends base_1.BaseValidator {
                             }
                         }
                     }
+                    // we do not want to add the data to the result
                     result.data = undefined;
-                    console.log(chalk_1.default.gray(`http: ${value}: ${result.statusCode}`));
                 }
                 else {
                     this.addError("http", `Failed to get Response [${value}]: ${response.code}: ${response.message}`);
@@ -185,7 +185,6 @@ class RecordValidator extends base_1.BaseValidator {
                 ip: value
             };
             try {
-                console.log(chalk_1.default.gray(`checkHttps[${this.name}]: ${value}`));
                 this.https = this.https || [];
                 assert_1.default(value !== undefined);
                 let callTime = Date.now();
@@ -216,8 +215,8 @@ class RecordValidator extends base_1.BaseValidator {
                             }
                         }
                     }
+                    // we do not want to add the data to the result
                     result.data = undefined;
-                    console.log(chalk_1.default.gray(`https[${timeout}]: ${value}: ${result.statusCode}`));
                 }
                 else {
                     this.addError("https", `Failed to get Response [${value}]: ${response.code}: ${response.message}`);

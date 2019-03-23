@@ -29,6 +29,11 @@ class DomainValidator extends base_1.BaseValidator {
             validate: { get: () => super.validate }
         });
         return __awaiter(this, void 0, void 0, function* () {
+            const domainConfig = this.config.getDomainConfig(this.name);
+            if (domainConfig.enabled === false) {
+                console.log(chalk_1.default.gray(`Skipping Disabled Domain: ${this.name}`));
+                return 0;
+            }
             const recordConfigs = this.config.getRecordConfigs(this.name);
             try {
                 for (const item of recordConfigs) {
@@ -50,7 +55,6 @@ class DomainValidator extends base_1.BaseValidator {
                 console.log(chalk_1.default.yellow(`Errors: ${this.errorCount}`));
             }
             let crawl = false;
-            const domainConfig = this.config.getDomainConfig(this.name);
             if (domainConfig.crawl !== undefined) {
                 crawl = domainConfig.crawl;
             }
@@ -78,7 +82,7 @@ class DomainValidator extends base_1.BaseValidator {
                         try {
                             scannedUrls[res.options.uri] = true;
                             if (error) {
-                                this.addError("getDomainUrls", error);
+                                this.addError("getDomainUrls", error.message);
                             }
                             else {
                                 const $ = res.$;
@@ -113,7 +117,7 @@ class DomainValidator extends base_1.BaseValidator {
                             console.log(chalk_1.default.red(ex.stack));
                             reject(false);
                         }
-                        console.log(chalk_1.default.gray("arie", `Crawl [${crawler.queueSize}:${Object.keys(scannedUrls).length}]: ${res.options.uri}`));
+                        console.log(chalk_1.default.gray(`crawl [${Object.keys(foundUrls).length}:${Object.keys(scannedUrls).length}]: ${res.options.uri}`));
                         if (Object.keys(foundUrls).length === Object.keys(scannedUrls).length) {
                             console.log(chalk_1.default.gray("getDomainUrls", `Found pages[${this.name}]: ${Object.keys(scannedUrls).length}`));
                             resolve(foundUrls);
