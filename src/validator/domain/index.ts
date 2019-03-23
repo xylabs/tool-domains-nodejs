@@ -52,43 +52,49 @@ export class DomainValidator extends BaseValidator {
     return super.validate()
   }
 
-  private getDomainUrls() {
+  private async getDomainUrls() {
     const foundUrls: any = {}
     const scannedUrls: any = {}
     return new Promise((resolve, reject) => {
       const crawler = new Crawler({
-        maxConnections: 10,
-        timeout: 500,
+        rateLimit: 100,
+        timeout: 1000,
         retries: 0,
-        callback: (error: any, res: any, done: any) => {
-          scannedUrls[res.options.uri] = true
-          if (error) {
-            this.addError("getDomainUrls", error)
-          } else {
-            const $ = res.$
-            if ($) {
-              $('a').each((i: any, elem: any) => {
-                // get the url from the anchor
-                if ($(elem).attr('href')) {
-                  const href = $(elem).attr('href').split('#')[0]
-                  const inParts = url.parse(res.options.uri)
-                  const host = `${inParts.protocol}//${inParts.host}`
-                  if (host) {
-                    const newUrl = url.resolve(host, href)
-                    const newParts = url.parse(newUrl)
-                    // if it is from the same domain and has not been added yet, add it
-                    if (newParts.protocol && newParts.protocol.match("^http")) {
-                      if (newParts.host === inParts.host) {
-                        if (foundUrls[newUrl] === undefined) {
-                          foundUrls[newUrl] = true
-                          crawler.queue(newUrl)
+        callback: async (error: any, res: any, done: any) => {
+          try {
+            scannedUrls[res.options.uri] = true
+            if (error) {
+              this.addError("getDomainUrls", error)
+            } else {
+              const $ = res.$
+              if ($) {
+                $('a').each((i: any, elem: any) => {
+                  // get the url from the anchor
+                  if ($(elem).attr('href')) {
+                    const href = $(elem).attr('href').split('#')[0]
+                    const inParts = url.parse(res.options.uri)
+                    const host = `${inParts.protocol}//${inParts.host}`
+                    if (host) {
+                      const newUrl = url.resolve(host, href)
+                      const newParts = url.parse(newUrl)
+                      // if it is from the same domain and has not been added yet, add it
+                      if (newParts.protocol && newParts.protocol.match("^http")) {
+                        if (newParts.host === inParts.host) {
+                          if (foundUrls[newUrl] === undefined) {
+                            foundUrls[newUrl] = true
+                            crawler.queue(newUrl)
+                          }
                         }
                       }
                     }
                   }
-                }
-              })
+                })
+              }
             }
+          } catch (ex) {
+            this.addError("crawl", `Unexpected Error: ${ex.message}`)
+            console.log(chalk.red(ex.stack))
+            reject(false)
           }
           console.log(chalk.gray(
             "arie", `Crawl [${crawler.queueSize}:${Object.keys(scannedUrls).length}]: ${res.options.uri}`))
@@ -96,6 +102,7 @@ export class DomainValidator extends BaseValidator {
             console.log(chalk.gray("getDomainUrls", `Found pages[${this.name}]: ${Object.keys(scannedUrls).length}`))
             resolve(foundUrls)
           }
+          done()
         }
       })
       const startingUrl = `https://${this.name}/`
