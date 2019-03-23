@@ -13,20 +13,16 @@ const getVersion = (): string => {
   return process.env.APP_VERSION || 'Unknown'
 }
 
-const start = async (output: string, domain?: string) => {
-  const tool = new XyDomainScan()
-  const result = await tool.start(output, domain)
-  console.log("==== Finished ====")
-  return result
-}
-
 const program = commander
 
 program
   .version(getVersion())
   .option("-o, --output [value]", "output file path", "dnslint-report.json")
   .option("-d, --domainToCheck [value]", "domain to check")
+  .option("-b, --bucket [value]", "s3 bucket to write result to")
 
 program.parse(process.argv)
 
-start(program.output, program.domainToCheck)
+// start
+const tool = new XyDomainScan()
+tool.start({ output: program.output, singleDomain: program.domainToCheck, bucket: program.bucket })
