@@ -107,7 +107,7 @@ export class DomainValidator extends BaseValidator {
             reject(false)
           }
           console.log(chalk.gray(
-            "arie", `Crawl [${crawler.queueSize}:${Object.keys(scannedUrls).length}]: ${res.options.uri}`))
+            `crawl [${Object.keys(foundUrls).length}:${Object.keys(scannedUrls).length}]: ${res.options.uri}`))
           if (Object.keys(foundUrls).length === Object.keys(scannedUrls).length) {
             console.log(chalk.gray("getDomainUrls", `Found pages[${this.name}]: ${Object.keys(scannedUrls).length}`))
             resolve(foundUrls)

@@ -16,6 +16,10 @@
     {
       "name": "support.xyfindit.com",
       "crawl": false
+    },
+    {
+      "name": "geohackers.xyo.network",
+      "crawl": false
     }
   ],
   "servers": [
@@ -25,7 +29,7 @@
       "records": [
         {
           "type": "default",
-          "html": true
+          "html": false
         }
       ]
     }

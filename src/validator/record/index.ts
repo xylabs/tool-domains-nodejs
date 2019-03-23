@@ -105,6 +105,7 @@ export class RecordValidator extends BaseValidator {
       response = await axios.get(`${prefix}${ip}`,
         {
           responseType: 'text',
+          maxRedirects: 0,
           validateStatus: (status: any) => true,
           transformResponse: (data: any) => data,
           timeout, headers: {
@@ -128,7 +129,6 @@ export class RecordValidator extends BaseValidator {
       ip: value
     }
     try {
-      console.log(chalk.gray(`checkHttp[${this.name}]: ${value}`))
       this.http = this.http || []
       assert(value !== undefined)
       let callTime = Date.now()
@@ -159,8 +159,8 @@ export class RecordValidator extends BaseValidator {
             }
           }
         }
+        // we do not want to add the data to the result
         result.data = undefined
-        console.log(chalk.gray(`http: ${value}: ${result.statusCode}`))
       } else {
         this.addError("http", `Failed to get Response [${value}]: ${response.code}: ${response.message}`)
       }
@@ -177,7 +177,6 @@ export class RecordValidator extends BaseValidator {
       ip: value
     }
     try {
-      console.log(chalk.gray(`checkHttps[${this.name}]: ${value}`))
       this.https = this.https || []
       assert(value !== undefined)
       let callTime = Date.now()
@@ -210,8 +209,8 @@ export class RecordValidator extends BaseValidator {
             }
           }
         }
+        // we do not want to add the data to the result
         result.data = undefined
-        console.log(chalk.gray(`https[${timeout}]: ${value}: ${result.statusCode}`))
       } else {
         this.addError("https", `Failed to get Response [${value}]: ${response.code}: ${response.message}`)
       }
