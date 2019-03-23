@@ -109,7 +109,8 @@ class XyDomainScan {
         return __awaiter(this, void 0, void 0, function* () {
             if (domainsConfig) {
                 for (const domain of domainsConfig) {
-                    if ((domain.name !== "default") && (domain.enabled === undefined || domain.enabled)) {
+                    if (domain.name !== "default") {
+                        console.log(chalk_1.default.yellow(`Adding Domain from Config: ${domain.name}`));
                         domains.set(domain.name, new validator_1.DomainValidator(domain.name, this.config));
                     }
                 }

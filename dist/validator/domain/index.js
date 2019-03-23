@@ -49,10 +49,17 @@ class DomainValidator extends base_1.BaseValidator {
             if (this.errorCount) {
                 console.log(chalk_1.default.yellow(`Errors: ${this.errorCount}`));
             }
-            if (this.config.servers) {
-                const serverConfig = this.config.servers.getConfig(this.serverType);
-                if (serverConfig.crawl) {
-                    this.pages = yield this.getDomainUrls();
+            let crawl = false;
+            const domainConfig = this.config.getDomainConfig(this.name);
+            if (domainConfig.crawl !== undefined) {
+                crawl = domainConfig.crawl;
+            }
+            else {
+                if (this.config.servers) {
+                    const serverConfig = this.config.servers.getConfig(this.serverType);
+                    if (serverConfig.crawl) {
+                        this.pages = yield this.getDomainUrls();
+                    }
                 }
             }
             return _super.validate.call(this);
@@ -83,8 +90,9 @@ class DomainValidator extends base_1.BaseValidator {
                                             const inParts = url_1.default.parse(res.options.uri);
                                             const host = `${inParts.protocol}//${inParts.host}`;
                                             if (host) {
-                                                const newUrl = url_1.default.resolve(host, href);
+                                                let newUrl = url_1.default.resolve(host, href);
                                                 const newParts = url_1.default.parse(newUrl);
+                                                newUrl = `${newParts.protocol}//${newParts.hostname}${newParts.pathname}`;
                                                 // if it is from the same domain and has not been added yet, add it
                                                 if (newParts.protocol && newParts.protocol.match("^http")) {
                                                     if (newParts.host === inParts.host) {
