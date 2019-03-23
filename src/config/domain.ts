@@ -2,22 +2,19 @@ import { RecordsConfig } from "./records"
 import { RecordConfig } from "./record"
 import { stringify } from "querystring"
 import _ from 'lodash'
+import { Base } from "./base"
 
-export class DomainConfig {
+export class DomainConfig extends Base {
   public name: string
-  public records?: RecordsConfig
-  public enabled?: boolean
-  public timeout?: number
-  public serverType?: string
+  public records = new RecordsConfig()
+  public enabled = true
+  public timeout = 1000
+  public serverType = "unknown"
+  public crawl = false
 
-  constructor(name: string, init?: any[]) {
+  constructor(name: string) {
+    super()
     this.name = name
-    if (init) {
-      for (const obj of init) {
-        _.merge(this, obj)
-      }
-    }
-    this.records = new RecordsConfig().concat(this.records || [])
   }
 
   public getTimeout() {

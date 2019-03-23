@@ -1,6 +1,7 @@
 import { DomainConfig } from "./domain"
+import { Base } from "./base"
 
-export class RecordConfig {
+export class RecordConfig extends Base {
 
   public type: string
   public enabled?: boolean
@@ -19,6 +20,7 @@ export class RecordConfig {
   public https?: any
 
   constructor(type: string) {
+    super()
     this.type = type
   }
 

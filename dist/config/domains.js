@@ -1,6 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const domain_1 = require("./domain");
+const record_1 = require("./record");
+const lodash_1 = __importDefault(require("lodash"));
 class DomainsConfig extends Array {
     concat(domains) {
         for (const domain of domains) {
@@ -14,6 +19,19 @@ class DomainsConfig extends Array {
         const result = new domain_1.DomainConfig(domain, [map.get("default"), map.get(domain)]);
         result.name = domain;
         return result;
+    }
+    getRecordConfig(serverType, recordType) {
+        let defaultRecordConfig = new record_1.RecordConfig(recordType);
+        let serverRecordConfig = new record_1.RecordConfig(recordType);
+        const defaultConfig = this.getConfig("default");
+        const serverConfig = this.getConfig(serverType);
+        if (defaultConfig && defaultConfig.records) {
+            defaultRecordConfig = defaultConfig.records.getConfig(recordType);
+        }
+        if (serverConfig && serverConfig.records) {
+            serverRecordConfig = serverConfig.records.getConfig(recordType);
+        }
+        return lodash_1.default.merge(defaultRecordConfig, serverRecordConfig);
     }
     getMap() {
         if (this.mapCache) {

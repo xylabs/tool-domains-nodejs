@@ -118,6 +118,7 @@
       "properties": {
         "name": {"type": "string"},
         "default": {"type": "boolean"},
+        "crawl": {"type": "boolean"},
         "include": {
           "type": "array",
           "items": {"type": "string"}
