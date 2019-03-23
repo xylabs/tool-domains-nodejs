@@ -10,7 +10,7 @@ export class DomainConfig extends Base {
   public enabled = true
   public timeout = 1000
   public serverType = "unknown"
-  public crawl = false
+  public crawl?: boolean
 
   constructor(name: string) {
     super()

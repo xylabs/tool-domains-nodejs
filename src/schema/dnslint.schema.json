@@ -99,6 +99,7 @@
       "properties": {
         "name": {"type": "string"},
         "enabled": {"type": "boolean"},
+        "crawl": {"type": "boolean"},
         "reverseDNS": {
           "enabled": "boolean"
         },

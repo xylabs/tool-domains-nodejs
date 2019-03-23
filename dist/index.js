@@ -21,17 +21,17 @@ class XyDomainScan {
         this.aws = new aws_1.AWS();
         this.config = new config_1.Config();
     }
-    start(output, singleDomain, config) {
+    start(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.config = yield config_1.Config.load({ config });
+            this.config = yield config_1.Config.load({ config: params.config });
             const domains = new Map();
             const result = {
                 domains: [],
                 errorCount: 0
             };
             // special case if domain specified
-            if (singleDomain) {
-                domains.set(singleDomain, new validator_1.DomainValidator(singleDomain, this.config));
+            if (params.singleDomain) {
+                domains.set(params.singleDomain, new validator_1.DomainValidator(params.singleDomain, this.config));
             }
             else {
                 console.log(chalk_1.default.gray("Getting Domains"));
@@ -60,8 +60,18 @@ class XyDomainScan {
                     console.error(chalk_1.default.red(ex.stack));
                 }
             }
-            console.log(`Saving to File: ${output}`);
-            this.saveToFile(output, result);
+            if (params.bucket) {
+                try {
+                    yield this.aws.saveFileToS3(params.bucket, this.getLatestS3FileName(), result);
+                    yield this.aws.saveFileToS3(params.bucket, this.getHistoricS3FileName(), result);
+                }
+                catch (ex) {
+                    console.error(chalk_1.default.red(ex.message));
+                    console.error(chalk_1.default.red(ex.stack));
+                }
+            }
+            console.log(`Saving to File: ${params.output}`);
+            this.saveToFile(params.output, result);
             if (result.errorCount === 0) {
                 console.log(chalk_1.default.green("Congratulations, all tests passed!"));
             }
@@ -70,6 +80,14 @@ class XyDomainScan {
             }
             return result;
         });
+    }
+    getLatestS3FileName() {
+        return `latest.json`;
+    }
+    getHistoricS3FileName() {
+        const date = new Date().toISOString();
+        const parts = date.split('T');
+        return `${parts[0]}/${parts[1]}.json`;
     }
     addAWSDomains(domains) {
         return __awaiter(this, void 0, void 0, function* () {
