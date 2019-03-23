@@ -14,8 +14,9 @@
       }]
     },
     {
-      "name": "xy.company",
-      "enabled": true
+      "name": "support.xyfindit.com",
+      "enabled": true,
+      "crawl": false
     }
   ],
   "servers": [

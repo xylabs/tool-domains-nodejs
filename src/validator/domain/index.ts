@@ -42,11 +42,16 @@ export class DomainValidator extends BaseValidator {
       console.log(chalk.yellow(`Errors: ${this.errorCount}`))
     }
 
-    if (this.config.servers) {
-      const serverConfig = this.config.servers.getConfig(this.serverType)
-
-      if (serverConfig.crawl) {
-        this.pages = await this.getDomainUrls()
+    let crawl = false
+    const domainConfig = this.config.getDomainConfig(this.name)
+    if (domainConfig.crawl !== undefined) {
+      crawl = domainConfig.crawl
+    } else {
+      if (this.config.servers) {
+        const serverConfig = this.config.servers.getConfig(this.serverType)
+        if (serverConfig.crawl) {
+          this.pages = await this.getDomainUrls()
+        }
       }
     }
     return super.validate()
