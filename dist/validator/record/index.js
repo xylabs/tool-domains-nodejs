@@ -153,7 +153,7 @@ class RecordValidator extends base_1.BaseValidator {
                     else {
                         if (this.config.html || this.config.html === undefined) {
                             if (result.statusCode === 200) {
-                                const results = yield this.validateHtml(response.data, value);
+                                yield this.validateHtml(response.data, value);
                             }
                         }
                     }
@@ -217,8 +217,8 @@ class RecordValidator extends base_1.BaseValidator {
                 }
             }
             catch (ex) {
-                this.addError("RecordValidator.checkHttps", ex);
-                // console.error(ex.stack)
+                this.addError("RecordValidator.checkHttps", ex.message);
+                console.error(chalk_1.default.magenta(ex.stack));
             }
             return result;
         });

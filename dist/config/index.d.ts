@@ -3,17 +3,17 @@ import { DomainConfig } from './domain';
 import { DomainsConfig } from './domains';
 import { ServersConfig } from './servers';
 import { RecordConfig } from './record';
-export declare class Config {
+import { Base } from './base';
+export declare class Config extends Base {
     static load(params: {
         config?: Config;
         filename?: string;
     }): Promise<Config>;
-    aws?: AWS;
-    domains?: DomainsConfig;
-    servers?: ServersConfig;
+    aws: AWS;
+    domains: DomainsConfig;
+    servers: ServersConfig;
     constructor(config?: any);
-    getDomains(): DomainsConfig;
-    getServers(): ServersConfig;
+    merge(config: any): void;
     getRecordConfig(domain: string, recordType: string): RecordConfig;
     getRecordConfigs(domain: string): Map<string, RecordConfig>;
     getDomainConfig(domain: string): DomainConfig;

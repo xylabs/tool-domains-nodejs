@@ -1,12 +1,13 @@
 import { RecordsConfig } from "./records";
-export declare class DomainConfig {
+import { Base } from "./base";
+export declare class DomainConfig extends Base {
     name: string;
-    records?: RecordsConfig;
-    enabled?: boolean;
-    timeout?: number;
-    serverType?: string;
-    crawl?: boolean;
-    constructor(name: string, init?: any[]);
+    records: RecordsConfig;
+    enabled: boolean;
+    timeout: number;
+    serverType: string;
+    crawl: boolean;
+    constructor(name: string);
     getTimeout(): number;
     isRecordEnabled(type: string): boolean;
     isReverseDNSEnabled(type: string): boolean;

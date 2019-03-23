@@ -102,8 +102,16 @@ export class RecordValidator extends BaseValidator {
     const timeout = this.config.timeout || 1000
     let response: any
     try {
-      response = await axios.get(`${prefix}${ip}`, { responseType: 'text', timeout, headers: {
-        Host: this.name}})
+      response = await axios.get(`${prefix}${ip}`,
+        {
+          responseType: 'text',
+          validateStatus: (status: any) => true,
+          transformResponse: (data: any) => data,
+          timeout, headers: {
+            Host: this.name
+          }
+        }
+      )
       // console.log(chalk.magenta(inspect(response)))
     } catch (ex) {
       response = (ex.response) ?
@@ -202,8 +210,8 @@ export class RecordValidator extends BaseValidator {
         this.addError("https", `Failed to get Response [${response.code}]: ${response.message}`)
       }
     } catch (ex) {
-      this.addError("RecordValidator.checkHttps", ex)
-      // console.error(ex.stack)
+      this.addError("RecordValidator.checkHttps", ex.message)
+      console.error(chalk.magenta(ex.stack))
     }
     return result
   }

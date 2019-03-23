@@ -59,56 +59,64 @@ class DomainValidator extends base_1.BaseValidator {
         });
     }
     getDomainUrls() {
-        const foundUrls = {};
-        const scannedUrls = {};
-        return new Promise((resolve, reject) => {
-            const crawler = new crawler_1.default({
-                maxConnections: 10,
-                timeout: 500,
-                retries: 0,
-                callback: (error, res, done) => {
-                    console.log(res.options.uri);
-                    scannedUrls[res.options.uri] = true;
-                    if (error) {
-                        this.addError("getDomainUrls", error);
-                    }
-                    else {
-                        const $ = res.$;
-                        if ($) {
-                            $('a').each((i, elem) => {
-                                // get the url from the anchor
-                                if ($(elem).attr('href')) {
-                                    const href = $(elem).attr('href').split('#')[0];
-                                    const inParts = url_1.default.parse(res.options.uri);
-                                    const host = `${inParts.protocol}//${inParts.host}`;
-                                    if (host) {
-                                        const newUrl = url_1.default.resolve(host, href);
-                                        const newParts = url_1.default.parse(newUrl);
-                                        // if it is from the same domain and has not been added yet, add it
-                                        if (newParts.protocol && newParts.protocol.match("^http")) {
-                                            if (newParts.host === inParts.host) {
-                                                if (foundUrls[newUrl] === undefined) {
-                                                    console.log(newUrl);
-                                                    foundUrls[newUrl] = true;
-                                                    crawler.queue(newUrl);
+        return __awaiter(this, void 0, void 0, function* () {
+            const foundUrls = {};
+            const scannedUrls = {};
+            return new Promise((resolve, reject) => {
+                const crawler = new crawler_1.default({
+                    rateLimit: 100,
+                    timeout: 1000,
+                    retries: 0,
+                    callback: (error, res, done) => __awaiter(this, void 0, void 0, function* () {
+                        try {
+                            scannedUrls[res.options.uri] = true;
+                            if (error) {
+                                this.addError("getDomainUrls", error);
+                            }
+                            else {
+                                const $ = res.$;
+                                if ($) {
+                                    $('a').each((i, elem) => {
+                                        // get the url from the anchor
+                                        if ($(elem).attr('href')) {
+                                            const href = $(elem).attr('href').split('#')[0];
+                                            const inParts = url_1.default.parse(res.options.uri);
+                                            const host = `${inParts.protocol}//${inParts.host}`;
+                                            if (host) {
+                                                const newUrl = url_1.default.resolve(host, href);
+                                                const newParts = url_1.default.parse(newUrl);
+                                                // if it is from the same domain and has not been added yet, add it
+                                                if (newParts.protocol && newParts.protocol.match("^http")) {
+                                                    if (newParts.host === inParts.host) {
+                                                        if (foundUrls[newUrl] === undefined) {
+                                                            foundUrls[newUrl] = true;
+                                                            crawler.queue(newUrl);
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
+                                    });
                                 }
-                            });
+                            }
                         }
-                    }
-                    console.log("arie", `QueueSize: ${crawler.queueSize}:${Object.keys(scannedUrls).length}`);
-                    if (Object.keys(foundUrls).length === Object.keys(scannedUrls).length) {
-                        console.log(chalk_1.default.gray("getDomainUrls", `Found pages[${this.name}]: ${Object.keys(scannedUrls).length}`));
-                        resolve(foundUrls);
-                    }
-                }
+                        catch (ex) {
+                            this.addError("crawl", `Unexpected Error: ${ex.message}`);
+                            console.log(chalk_1.default.red(ex.stack));
+                            reject(false);
+                        }
+                        console.log(chalk_1.default.gray("arie", `Crawl [${crawler.queueSize}:${Object.keys(scannedUrls).length}]: ${res.options.uri}`));
+                        if (Object.keys(foundUrls).length === Object.keys(scannedUrls).length) {
+                            console.log(chalk_1.default.gray("getDomainUrls", `Found pages[${this.name}]: ${Object.keys(scannedUrls).length}`));
+                            resolve(foundUrls);
+                        }
+                        done();
+                    })
+                });
+                const startingUrl = `https://${this.name}/`;
+                foundUrls[startingUrl] = true;
+                crawler.queue(startingUrl);
             });
-            const startingUrl = `https://${this.name}/`;
-            foundUrls[startingUrl] = true;
-            crawler.queue(startingUrl);
         });
     }
 }

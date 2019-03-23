@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const load_json_file_1 = __importDefault(require("load-json-file"));
+const aws_1 = require("./aws");
 const domain_1 = require("./domain");
 const chalk_1 = __importDefault(require("chalk"));
 const domains_1 = require("./domains");
@@ -19,14 +20,16 @@ const default_json_1 = __importDefault(require("./default.json"));
 const lodash_1 = __importDefault(require("lodash"));
 const servers_1 = require("./servers");
 const record_1 = require("./record");
-class Config {
+const base_1 = require("./base");
+class Config extends base_1.Base {
     constructor(config) {
-        this.aws = undefined;
+        super();
+        this.aws = new aws_1.AWS();
+        this.domains = new domains_1.DomainsConfig();
+        this.servers = new servers_1.ServersConfig();
         if (config) {
-            Object.assign(this, config);
+            this.merge(config);
         }
-        this.domains = new domains_1.DomainsConfig().concat(this.domains || []);
-        this.servers = new servers_1.ServersConfig().concat(this.servers || []);
     }
     static load(params) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -73,17 +76,10 @@ class Config {
             }
         });
     }
-    getDomains() {
-        if (!this.domains) {
-            this.domains = new domains_1.DomainsConfig();
-        }
-        return this.domains;
-    }
-    getServers() {
-        if (!this.servers) {
-            this.servers = new servers_1.ServersConfig();
-        }
-        return this.servers;
+    merge(config) {
+        this.aws.merge(config.aws);
+        this.domains = this.domains.merge(config.domains);
+        this.servers = this.servers.merge(config.servers);
     }
     getRecordConfig(domain, recordType) {
         const serverType = this.getServerType(domain);
