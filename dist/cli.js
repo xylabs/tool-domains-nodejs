@@ -32,8 +32,8 @@ const start = (output, domain) => __awaiter(this, void 0, void 0, function* () {
 const program = commander_1.default;
 program
     .version(getVersion())
-    .option("-o, --output [value]", "Output file path", "dnslint-report.json")
-    .option("-d, --domainToCheck [value]", "Domain to Check");
+    .option("-o, --output [value]", "output file path", "dnslint-report.json")
+    .option("-d, --domainToCheck [value]", "domain to check");
 program.parse(process.argv);
 start(program.output, program.domainToCheck);
 //# sourceMappingURL=cli.js.map

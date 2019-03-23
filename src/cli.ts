@@ -1,8 +1,6 @@
 import commander from 'commander'
 import dotenvExpand from 'dotenv-expand'
 import { XyDomainScan } from './'
-import { inspect } from 'util'
-import { Config } from './config'
 
 const getVersion = (): string => {
   dotenvExpand({
@@ -26,8 +24,8 @@ const program = commander
 
 program
   .version(getVersion())
-  .option("-o, --output [value]", "Output file path", "dnslint-report.json")
-  .option("-d, --domainToCheck [value]", "Domain to Check")
+  .option("-o, --output [value]", "output file path", "dnslint-report.json")
+  .option("-d, --domainToCheck [value]", "domain to check")
 
 program.parse(process.argv)
 

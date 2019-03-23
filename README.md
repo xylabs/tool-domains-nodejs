@@ -69,6 +69,10 @@ Make sure you put the config file in the same folder from where you are running 
 }
 ```
 
+## AWS Support
+
+When aws=true is set in the dnslint.json file, then dnslint will read a list of domains from Route53, using the credentials configured in the AWS CLI
+
 ## Developer Guide
 
 ### Install dependencies

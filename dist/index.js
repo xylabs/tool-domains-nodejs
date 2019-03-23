@@ -14,7 +14,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const aws_1 = require("./aws");
 const fs_1 = __importDefault(require("fs"));
 const config_1 = require("./config");
-const ts_optchain_1 = require("ts-optchain");
 const chalk_1 = __importDefault(require("chalk"));
 const validator_1 = require("./validator");
 class XyDomainScan {
@@ -36,8 +35,10 @@ class XyDomainScan {
             }
             else {
                 console.log(chalk_1.default.gray("Getting Domains"));
-                if (ts_optchain_1.oc(this.config).aws.enabled(true)) {
-                    yield this.addAWSDomains(domains);
+                if (this.config.aws) {
+                    if (this.config.aws.enabled) {
+                        yield this.addAWSDomains(domains);
+                    }
                 }
                 console.log(chalk_1.default.gray("Getting Config Domains"));
                 if (this.config.domains) {
