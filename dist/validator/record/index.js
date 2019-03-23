@@ -115,11 +115,13 @@ class RecordValidator extends base_1.BaseValidator {
                         Host: this.name
                     }
                 });
-                // console.log(chalk.magenta(inspect(response)))
             }
             catch (ex) {
-                response = (ex.response) ?
-                    ex.response : ex;
+                this.addError("get", `Failed [${prefix}${ip}]:${response.code}`);
+                response = {
+                    code: ex.code,
+                    message: ex.message
+                };
             }
             return response;
         });

@@ -27,7 +27,8 @@ export class AWS {
       const params = {
         Bucket: bucket,
         Key: filename,
-        Body: buffer
+        Body: buffer,
+        ContentType: "application/json"
       }
 
       this.s3.upload(params, (err: any, result: any) => {

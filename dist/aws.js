@@ -16,6 +16,7 @@ const chalk_1 = __importDefault(require("chalk"));
 class AWS {
     constructor() {
         this.r53 = new aws_sdk_1.Route53();
+        this.s3 = new aws_sdk_1.S3();
     }
     getDomains() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29,6 +30,28 @@ class AWS {
                 }
             }
             return result;
+        });
+    }
+    saveFileToS3(bucket, filename, data) {
+        console.log(chalk_1.default.gray(`Saving to S3`));
+        return new Promise((resolve, reject) => {
+            const buffer = Buffer.from(JSON.stringify(data));
+            const params = {
+                Bucket: bucket,
+                Key: filename,
+                Body: buffer,
+                ContentType: "application/json"
+            };
+            this.s3.upload(params, (err, result) => {
+                if (err) {
+                    console.error(chalk_1.default.red(`aws.saveFileToS3: ${err}`));
+                    reject(err);
+                }
+                else {
+                    console.log(chalk_1.default.gray(`Saved to S3: ${filename}`));
+                    resolve(result);
+                }
+            });
         });
     }
     getZones() {
