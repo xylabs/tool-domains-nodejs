@@ -87,20 +87,15 @@ class Config {
     }
     getRecordConfig(domain, recordType) {
         const serverType = this.getServerType(domain);
-        const result = new record_1.RecordConfig(recordType);
+        let serverRecord = new record_1.RecordConfig(recordType);
+        let domainRecord = new record_1.RecordConfig(recordType);
         if (this.servers !== undefined) {
-            const records = this.servers.getConfig(serverType).records;
-            if (records) {
-                lodash_1.default.merge(result, records.getConfig(recordType));
-            }
+            serverRecord = this.servers.getRecordConfig(serverType, recordType);
         }
         if (this.domains !== undefined) {
-            const records = this.domains.getConfig(domain).records;
-            if (records) {
-                lodash_1.default.merge(result, records.getConfig(recordType));
-            }
+            domainRecord = this.domains.getRecordConfig(serverType, recordType);
         }
-        return result;
+        return lodash_1.default.merge(serverRecord, domainRecord);
     }
     getRecordConfigs(domain) {
         const serverType = this.getServerType(domain);
@@ -110,7 +105,9 @@ class Config {
             if (records) {
                 for (const record of records) {
                     if (record.type) {
-                        result.set(record.type, records.getConfig(record.type));
+                        if (result.get(record.type) === undefined) {
+                            result.set(record.type, this.getRecordConfig(domain, record.type));
+                        }
                     }
                 }
             }
@@ -119,9 +116,8 @@ class Config {
             const records = this.servers.getConfig(serverType).records;
             if (records) {
                 for (const record of records) {
-                    if (record.type) {
-                        const newItem = lodash_1.default.merge(result.get(record.type) || new record_1.RecordConfig(record.type), records.getConfig(record.type));
-                        result.set(record.type, newItem);
+                    if (result.get(record.type) === undefined) {
+                        result.set(record.type, this.getRecordConfig(domain, record.type));
                     }
                 }
             }
@@ -130,9 +126,8 @@ class Config {
             const records = this.domains.getConfig(domain).records;
             if (records) {
                 for (const record of records) {
-                    if (record.type) {
-                        const newItem = lodash_1.default.merge(result.get(record.type) || new record_1.RecordConfig(record.type), records.getConfig(record.type));
-                        result.set(record.type, newItem);
+                    if (result.get(record.type) === undefined) {
+                        result.set(record.type, this.getRecordConfig(domain, record.type));
                     }
                 }
             }

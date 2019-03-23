@@ -41,8 +41,13 @@ export class DomainValidator extends BaseValidator {
     if (this.errorCount) {
       console.log(chalk.yellow(`Errors: ${this.errorCount}`))
     }
-    if (this.serverType === 'website') {
-      // this.pages = await this.getDomainUrls()
+
+    if (this.config.servers) {
+      const serverConfig = this.config.servers.getConfig(this.serverType)
+
+      if (serverConfig.crawl) {
+        this.pages = await this.getDomainUrls()
+      }
     }
     return super.validate()
   }
@@ -56,7 +61,6 @@ export class DomainValidator extends BaseValidator {
         timeout: 500,
         retries: 0,
         callback: (error: any, res: any, done: any) => {
-          console.log(res.options.uri)
           scannedUrls[res.options.uri] = true
           if (error) {
             this.addError("getDomainUrls", error)
@@ -76,7 +80,6 @@ export class DomainValidator extends BaseValidator {
                     if (newParts.protocol && newParts.protocol.match("^http")) {
                       if (newParts.host === inParts.host) {
                         if (foundUrls[newUrl] === undefined) {
-                          console.log(newUrl)
                           foundUrls[newUrl] = true
                           crawler.queue(newUrl)
                         }
@@ -87,7 +90,8 @@ export class DomainValidator extends BaseValidator {
               })
             }
           }
-          console.log("arie", `QueueSize: ${crawler.queueSize}:${Object.keys(scannedUrls).length}`)
+          console.log(chalk.gray(
+            "arie", `Crawl [${crawler.queueSize}:${Object.keys(scannedUrls).length}]: ${res.options.uri}`))
           if (Object.keys(foundUrls).length === Object.keys(scannedUrls).length) {
             console.log(chalk.gray("getDomainUrls", `Found pages[${this.name}]: ${Object.keys(scannedUrls).length}`))
             resolve(foundUrls)

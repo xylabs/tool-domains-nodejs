@@ -5,6 +5,8 @@ import _ from "lodash"
 
 export class ServersConfig extends Array <ServerConfig> {
 
+  private mapCache?: Map<string, ServerConfig>
+
   public concat(servers: ServerConfig[]): ServersConfig {
     for (const server of servers) {
       const serverConfig = Object.assign(new ServerConfig(server.name), server)
@@ -13,16 +15,29 @@ export class ServersConfig extends Array <ServerConfig> {
     return this
   }
 
-  public getConfig(serverType: string): ServerConfig {
-    const result = new ServerConfig(serverType)
+  public merge(items: any[]) {
     const map = this.getMap()
-    Object.assign(result, map.get("default"))
-    Object.assign(result, map.get(serverType))
-    result.name = serverType
+    this.mapCache = undefined
+    for (const item of items) {
+      const newItem = map.get(item.name) || new ServerConfig(item.name)
+      map.set(item.name, newItem.merge(item))
+    }
+    const result = new ServersConfig()
+    for (const item of map) {
+      result.push(item[1])
+    }
+    return result
+  }
+
+  public getConfig(serverType: string): ServerConfig {
+    let result = new ServerConfig(serverType)
+    const map = this.getMap()
+    result = _.merge(result, map.get("default"))
+    result = _.merge(result, map.get(serverType))
 
     // make sure it is a full object
-    const records = new RecordsConfig()
-    Object.assign(records, result.records)
+    let records = new RecordsConfig()
+    records = _.merge(records, result.records)
     result.records = records
     return result
   }
@@ -42,10 +57,13 @@ export class ServersConfig extends Array <ServerConfig> {
   }
 
   public getMap() {
-    const map = new Map<string, ServerConfig>()
-    for (const server of this) {
-      map.set(server.name, server)
+    if (this.mapCache) {
+      return this.mapCache
     }
-    return map
+    this.mapCache = new Map<string, ServerConfig>()
+    for (const domain of this) {
+      this.mapCache.set(domain.name, domain)
+    }
+    return this.mapCache
   }
 }

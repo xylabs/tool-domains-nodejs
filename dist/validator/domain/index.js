@@ -49,8 +49,11 @@ class DomainValidator extends base_1.BaseValidator {
             if (this.errorCount) {
                 console.log(chalk_1.default.yellow(`Errors: ${this.errorCount}`));
             }
-            if (this.serverType === 'website') {
-                // this.pages = await this.getDomainUrls()
+            if (this.config.servers) {
+                const serverConfig = this.config.servers.getConfig(this.serverType);
+                if (serverConfig.crawl) {
+                    this.pages = yield this.getDomainUrls();
+                }
             }
             return _super.validate.call(this);
         });

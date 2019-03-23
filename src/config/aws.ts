@@ -1,5 +1,9 @@
-import loadJsonFile from 'load-json-file'
+import { Base } from "./base"
 
-export class AWS {
+export class AWS extends Base {
   public enabled = true
+
+  public merge(config: any) {
+    this.enabled = config.enabled
+  }
 }

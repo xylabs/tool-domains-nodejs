@@ -9,8 +9,9 @@ import { ServersConfig } from './servers'
 import Ajv from 'ajv'
 import schema from '../schema/dnslint.schema.json'
 import { RecordConfig } from './record'
+import { Base } from './base'
 
-export class Config {
+export class Config extends Base {
 
   public static async load(params: {config?: Config, filename?: string}): Promise<Config> {
     try {
@@ -57,30 +58,21 @@ export class Config {
     }
   }
 
-  public aws ?: AWS = undefined
-  public domains?: DomainsConfig
-  public servers?: ServersConfig
+  public aws = new AWS()
+  public domains = new DomainsConfig()
+  public servers = new ServersConfig()
 
   constructor(config?: any) {
+    super()
     if (config) {
-      Object.assign(this, config)
+      this.merge(config)
     }
-    this.domains = new DomainsConfig().concat(this.domains || [])
-    this.servers = new ServersConfig().concat(this.servers || [])
   }
 
-  public getDomains() {
-    if (!this.domains) {
-      this.domains = new DomainsConfig()
-    }
-    return this.domains
-  }
-
-  public getServers() {
-    if (!this.servers) {
-      this.servers = new ServersConfig()
-    }
-    return this.servers
+  public merge(config: any) {
+    this.aws.merge(config.aws)
+    this.domains = this.domains.merge(config.domains)
+    this.servers = this.servers.merge(config.servers)
   }
 
   public getRecordConfig(domain: string, recordType: string) {

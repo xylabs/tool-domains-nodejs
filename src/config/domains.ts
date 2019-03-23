@@ -6,6 +6,20 @@ export class DomainsConfig extends Array<DomainConfig> {
 
   private mapCache?: Map<string, DomainConfig>
 
+  public merge(items: any[]) {
+    const map = this.getMap()
+    this.mapCache = undefined
+    for (const item of items) {
+      const newItem = map.get(item.name) || new DomainConfig(item.name)
+      map.set(item.name, newItem.merge(item))
+    }
+    const result = new DomainsConfig()
+    for (const item of map) {
+      result.push(item[1])
+    }
+    return result
+  }
+
   public concat(domains: DomainConfig[]): DomainsConfig {
     for (const domain of domains) {
       const domainConfig = Object.assign(new DomainConfig(domain.name), domain)
@@ -16,8 +30,9 @@ export class DomainsConfig extends Array<DomainConfig> {
 
   public getConfig(domain: string): DomainConfig {
     const map = this.getMap()
-    const result = new DomainConfig(domain, [map.get("default"), map.get(domain)])
-    result.name = domain
+    let result = new DomainConfig(domain)
+    result = result.merge(map.get("default"))
+    result = result.merge(map.get(domain))
     return result
   }
 

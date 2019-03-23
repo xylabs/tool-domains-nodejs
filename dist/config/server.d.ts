@@ -5,5 +5,6 @@ export declare class ServerConfig {
     include?: string[];
     exclude?: string[];
     records?: RecordsConfig;
+    crawl?: boolean;
     constructor(name: string, init?: any[]);
 }

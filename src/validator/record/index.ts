@@ -144,7 +144,7 @@ export class RecordValidator extends BaseValidator {
         } else {
           if (this.config.html || this.config.html === undefined) {
             if (result.statusCode === 200) {
-              const results = await this.validateHtml(response.data, value)
+              await this.validateHtml(response.data, value)
             }
           }
         }

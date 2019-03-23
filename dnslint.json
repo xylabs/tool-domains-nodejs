@@ -21,6 +21,7 @@
   "servers": [
     {
       "name": "website",
+      "crawl": true,
       "records": [
         {
           "type": "default",
