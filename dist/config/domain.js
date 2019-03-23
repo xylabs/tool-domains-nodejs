@@ -9,7 +9,6 @@ class DomainConfig extends base_1.Base {
         this.enabled = true;
         this.timeout = 1000;
         this.serverType = "unknown";
-        this.crawl = false;
         this.name = name;
     }
     getTimeout() {

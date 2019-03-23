@@ -89,7 +89,9 @@ export class XyDomainScan {
       const awsDomains = await this.aws.getDomains()
       console.log(chalk.gray(`AWS Domains Found: ${awsDomains.length}`))
       for (const domain of awsDomains) {
-        domains.set(domain, new DomainValidator(domain, this.config))
+        // remove trailing '.'
+        const cleanDomain = domain.slice(0, domain.length - 1)
+        domains.set(cleanDomain, new DomainValidator(cleanDomain, this.config))
       }
     } catch (ex) {
       console.error(chalk.red(`AWS Domains Error: ${ex.message}`))
@@ -100,7 +102,8 @@ export class XyDomainScan {
   private async addDomains(domains: Map<string, DomainValidator>, domainsConfig: DomainsConfig) {
     if (domainsConfig) {
       for (const domain of domainsConfig) {
-        if ((domain.name !== "default") && (domain.enabled === undefined || domain.enabled)) {
+        if (domain.name !== "default") {
+          console.log(chalk.yellow(`Adding Domain from Config: ${domain.name}`))
           domains.set(domain.name, new DomainValidator(domain.name, this.config))
         }
       }

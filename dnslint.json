@@ -15,7 +15,6 @@
     },
     {
       "name": "support.xyfindit.com",
-      "enabled": true,
       "crawl": false
     }
   ],

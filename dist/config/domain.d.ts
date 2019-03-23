@@ -6,7 +6,7 @@ export declare class DomainConfig extends Base {
     enabled: boolean;
     timeout: number;
     serverType: string;
-    crawl: boolean;
+    crawl?: boolean;
     constructor(name: string);
     getTimeout(): number;
     isRecordEnabled(type: string): boolean;

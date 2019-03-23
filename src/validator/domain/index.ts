@@ -22,6 +22,11 @@ export class DomainValidator extends BaseValidator {
   }
 
   public async validate(): Promise<number> {
+    const domainConfig = this.config.getDomainConfig(this.name)
+    if (domainConfig.enabled === false) {
+      console.log(chalk.gray(`Skipping Disabled Domain: ${this.name}`))
+      return 0
+    }
     const recordConfigs = this.config.getRecordConfigs(this.name)
     try {
       for (const item of recordConfigs) {
@@ -43,7 +48,6 @@ export class DomainValidator extends BaseValidator {
     }
 
     let crawl = false
-    const domainConfig = this.config.getDomainConfig(this.name)
     if (domainConfig.crawl !== undefined) {
       crawl = domainConfig.crawl
     } else {
