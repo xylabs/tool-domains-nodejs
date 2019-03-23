@@ -138,7 +138,8 @@ export class RecordValidator extends BaseValidator {
         result.statusMessage = response.statusText
         if (this.config.http.callTimeMax) {
           if (result.callTime > this.config.http.callTimeMax) {
-            this.addError("https", `Call too slow: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`)
+            this.addError(
+              "https", `Call too slow [${value}]: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`)
           }
         }
         if (result.headers) {
@@ -148,7 +149,7 @@ export class RecordValidator extends BaseValidator {
         this.http.push(result)
         const expectedCode = this.config.http.statusCode || 200
         if (result.statusCode !== expectedCode) {
-          this.addError("http", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
+          this.addError("http", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`)
         } else {
           if (this.config.html || this.config.html === undefined) {
             if (result.statusCode === 200) {
@@ -159,7 +160,7 @@ export class RecordValidator extends BaseValidator {
         result.data = undefined
         console.log(chalk.gray(`http: ${value}: ${result.statusCode}`))
       } else {
-        this.addError("http", `Failed to get Response [${response.code}]: ${response.message}`)
+        this.addError("http", `Failed to get Response [${value}]: ${response.code}: ${response.message}`)
       }
     } catch (ex) {
       this.addError("RecordValidator.checkHttp", ex)
@@ -186,7 +187,8 @@ export class RecordValidator extends BaseValidator {
         result.statusMessage = response.statusText
         if (this.config.https.callTimeMax) {
           if (callTime > this.config.https.callTimeMax) {
-            this.addError("https", `Call too slow: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
+            this.addError(
+              "https", `Call too slow [${value}]: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
           }
         }
         if (result.headers) {
@@ -196,7 +198,9 @@ export class RecordValidator extends BaseValidator {
         this.https.push(result)
         const expectedCode = this.config.https.statusCode || 200
         if (result.statusCode !== expectedCode) {
-          this.addError("https", `Unexpected Response Code: ${result.statusCode} [Expected: ${expectedCode}]`)
+          this.addError(
+            "https", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`
+            )
         } else {
           if (result.statusCode === 200) {
             if (this.config.html || this.config.html === undefined) {
@@ -207,7 +211,7 @@ export class RecordValidator extends BaseValidator {
         result.data = undefined
         console.log(chalk.gray(`https[${timeout}]: ${value}: ${result.statusCode}`))
       } else {
-        this.addError("https", `Failed to get Response [${response.code}]: ${response.message}`)
+        this.addError("https", `Failed to get Response [${value}]: ${response.code}: ${response.message}`)
       }
     } catch (ex) {
       this.addError("RecordValidator.checkHttps", ex.message)
