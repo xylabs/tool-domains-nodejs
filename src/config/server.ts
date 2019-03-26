@@ -49,8 +49,9 @@ export class ServerConfig extends Config {
       const name = this.name
       const records = this.records
       let newItem = new ServerConfig(name)
+      newItem = _.merge(newItem, this)
       newItem = _.merge(newItem, config)
-      newItem.records = _.merge(newItem.records, records)
+      newItem.records = _.merge(records, config.records)
       newItem.name = name
       console.log(chalk.gray(`server.merge[${config.name}]: ${newItem.records}`))
       return newItem

@@ -54,6 +54,10 @@ export class XyDomainScan {
   public async start(params: {output: string, singleDomain?: string, bucket?: string, config?: MasterConfig}) {
     this.config = await this.loadConfig()
 
+    for (const domain of this.config.domains.values()) {
+      domain.serverType = this.config.getServerType(domain.name)
+    }
+
     // if domain specified, clear configed domains and add it
     if (params.singleDomain) {
       console.log(chalk.yellow(`Configuring Single Domain: ${params.singleDomain}`))

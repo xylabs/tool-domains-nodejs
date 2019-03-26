@@ -66,6 +66,9 @@ class XyDomainScan {
     start(params) {
         return __awaiter(this, void 0, void 0, function* () {
             this.config = yield this.loadConfig();
+            for (const domain of this.config.domains.values()) {
+                domain.serverType = this.config.getServerType(domain.name);
+            }
             // if domain specified, clear configed domains and add it
             if (params.singleDomain) {
                 console.log(chalk_1.default.yellow(`Configuring Single Domain: ${params.singleDomain}`));

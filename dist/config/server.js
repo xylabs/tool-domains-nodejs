@@ -40,6 +40,7 @@ class ServerConfig extends config_1.Config {
             const name = this.name;
             const records = this.records;
             let newItem = new ServerConfig(name);
+            newItem = lodash_1.default.merge(newItem, this);
             newItem = lodash_1.default.merge(newItem, config);
             newItem.records = lodash_1.default.merge(newItem.records, records);
             newItem.name = name;

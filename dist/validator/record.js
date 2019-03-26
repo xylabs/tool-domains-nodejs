@@ -152,7 +152,7 @@ class RecordValidator extends validator_1.Validator {
                         this.addError("http", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`);
                     }
                     else {
-                        if (this.config.html || this.config.html === undefined) {
+                        if (this.config.html) {
                             if (result.statusCode === 200) {
                                 yield this.validateHtml(response.data, value);
                             }
@@ -204,7 +204,7 @@ class RecordValidator extends validator_1.Validator {
                     }
                     else {
                         if (result.statusCode === 200) {
-                            if (this.config.html || this.config.html === undefined) {
+                            if (this.config.html) {
                                 yield this.validateHtml(response.data, value);
                             }
                         }
