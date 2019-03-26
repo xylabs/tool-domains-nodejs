@@ -5,6 +5,6 @@ export declare class DomainsConfig extends Array<DomainConfig> {
     merge(items: any[]): DomainsConfig;
     concat(domains: DomainConfig[]): DomainsConfig;
     getConfig(domain: string): DomainConfig;
-    getRecordConfig(serverType: string, recordType: string): RecordConfig;
+    getRecordConfig(domain: string, recordType: string): RecordConfig;
     getMap(): Map<string, DomainConfig>;
 }

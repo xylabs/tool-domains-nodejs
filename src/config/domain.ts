@@ -1,20 +1,58 @@
-import { RecordsConfig } from "./records"
 import { RecordConfig } from "./record"
-import { stringify } from "querystring"
 import _ from 'lodash'
-import { Base } from "./base"
+import { Config } from "./config"
+import { Configs } from "./configs"
+import chalk from "chalk"
+import assert from "assert"
 
-export class DomainConfig extends Base {
+export class DomainConfig extends Config {
+
+  public static parse(source: any, type: string) {
+    let srcObj = source
+    if (typeof source === "string") {
+      srcObj = JSON.parse(source)
+    }
+
+    assert(typeof srcObj.name === "string")
+
+    let domain = new DomainConfig(srcObj.name, type)
+    domain = _.merge(domain, srcObj)
+    domain.records = new Configs<RecordConfig>()
+    if (srcObj.records) {
+      for (const record of srcObj.records) {
+        const newRecordObj = RecordConfig.parse(record, domain.name)
+        domain.records.set(newRecordObj.type, newRecordObj)
+      }
+    }
+    return domain
+  }
+
   public name: string
-  public records = new RecordsConfig()
-  public enabled = true
+  public serverType: string
+  public records = new Configs<RecordConfig>()
   public timeout = 1000
-  public serverType = "unknown"
   public crawl?: boolean
 
-  constructor(name: string) {
+  constructor(name: string, type: string) {
     super()
     this.name = name
+    this.serverType = type
+  }
+
+  public merge(config?: DomainConfig) {
+    if (config) {
+      const name = this.name
+      let newItem = new DomainConfig(name, this.serverType)
+      newItem = _.merge(newItem, config)
+      newItem.records = this.records.merge(config.records)
+      newItem.name = name
+      return newItem
+    }
+    return this
+  }
+
+  public getKey() {
+    return this.name
   }
 
   public getTimeout() {
@@ -28,9 +66,7 @@ export class DomainConfig extends Base {
     if (this.records) {
       const recordConfig = this.records.getConfig(type)
       if (recordConfig) {
-        if (recordConfig.enabled !== undefined) {
-          return recordConfig.enabled
-        }
+        return recordConfig.isEnabled()
       }
     }
     return true

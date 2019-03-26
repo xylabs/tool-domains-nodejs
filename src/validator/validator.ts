@@ -1,15 +1,15 @@
 import chalk from 'chalk'
 import { ValidationError } from './error'
 import _ from 'lodash'
-import isCircular from 'is-circular'
+import { Config } from '../config/config'
 
-export class BaseValidator {
-  public name: string
+export class Validator<T extends Config> {
+  public config: T
   public errors?: ValidationError[]
   public errorCount = 0
 
-  constructor(name: string) {
-    this.name = name
+  constructor(config: T) {
+    this.config = config
   }
 
   public toJSON () {
@@ -17,10 +17,6 @@ export class BaseValidator {
   }
 
   public async validate() {
-    if (isCircular(this)) {
-      this.addError("base", `CIRCULAR: ${this.name}`)
-    }
-
     if (this.errors) {
       this.errorCount += this.addErrors.length
     }

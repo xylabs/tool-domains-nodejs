@@ -1,9 +1,4 @@
-import { Base } from "./base"
+import { Config } from "./config"
 
-export class AWS extends Base {
-  public enabled = true
-
-  public merge(config: any) {
-    this.enabled = config.enabled
-  }
+export class AWSConfig extends Config {
 }

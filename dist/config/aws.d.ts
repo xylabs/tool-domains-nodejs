@@ -1,5 +1,3 @@
-import { Base } from "./base";
-export declare class AWS extends Base {
-    enabled: boolean;
-    merge(config: any): void;
+import { Config } from "./config";
+export declare class AWSConfig extends Config {
 }

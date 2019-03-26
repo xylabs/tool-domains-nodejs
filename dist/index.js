@@ -15,70 +15,80 @@ const aws_1 = require("./aws");
 const fs_1 = __importDefault(require("fs"));
 const config_1 = require("./config");
 const chalk_1 = __importDefault(require("chalk"));
-const validator_1 = require("./validator");
+const master_1 = require("./validator/master");
+const aws_2 = require("./config/aws");
+const default_json_1 = __importDefault(require("./config/default.json"));
+const load_json_file_1 = __importDefault(require("load-json-file"));
 class XyDomainScan {
     constructor() {
         this.aws = new aws_1.AWS();
-        this.config = new config_1.Config();
+        this.config = new config_1.MasterConfig();
+        this.validator = new master_1.MasterValidator(new config_1.MasterConfig());
+    }
+    loadConfig(filename) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const filenameToLoad = filename || './dnslint.json';
+                /*const ajv = new Ajv({ schemaId: 'id' })
+                const validate = ajv.compile(schema)
+                if (!validate(defaultConfig)) {
+                  console.error(chalk.red(`${validate.errors}`))
+                } else {
+                  console.log(chalk.green("Default Config Validated"))
+                }*/
+                const defaultConfig = config_1.MasterConfig.parse(default_json_1.default);
+                console.log(chalk_1.default.gray("Loaded Default Config"));
+                try {
+                    const userConfigJson = yield load_json_file_1.default(filenameToLoad);
+                    const userConfig = config_1.MasterConfig.parse(userConfigJson);
+                    /*if (!validate(userJson)) {
+                      console.error(chalk.red(`${validate.errors}`))
+                    } else {
+                      console.log(chalk.green("User Config Validated"))
+                    }*/
+                    console.log(chalk_1.default.gray("Loaded User Config"));
+                    const result = defaultConfig.merge(userConfig);
+                    return result;
+                }
+                catch (ex) {
+                    console.log(chalk_1.default.yellow(`No dnslint.json config file found.  Using defaults: ${ex.message}`));
+                    console.error(ex.stack);
+                    return defaultConfig;
+                }
+            }
+            catch (ex) {
+                console.log(chalk_1.default.red(`Failed to load defaults: ${ex}`));
+                console.error(ex.stack);
+                return new config_1.MasterConfig();
+            }
+        });
     }
     start(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.config = yield config_1.Config.load({ config: params.config });
-            const domains = new Map();
-            const result = {
-                domains: [],
-                errorCount: 0
-            };
-            // special case if domain specified
+            this.config = yield this.loadConfig();
+            // if domain specified, clear configed domains and add it
             if (params.singleDomain) {
-                domains.set(params.singleDomain, new validator_1.DomainValidator(params.singleDomain, this.config));
+                console.log(chalk_1.default.yellow(`Configuring Single Domain: ${params.singleDomain}`));
+                const singleDomainConfig = this.config.getDomainConfig(params.singleDomain);
+                this.config.domains.set(singleDomainConfig.name, singleDomainConfig);
+                this.config.aws = new aws_2.AWSConfig();
+                this.config.aws.enabled = false;
             }
-            else {
-                console.log(chalk_1.default.gray("Getting Domains"));
-                if (this.config.aws) {
-                    if (this.config.aws.enabled) {
-                        yield this.addAWSDomains(domains);
-                    }
-                }
-                console.log(chalk_1.default.gray("Getting Config Domains"));
-                if (this.config.domains) {
-                    yield this.addDomains(domains, this.config.domains);
-                }
-            }
-            console.log(`Domains Found: ${domains.size}`);
-            let completedDomains = 0;
-            for (const domain of domains.values()) {
-                try {
-                    completedDomains++;
-                    result.domains.push(domain);
-                    console.log(`Domain:[${completedDomains}/${domains.size}]: ${domain.name} [${domain.serverType}]`);
-                    result.errorCount += yield domain.validate();
-                }
-                catch (ex) {
-                    result.errorCount++;
-                    console.error(chalk_1.default.red(ex.message));
-                    console.error(chalk_1.default.red(ex.stack));
-                }
-            }
+            this.validator = new master_1.MasterValidator(this.config);
+            console.log(`Domains Found: ${this.config.domains.size}`);
+            yield this.validator.validate();
             if (params.bucket) {
-                try {
-                    yield this.aws.saveFileToS3(params.bucket, this.getLatestS3FileName(), result);
-                    yield this.aws.saveFileToS3(params.bucket, this.getHistoricS3FileName(), result);
-                }
-                catch (ex) {
-                    console.error(chalk_1.default.red(ex.message));
-                    console.error(chalk_1.default.red(ex.stack));
-                }
+                this.saveToAws(params.bucket);
             }
             console.log(`Saving to File: ${params.output}`);
-            this.saveToFile(params.output, result);
-            if (result.errorCount === 0) {
+            this.saveToFile(params.output);
+            if (this.validator.errorCount === 0) {
                 console.log(chalk_1.default.green("Congratulations, all tests passed!"));
             }
             else {
-                console.error(chalk_1.default.yellow(`Total Errors Found: ${result.errorCount}`));
+                console.error(chalk_1.default.yellow(`Total Errors Found: ${this.validator.errorCount}`));
             }
-            return result;
+            return this.validator;
         });
     }
     getLatestS3FileName() {
@@ -89,45 +99,26 @@ class XyDomainScan {
         const parts = date.split('T');
         return `${parts[0]}/${parts[1]}.json`;
     }
-    addAWSDomains(domains) {
+    saveToAws(bucket) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(chalk_1.default.gray("Getting AWS Domains"));
             try {
-                const awsDomains = yield this.aws.getDomains();
-                console.log(chalk_1.default.gray(`AWS Domains Found: ${awsDomains.length}`));
-                for (const domain of awsDomains) {
-                    // remove trailing '.'
-                    const cleanDomain = domain.slice(0, domain.length - 1);
-                    domains.set(cleanDomain, new validator_1.DomainValidator(cleanDomain, this.config));
-                }
+                yield this.aws.saveFileToS3(bucket, this.getLatestS3FileName(), this.validator);
+                yield this.aws.saveFileToS3(bucket, this.getHistoricS3FileName(), this.validator);
             }
             catch (ex) {
-                console.error(chalk_1.default.red(`AWS Domains Error: ${ex.message}`));
+                console.error(chalk_1.default.red(ex.message));
+                console.error(chalk_1.default.red(ex.stack));
             }
-            return domains;
         });
     }
-    addDomains(domains, domainsConfig) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (domainsConfig) {
-                for (const domain of domainsConfig) {
-                    if (domain.name !== "default") {
-                        console.log(chalk_1.default.yellow(`Adding Domain from Config: ${domain.name}`));
-                        domains.set(domain.name, new validator_1.DomainValidator(domain.name, this.config));
-                    }
-                }
-            }
-            return domains;
-        });
-    }
-    saveToFile(filename, obj) {
+    saveToFile(filename) {
         return __awaiter(this, void 0, void 0, function* () {
             fs_1.default.open(filename, 'w', (err, fd) => {
                 if (err) {
                     console.log(`failed to open file: ${err}`);
                 }
                 else {
-                    fs_1.default.write(fd, JSON.stringify(obj), (errWrite) => {
+                    fs_1.default.write(fd, JSON.stringify(this.validator), (errWrite) => {
                         if (errWrite) {
                             console.log(`failed to write file: ${errWrite}`);
                         }

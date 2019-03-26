@@ -1,28 +1,28 @@
-import { BaseValidator } from '../base'
-import { Dns } from '../../dns'
+import { Validator } from './validator'
+import { Dns } from '../dns'
 import http, { IncomingMessage } from 'http'
 import https, { Agent } from 'https'
 import chalk from 'chalk'
-import { RecordConfig } from '../../config/record'
+import { RecordConfig } from '../config/record'
 import assert from 'assert'
 import htmlValidator from 'html-validator'
 import axios from 'axios'
 import { inspect } from 'util'
 
-export class RecordValidator extends BaseValidator {
+export class RecordValidator extends Validator<RecordConfig> {
 
   public type: string
+  public domain?: string
   public records: any[] = []
   public http?: any[]
   public https?: any[]
   public reverseDns?: any
   public values?: any
-  public config: RecordConfig
 
-  constructor(name: string, config: RecordConfig) {
-    super(name)
-    this.config = config
+  constructor(config: RecordConfig) {
+    super(config)
     this.type = config.type
+    this.domain = config.domain
   }
 
   public async validate() {
@@ -41,12 +41,6 @@ export class RecordValidator extends BaseValidator {
           this.reverseDns = await this.reverseLookup(this.config.reverseDNS.value)
         }
       }
-      /*if (this.config.values) {
-        this.expected =
-        for (const record of this.records) {
-
-        }
-      }*/
     }
     return super.validate()
   }
@@ -59,7 +53,7 @@ export class RecordValidator extends BaseValidator {
         enabled = config.enabled
       }
       if (enabled) {
-        for (const record of this.records) {
+        for (const record of this.records.values()) {
           result.push(await this.checkHttp(record))
         }
       }
@@ -75,7 +69,7 @@ export class RecordValidator extends BaseValidator {
         enabled = config.enabled
       }
       if (enabled) {
-        for (const record of this.records) {
+        for (const record of this.records.values()) {
           result.push(await this.checkHttps(record))
         }
       }
@@ -109,7 +103,7 @@ export class RecordValidator extends BaseValidator {
           validateStatus: (status: any) => true,
           transformResponse: (data: any) => data,
           timeout, headers: {
-            Host: this.name
+            Host: this.config.domain
           }
         }
       )
@@ -216,7 +210,7 @@ export class RecordValidator extends BaseValidator {
       }
     } catch (ex) {
       this.addError("RecordValidator.checkHttps", ex.message)
-      console.error(chalk.magenta(ex.stack))
+      console.error(chalk.red(ex.stack))
     }
     return result
   }
@@ -224,7 +218,7 @@ export class RecordValidator extends BaseValidator {
   protected async reverseLookup(value ?: string) {
     const result: any[] = []
     try {
-      for (const record of this.records) {
+      for (const record of this.records.values()) {
         const domains = await Dns.reverse(record)
         let valid = true
         if (value) {
@@ -250,8 +244,8 @@ export class RecordValidator extends BaseValidator {
 
   private async resolve() {
     try {
-      if (this.type) {
-        return await Dns.resolve(this.name, this.type)
+      if (this.type && this.domain) {
+        return await Dns.resolve(this.domain, this.type)
       }
       this.addError("RecordValidator.resolve", "Missing Type")
     } catch (ex) {
