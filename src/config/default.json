@@ -269,8 +269,7 @@
         },
         {
           "type": "A",
-          "allowed": [0, 1],
-          "html": true
+          "allowed": [0, 1]
         },
         {
           "type": "CNAME",

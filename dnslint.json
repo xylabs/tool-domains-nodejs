@@ -10,7 +10,8 @@
         "enabled": false
       },
       "records": [{
-        "type": "default"
+        "type": "default",
+        "html": false
       }]
     },
     {
@@ -20,12 +21,20 @@
     {
       "name": "geohackers.xyo.network",
       "crawl": false
+    },
+    {
+      "name": "geohacker.xyo.network",
+      "crawl": false
+    },
+    {
+      "name": "community.xyo.network",
+      "crawl": false
     }
   ],
   "servers": [
     {
       "name": "website",
-      "crawl": true,
+      "crawl": false,
       "records": [
         {
           "type": "default",

@@ -78,7 +78,7 @@
       }
     },
     "webcall": {
-      "$id": "#definitions/http",
+      "$id": "#definitions/webcall",
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -86,6 +86,8 @@
         "statusCode": {"type": "number"},
         "httpVersion": {"type": "string"},
         "callTimeMax": {"type": "number"},
+        "ssl": {"type": "boolean"},
+        "port": {"type": "number"},
         "headers": {
           "type": "array",
           "items": {"$ref": "#/definitions/header"}

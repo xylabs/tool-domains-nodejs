@@ -1,41 +1,42 @@
 
-import { RecordValidator } from '../record'
-import { BaseValidator } from '../base'
+import { RecordValidator } from './record'
+import { Validator } from './validator'
 import chalk from 'chalk'
-import { Config } from '../../config'
+import { MasterConfig } from '../config'
 import _ from 'lodash'
 import Crawler from 'crawler'
 import url from 'url'
 import { inspect } from 'util'
+import { DomainConfig } from '../config/domain'
+import { RecordConfig } from '../config/record'
 
-export class DomainValidator extends BaseValidator {
+export class DomainValidator extends Validator<DomainConfig> {
+  public name: string
+  public type: string
   public records: RecordValidator[] = []
-  public serverType: string
-  public config: Config
   public pages?: any
 
-  constructor(name: string, config: Config) {
-    super(name)
-    this.name = name
-    this.config = config
-    this.serverType = config.getServerType(name)
+  constructor (config: DomainConfig, type: string) {
+    super(config)
+    this.name = config.name
+    this.type = type
   }
 
-  public async validate(): Promise<number> {
-    const domainConfig = this.config.getDomainConfig(this.name)
-    if (domainConfig.enabled === false) {
-      console.log(chalk.gray(`Skipping Disabled Domain: ${this.name}`))
+  public async validate() {
+    if (!this.config.isEnabled()) {
+      console.log(chalk.gray(`Skipping Disabled Domain: ${this.config.name}`))
       return 0
     }
-    const recordConfigs = this.config.getRecordConfigs(this.name)
     try {
-      for (const item of recordConfigs) {
-        const recordConfig = item[1]
-        if (recordConfig.type !== "default") {
-          if (recordConfig.isEnabled()) {
-            const record = new RecordValidator(this.name, recordConfig)
-            this.records.push(record)
-            this.errorCount += await record.validate()
+      this.records = []
+      if (this.config.records) {
+        for (const recordConfig of this.config.records.values()) {
+          if (recordConfig.type !== "default") {
+            if (recordConfig.isEnabled()) {
+              const record = new RecordValidator(recordConfig)
+              this.records.push(record)
+              this.errorCount += await record.validate()
+            }
           }
         }
       }
@@ -48,15 +49,8 @@ export class DomainValidator extends BaseValidator {
     }
 
     let crawl = false
-    if (domainConfig.crawl !== undefined) {
-      crawl = domainConfig.crawl
-    } else {
-      if (this.config.servers) {
-        const serverConfig = this.config.servers.getConfig(this.serverType)
-        if (serverConfig.crawl) {
-          this.pages = await this.getDomainUrls()
-        }
-      }
+    if (this.config.crawl !== undefined) {
+      crawl = this.config.crawl
     }
     return super.validate()
   }
@@ -73,7 +67,7 @@ export class DomainValidator extends BaseValidator {
           try {
             scannedUrls[res.options.uri] = true
             if (error) {
-              this.addError("getDomainUrls", error)
+              this.addError("getDomainUrls", error.message)
             } else {
               const $ = res.$
               if ($) {
@@ -109,13 +103,15 @@ export class DomainValidator extends BaseValidator {
           console.log(chalk.gray(
             `crawl [${Object.keys(foundUrls).length}:${Object.keys(scannedUrls).length}]: ${res.options.uri}`))
           if (Object.keys(foundUrls).length === Object.keys(scannedUrls).length) {
-            console.log(chalk.gray("getDomainUrls", `Found pages[${this.name}]: ${Object.keys(scannedUrls).length}`))
+            console.log(chalk.gray(
+              "getDomainUrls", `Found pages[${this.config.name}]: ${Object.keys(scannedUrls).length}`
+            ))
             resolve(foundUrls)
           }
           done()
         }
       })
-      const startingUrl = `https://${this.name}/`
+      const startingUrl = `https://${this.config.name}/`
       foundUrls[startingUrl] = true
       crawler.queue(startingUrl)
     })

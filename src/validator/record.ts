@@ -1,28 +1,28 @@
-import { BaseValidator } from '../base'
-import { Dns } from '../../dns'
+import { Validator } from './validator'
+import { Dns } from '../dns'
 import http, { IncomingMessage } from 'http'
 import https, { Agent } from 'https'
 import chalk from 'chalk'
-import { RecordConfig } from '../../config/record'
+import { RecordConfig } from '../config/record'
 import assert from 'assert'
 import htmlValidator from 'html-validator'
 import axios from 'axios'
 import { inspect } from 'util'
 
-export class RecordValidator extends BaseValidator {
+export class RecordValidator extends Validator<RecordConfig> {
 
   public type: string
+  public domain?: string
   public records: any[] = []
   public http?: any[]
   public https?: any[]
   public reverseDns?: any
   public values?: any
-  public config: RecordConfig
 
-  constructor(name: string, config: RecordConfig) {
-    super(name)
-    this.config = config
+  constructor(config: RecordConfig) {
+    super(config)
     this.type = config.type
+    this.domain = config.domain
   }
 
   public async validate() {
@@ -32,8 +32,10 @@ export class RecordValidator extends BaseValidator {
         if (((this.config.http.enabled === undefined) && true) || this.config.http.enabled) {
           this.http = await this.checkAllHttp(this.config.http)
         }
-        if (((this.config.https.enabled === undefined) && true) || this.config.https.enabled) {
-          this.http = await this.checkAllHttps(this.config.https)
+        if (this.config.https) {
+          if (((this.config.https.enabled === undefined) && true) || this.config.https.enabled) {
+            this.http = await this.checkAllHttps(this.config.https)
+          }
         }
       }
       if (this.config.reverseDNS) {
@@ -41,12 +43,6 @@ export class RecordValidator extends BaseValidator {
           this.reverseDns = await this.reverseLookup(this.config.reverseDNS.value)
         }
       }
-      /*if (this.config.values) {
-        this.expected =
-        for (const record of this.records) {
-
-        }
-      }*/
     }
     return super.validate()
   }
@@ -59,7 +55,7 @@ export class RecordValidator extends BaseValidator {
         enabled = config.enabled
       }
       if (enabled) {
-        for (const record of this.records) {
+        for (const record of this.records.values()) {
           result.push(await this.checkHttp(record))
         }
       }
@@ -75,7 +71,7 @@ export class RecordValidator extends BaseValidator {
         enabled = config.enabled
       }
       if (enabled) {
-        for (const record of this.records) {
+        for (const record of this.records.values()) {
           result.push(await this.checkHttps(record))
         }
       }
@@ -109,7 +105,7 @@ export class RecordValidator extends BaseValidator {
           validateStatus: (status: any) => true,
           transformResponse: (data: any) => data,
           timeout, headers: {
-            Host: this.name
+            Host: this.config.domain
           }
         }
       )
@@ -138,24 +134,33 @@ export class RecordValidator extends BaseValidator {
         result.headers = response.headers
         result.statusCode = response.status
         result.statusMessage = response.statusText
-        if (this.config.http.callTimeMax) {
-          if (result.callTime > this.config.http.callTimeMax) {
-            this.addError(
-              "https", `Call too slow [${value}]: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`)
+        if (this.config.http) {
+          if (this.config.http.callTimeMax) {
+            if (result.callTime > this.config.http.callTimeMax) {
+              this.addError(
+                "https",
+                `Call too slow [${value}]: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`
+              )
+            }
           }
-        }
-        if (result.headers) {
-          await this.validateHeaders(this.config.http.headers, result.headers)
-        }
-        result.ip = value
-        this.http.push(result)
-        const expectedCode = this.config.http.statusCode || 200
-        if (result.statusCode !== expectedCode) {
-          this.addError("http", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`)
-        } else {
-          if (this.config.html || this.config.html === undefined) {
-            if (result.statusCode === 200) {
-              await this.validateHtml(response.data, value)
+
+          if (result.headers && this.config.http.headers) {
+            await this.validateHeaders(this.config.http.headers, result.headers)
+          }
+
+          result.ip = value
+          this.http.push(result)
+          const expectedCode = this.config.http.statusCode || 200
+          if (result.statusCode !== expectedCode) {
+            this.addError(
+              "http",
+              `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`
+            )
+          } else {
+            if (this.config.html) {
+              if (result.statusCode === 200) {
+                await this.validateHtml(response.data, value)
+              }
             }
           }
         }
@@ -186,26 +191,28 @@ export class RecordValidator extends BaseValidator {
         result.headers = response.headers
         result.statusCode = response.status
         result.statusMessage = response.statusText
-        if (this.config.https.callTimeMax) {
-          if (callTime > this.config.https.callTimeMax) {
-            this.addError(
-              "https", `Call too slow [${value}]: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
+        if (this.config.https) {
+          if (this.config.https.callTimeMax) {
+            if (callTime > this.config.https.callTimeMax) {
+              this.addError(
+                "https", `Call too slow [${value}]: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
+            }
           }
-        }
-        if (result.headers) {
-          await this.validateHeaders(this.config.https.headers, result.headers)
-        }
-        result.ip = value
-        this.https.push(result)
-        const expectedCode = this.config.https.statusCode || 200
-        if (result.statusCode !== expectedCode) {
-          this.addError(
-            "https", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`
-            )
-        } else {
-          if (result.statusCode === 200) {
-            if (this.config.html || this.config.html === undefined) {
-              await this.validateHtml(response.data, value)
+          if (result.headers && this.config.https.headers) {
+            await this.validateHeaders(this.config.https.headers, result.headers)
+          }
+          result.ip = value
+          this.https.push(result)
+          const expectedCode = this.config.https.statusCode || 200
+          if (result.statusCode !== expectedCode) {
+            this.addError(
+              "https", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`
+              )
+          } else {
+            if (result.statusCode === 200) {
+              if (this.config.html) {
+                await this.validateHtml(response.data, value)
+              }
             }
           }
         }
@@ -216,7 +223,7 @@ export class RecordValidator extends BaseValidator {
       }
     } catch (ex) {
       this.addError("RecordValidator.checkHttps", ex.message)
-      console.error(chalk.magenta(ex.stack))
+      console.error(chalk.red(ex.stack))
     }
     return result
   }
@@ -224,7 +231,7 @@ export class RecordValidator extends BaseValidator {
   protected async reverseLookup(value ?: string) {
     const result: any[] = []
     try {
-      for (const record of this.records) {
+      for (const record of this.records.values()) {
         const domains = await Dns.reverse(record)
         let valid = true
         if (value) {
@@ -250,8 +257,8 @@ export class RecordValidator extends BaseValidator {
 
   private async resolve() {
     try {
-      if (this.type) {
-        return await Dns.resolve(this.name, this.type)
+      if (this.type && this.domain) {
+        return await Dns.resolve(this.domain, this.type)
       }
       this.addError("RecordValidator.resolve", "Missing Type")
     } catch (ex) {

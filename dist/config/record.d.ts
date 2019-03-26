@@ -1,7 +1,9 @@
-import { Base } from "./base";
-export declare class RecordConfig extends Base {
+import { Config } from "./config";
+import { WebcallConfig } from "./webcall";
+export declare class RecordConfig extends Config {
+    static parse(source: any, domain: string): RecordConfig;
     type: string;
-    enabled?: boolean;
+    domain?: string;
     timeout?: number;
     html?: boolean;
     callTimeMax?: number;
@@ -11,8 +13,8 @@ export declare class RecordConfig extends Base {
     };
     allowed?: number[];
     values?: any[];
-    http?: any;
-    https?: any;
-    constructor(type: string);
-    isEnabled(): boolean;
+    http?: WebcallConfig;
+    https?: WebcallConfig;
+    constructor(type: string, domain?: string);
+    merge(config?: any): RecordConfig;
 }

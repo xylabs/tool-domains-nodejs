@@ -34,18 +34,18 @@ class DomainsConfig extends Array {
         result = result.merge(map.get(domain));
         return result;
     }
-    getRecordConfig(serverType, recordType) {
-        let defaultRecordConfig = new record_1.RecordConfig(recordType);
-        let serverRecordConfig = new record_1.RecordConfig(recordType);
+    getRecordConfig(domain, recordType) {
+        let defaultRecordConfig = new record_1.RecordConfig(domain, recordType);
+        let domainRecordConfig = new record_1.RecordConfig(domain, recordType);
         const defaultConfig = this.getConfig("default");
-        const serverConfig = this.getConfig(serverType);
+        const domainConfig = this.getConfig(domain);
         if (defaultConfig && defaultConfig.records) {
             defaultRecordConfig = defaultConfig.records.getConfig(recordType);
         }
-        if (serverConfig && serverConfig.records) {
-            serverRecordConfig = serverConfig.records.getConfig(recordType);
+        if (domainConfig && domainConfig.records) {
+            domainRecordConfig = domainConfig.records.getConfig(recordType);
         }
-        return lodash_1.default.merge(defaultRecordConfig, serverRecordConfig);
+        return lodash_1.default.merge(defaultRecordConfig, domainRecordConfig);
     }
     getMap() {
         if (this.mapCache) {

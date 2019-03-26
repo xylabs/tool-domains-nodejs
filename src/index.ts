@@ -1,76 +1,93 @@
 import { AWS } from './aws'
 import fs from 'fs'
-import { Config } from './config'
+import { MasterConfig } from './config'
 import chalk from 'chalk'
 import { DomainValidator } from './validator'
-import { DomainsConfig } from './config/domains'
+import { DomainConfig } from './config/domain'
+import { Configs } from './config/configs'
+import { MasterValidator } from './validator/master'
+import { AWSConfig } from './config/aws'
+import defaultConfigJson from './config/default.json'
+import loadJsonFile from 'load-json-file'
 
 export class XyDomainScan {
 
   private aws = new AWS()
-  private config = new Config()
+  private config = new MasterConfig("master")
+  private validator = new MasterValidator(new MasterConfig("master"))
 
-  public async start(params: {output: string, singleDomain?: string, bucket?: string, config?: Config}) {
-    this.config = await Config.load({ config: params.config })
-    const domains = new Map<string, DomainValidator>()
-    const result: any = {
-      domains: [],
-      errorCount: 0
-    }
-
-    // special case if domain specified
-    if (params.singleDomain) {
-      domains.set(params.singleDomain, new DomainValidator(params.singleDomain, this.config))
-    } else {
-
-      console.log(chalk.gray("Getting Domains"))
-
-      if (this.config.aws) {
-        if (this.config.aws.enabled) {
-          await this.addAWSDomains(domains)
-        }
-      }
-
-      console.log(chalk.gray("Getting Config Domains"))
-      if (this.config.domains) {
-        await this.addDomains(domains, this.config.domains)
-      }
-    }
-
-    console.log(`Domains Found: ${domains.size}`)
-
-    let completedDomains = 0
-    for (const domain of domains.values()) {
+  public async loadConfig(filename?: string) {
+    try {
+      const filenameToLoad = filename || './dnslint.json'
+      /*const ajv = new Ajv({ schemaId: 'id' })
+      const validate = ajv.compile(schema)
+      if (!validate(defaultConfig)) {
+        console.error(chalk.red(`${validate.errors}`))
+      } else {
+        console.log(chalk.green("Default Config Validated"))
+      }*/
+      const defaultConfig = MasterConfig.parse(defaultConfigJson)
+      console.log(chalk.gray("Loaded Default Config"))
       try {
-        completedDomains++
-        result.domains.push(domain)
-        console.log(`Domain:[${completedDomains}/${domains.size}]: ${domain.name} [${domain.serverType}]`)
-        result.errorCount += await domain.validate()
+        const userConfigJson = await loadJsonFile(filenameToLoad)
+        const userConfig = MasterConfig.parse(userConfigJson)
+        /*if (!validate(userJson)) {
+          console.error(chalk.red(`${validate.errors}`))
+        } else {
+          console.log(chalk.green("User Config Validated"))
+        }*/
+        console.log(chalk.gray("Loaded User Config"))
+        const result = defaultConfig.merge(userConfig)
+        return result
       } catch (ex) {
-        result.errorCount++
-        console.error(chalk.red(ex.message))
-        console.error(chalk.red(ex.stack))
+        console.log(chalk.yellow(`No dnslint.json config file found.  Using defaults: ${ex.message}`))
+        console.error(ex.stack)
+        return defaultConfig
       }
+    } catch (ex) {
+      console.log(chalk.red(`Failed to load defaults: ${ex}`))
+      console.error(ex.stack)
+      return new MasterConfig("master")
     }
+  }
+
+  public async start(params: {output: string, singleDomain?: string, bucket?: string, config?: MasterConfig}) {
+    this.config = await this.loadConfig()
+
+    for (const domain of this.config.domains.values()) {
+      domain.serverType = this.config.getServerType(domain.name)
+    }
+
+    // if domain specified, clear configed domains and add it
+    if (params.singleDomain) {
+      console.log(chalk.yellow(`Configuring Single Domain: ${params.singleDomain}`))
+      const singleDomainConfig = this.config.getDomainConfig(params.singleDomain)
+      this.config.domains.set(
+        singleDomainConfig.name,
+        singleDomainConfig
+      )
+      this.config.aws = new AWSConfig("aws")
+      this.config.aws.enabled = false
+    }
+
+    this.validator = new MasterValidator(this.config)
+
+    console.log(`Domains Found: ${this.config.domains.size}`)
+
+    await this.validator.validate()
 
     if (params.bucket) {
-      try {
-        await this.aws.saveFileToS3(params.bucket, this.getLatestS3FileName(), result)
-        await this.aws.saveFileToS3(params.bucket, this.getHistoricS3FileName(), result)
-      } catch (ex) {
-        console.error(chalk.red(ex.message))
-        console.error(chalk.red(ex.stack))
-      }
+      this.saveToAws(params.bucket)
     }
 
     console.log(`Saving to File: ${params.output}`)
-    this.saveToFile(params.output, result)
-    if (result.errorCount === 0) {
+    this.saveToFile(params.output)
+    if (this.validator.errorCount === 0) {
       console.log(chalk.green("Congratulations, all tests passed!"))
     } else {
-      console.error(chalk.yellow(`Total Errors Found: ${result.errorCount}`))
+      console.error(chalk.yellow(`Total Errors Found: ${this.validator.errorCount}`))
     }
-    return result
+    return this.validator
   }
 
   private getLatestS3FileName() {
@@ -83,40 +100,22 @@ export class XyDomainScan {
     return `${parts[0]}/${parts[1]}.json`
   }
 
-  private async addAWSDomains(domains: Map<string, DomainValidator>) {
-    console.log(chalk.gray("Getting AWS Domains"))
+  private async saveToAws(bucket: string) {
     try {
-      const awsDomains = await this.aws.getDomains()
-      console.log(chalk.gray(`AWS Domains Found: ${awsDomains.length}`))
-      for (const domain of awsDomains) {
-        // remove trailing '.'
-        const cleanDomain = domain.slice(0, domain.length - 1)
-        domains.set(cleanDomain, new DomainValidator(cleanDomain, this.config))
-      }
+      await this.aws.saveFileToS3(bucket, this.getLatestS3FileName(), this.validator)
+      await this.aws.saveFileToS3(bucket, this.getHistoricS3FileName(), this.validator)
     } catch (ex) {
-      console.error(chalk.red(`AWS Domains Error: ${ex.message}`))
+      console.error(chalk.red(ex.message))
+      console.error(chalk.red(ex.stack))
     }
-    return domains
   }
 
-  private async addDomains(domains: Map<string, DomainValidator>, domainsConfig: DomainsConfig) {
-    if (domainsConfig) {
-      for (const domain of domainsConfig) {
-        if (domain.name !== "default") {
-          console.log(chalk.yellow(`Adding Domain from Config: ${domain.name}`))
-          domains.set(domain.name, new DomainValidator(domain.name, this.config))
-        }
-      }
-    }
-    return domains
-  }
-
-  private async saveToFile(filename: string, obj: object) {
+  private async saveToFile(filename: string) {
     fs.open(filename, 'w', (err, fd) => {
       if (err) {
         console.log(`failed to open file: ${err}`)
       } else {
-        fs.write(fd, JSON.stringify(obj), (errWrite) => {
+        fs.write(fd, JSON.stringify(this.validator), (errWrite) => {
           if (errWrite) {
             console.log(`failed to write file: ${errWrite}`)
           }

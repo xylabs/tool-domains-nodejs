@@ -1,15 +1,15 @@
 import chalk from 'chalk'
 import { ValidationError } from './error'
 import _ from 'lodash'
-import { Config } from '../config'
+import { Config } from '../config/config'
 
-export class BaseValidator {
-  public name: string
+export class Validator<T extends Config> {
+  public config: T
   public errors?: ValidationError[]
   public errorCount = 0
 
-  constructor(name: string) {
-    this.name = name
+  constructor(config: T) {
+    this.config = config
   }
 
   public toJSON () {
@@ -20,6 +20,7 @@ export class BaseValidator {
     if (this.errors) {
       this.errorCount += this.addErrors.length
     }
+
     return this.errorCount
   }
 

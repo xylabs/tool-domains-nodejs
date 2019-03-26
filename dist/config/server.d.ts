@@ -1,11 +1,11 @@
-import { RecordsConfig } from "./records";
-import { Base } from "./base";
-export declare class ServerConfig extends Base {
+import { RecordsConfig } from './records';
+export declare class ServerConfig extends RecordsConfig {
+    static parse(source: any): ServerConfig;
     name: string;
     default?: boolean;
     include?: string[];
     exclude?: string[];
-    records?: RecordsConfig;
     crawl?: boolean;
-    constructor(name: string, init?: any[]);
+    constructor(name: string);
+    merge(config?: ServerConfig): this;
 }

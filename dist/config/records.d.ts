@@ -1,7 +1,7 @@
-import { RecordConfig } from './record';
-export declare class RecordsConfig extends Array<RecordConfig> {
-    concat(records: RecordConfig[]): RecordsConfig;
-    isEnabled(type: string): boolean;
-    getConfig(type: string): RecordConfig;
-    getMap(): Map<string, RecordConfig>;
+import { Config } from "./config";
+import { Configs } from "./configs";
+import { RecordConfig } from "./record";
+export declare class RecordsConfig extends Config {
+    records: Configs<RecordConfig>;
+    merge(config?: RecordsConfig): this;
 }

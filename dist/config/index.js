@@ -1,129 +1,114 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const load_json_file_1 = __importDefault(require("load-json-file"));
 const aws_1 = require("./aws");
 const domain_1 = require("./domain");
-const chalk_1 = __importDefault(require("chalk"));
-const domains_1 = require("./domains");
-const default_json_1 = __importDefault(require("./default.json"));
 const lodash_1 = __importDefault(require("lodash"));
-const servers_1 = require("./servers");
 const record_1 = require("./record");
-const base_1 = require("./base");
-class Config extends base_1.Base {
-    constructor(config) {
-        super();
-        this.aws = new aws_1.AWS();
-        this.domains = new domains_1.DomainsConfig();
-        this.servers = new servers_1.ServersConfig();
-        if (config) {
-            this.merge(config);
-        }
+const config_1 = require("./config");
+const configs_1 = require("./configs");
+const server_1 = require("./server");
+class MasterConfig extends config_1.Config {
+    constructor() {
+        super(...arguments);
+        this.aws = new aws_1.AWSConfig("aws");
+        this.domains = new configs_1.Configs();
+        this.servers = new configs_1.Configs();
     }
-    static load(params) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                params.filename = params.filename || './dnslint.json';
-                /*const ajv = new Ajv({ schemaId: 'id' })
-                const validate = ajv.compile(schema)
-                if (!validate(defaultConfig)) {
-                  console.error(chalk.red(`${validate.errors}`))
-                } else {
-                  console.log(chalk.green("Default Config Validated"))
-                }*/
-                const defaultConfig = default_json_1.default;
-                console.log(chalk_1.default.gray("Loaded Default Config"));
-                try {
-                    const userJson = yield load_json_file_1.default(params.filename);
-                    /*if (!validate(userJson)) {
-                      console.error(chalk.red(`${validate.errors}`))
-                    } else {
-                      console.log(chalk.green("User Config Validated"))
-                    }*/
-                    console.log(chalk_1.default.gray("Loaded User Config"));
-                    let result;
-                    if (params.config) {
-                        result = new Config(lodash_1.default.mergeWith(params.config, defaultConfig, userJson, (objValue, srcValue, key, object, source, stack) => {
-                            return undefined;
-                        }));
-                    }
-                    else {
-                        result = new Config(lodash_1.default.mergeWith(defaultConfig, userJson, (objValue, srcValue, key, object, source, stack) => {
-                            return undefined;
-                        }));
-                    }
-                    return result;
-                }
-                catch (ex) {
-                    console.log(chalk_1.default.yellow("No dnslint.json config file found.  Using defaults."));
-                    return new Config(defaultConfig);
-                }
+    static parse(source) {
+        let srcObj = source;
+        if (typeof source === "string") {
+            srcObj = JSON.parse(source);
+        }
+        const master = lodash_1.default.merge(new MasterConfig("master"), srcObj);
+        master.domains = new configs_1.Configs();
+        if (srcObj.domains) {
+            for (const domain of srcObj.domains) {
+                const serverType = master.getServerType(domain.name);
+                const newDomainObj = domain_1.DomainConfig.parse(domain, serverType);
+                master.domains.set(newDomainObj.name, newDomainObj);
             }
-            catch (ex) {
-                console.log(chalk_1.default.red(`Failed to load defaults: ${ex}`));
-                return new Config();
+        }
+        master.servers = new configs_1.Configs();
+        if (srcObj.servers) {
+            for (const server of srcObj.servers) {
+                const newServerObj = server_1.ServerConfig.parse(server);
+                master.servers.set(newServerObj.name, newServerObj);
             }
-        });
+        }
+        return master;
     }
     merge(config) {
-        this.aws.merge(config.aws);
-        this.domains = this.domains.merge(config.domains);
-        this.servers = this.servers.merge(config.servers);
+        if (config) {
+            this.aws = this.aws.merge(config.aws);
+            this.domains = this.domains.merge(config.domains);
+            this.servers = this.servers.merge(config.servers);
+        }
+        return this;
     }
     getRecordConfig(domain, recordType) {
         const serverType = this.getServerType(domain);
-        let serverRecord = new record_1.RecordConfig(recordType);
-        let domainRecord = new record_1.RecordConfig(recordType);
+        let serverRecord = new record_1.RecordConfig(recordType, domain);
+        let domainRecord = new record_1.RecordConfig(recordType, domain);
         if (this.servers !== undefined) {
-            serverRecord = this.servers.getRecordConfig(serverType, recordType);
+            const serverConfig = this.servers.getConfig(serverType);
+            if (serverConfig && serverConfig.records) {
+                const record = serverConfig.records.getConfig(recordType);
+                if (record) {
+                    serverRecord = record;
+                }
+            }
         }
         if (this.domains !== undefined) {
-            domainRecord = this.domains.getRecordConfig(serverType, recordType);
+            const domainConfig = this.domains.getConfig(domain);
+            if (domainConfig && domainConfig.records) {
+                const record = domainConfig.records.getConfig(recordType);
+                if (record) {
+                    domainRecord = record;
+                }
+            }
         }
-        return lodash_1.default.merge(serverRecord, domainRecord);
+        return serverRecord.merge(domainRecord);
     }
     getRecordConfigs(domain) {
+        const result = new configs_1.Configs();
         const serverType = this.getServerType(domain);
-        const result = new Map();
-        if (this.domains !== undefined) {
-            const records = this.domains.getConfig("default").records;
-            if (records) {
-                for (const record of records) {
-                    if (record.type) {
-                        if (result.get(record.type) === undefined) {
-                            result.set(record.type, this.getRecordConfig(domain, record.type));
+        if (this.servers !== undefined) {
+            const serverConfig = this.servers.getConfig(serverType);
+            if (serverConfig) {
+                const records = serverConfig.records;
+                if (records) {
+                    for (const record of records.values()) {
+                        if (record.type) {
+                            const existing = result.get(record.type);
+                            if (existing === undefined) {
+                                result.set(record.type, this.getRecordConfig(domain, record.type));
+                            }
+                            else {
+                                result.set(record.type, existing.merge(this.getRecordConfig(domain, record.type)));
+                            }
                         }
                     }
                 }
             }
         }
-        if (this.servers !== undefined) {
-            const records = this.servers.getConfig(serverType).records;
-            if (records) {
-                for (const record of records) {
-                    if (result.get(record.type) === undefined) {
-                        result.set(record.type, this.getRecordConfig(domain, record.type));
-                    }
-                }
-            }
-        }
         if (this.domains !== undefined) {
-            const records = this.domains.getConfig(domain).records;
-            if (records) {
-                for (const record of records) {
-                    if (result.get(record.type) === undefined) {
-                        result.set(record.type, this.getRecordConfig(domain, record.type));
+            const domainConfig = this.domains.getConfig(domain);
+            if (domainConfig) {
+                const records = domainConfig.records;
+                if (records) {
+                    for (const record of records.values()) {
+                        if (record.type) {
+                            const existing = result.get(record.type);
+                            if (existing === undefined) {
+                                result.set(record.type, this.getRecordConfig(domain, record.type));
+                            }
+                            else {
+                                result.set(record.type, existing.merge(this.getRecordConfig(domain, record.type)));
+                            }
+                        }
                     }
                 }
             }
@@ -131,16 +116,25 @@ class Config extends base_1.Base {
         return result;
     }
     getDomainConfig(domain) {
-        const result = new domain_1.DomainConfig(domain);
+        let result = new domain_1.DomainConfig(domain, this.getServerType(domain));
         if (this.domains !== undefined) {
-            Object.assign(result, this.domains.getConfig(domain));
+            result = result.merge(this.domains.getConfig(domain));
+            result.records = this.getRecordConfigs(domain);
+        }
+        result.name = domain;
+        return result;
+    }
+    getServerConfig(server) {
+        let result = new server_1.ServerConfig(server);
+        if (this.servers !== undefined) {
+            result = lodash_1.default.merge(result, this.servers.getConfig(server));
         }
         return result;
     }
     getServerType(domain) {
         let defaultName = "unknown";
         if (this.servers) {
-            for (const server of this.servers) {
+            for (const server of this.servers.values()) {
                 const include = server.include;
                 if (include) {
                     for (const filter of include) {
@@ -157,5 +151,5 @@ class Config extends base_1.Base {
         return defaultName;
     }
 }
-exports.Config = Config;
+exports.MasterConfig = MasterConfig;
 //# sourceMappingURL=index.js.map

@@ -1,13 +1,12 @@
 import { RecordsConfig } from "./records";
-import { Base } from "./base";
-export declare class DomainConfig extends Base {
+export declare class DomainConfig extends RecordsConfig {
+    static parse(source: any, type: string): DomainConfig;
     name: string;
-    records: RecordsConfig;
-    enabled: boolean;
-    timeout: number;
     serverType: string;
+    timeout: number;
     crawl?: boolean;
-    constructor(name: string);
+    constructor(name: string, type: string);
+    merge(config?: DomainConfig): this;
     getTimeout(): number;
     isRecordEnabled(type: string): boolean;
     isReverseDNSEnabled(type: string): boolean;

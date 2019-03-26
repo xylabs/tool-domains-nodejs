@@ -1,20 +1,50 @@
-import { RecordsConfig } from "./records"
 import { RecordConfig } from "./record"
-import { stringify } from "querystring"
 import _ from 'lodash'
-import { Base } from "./base"
+import { Configs } from "./configs"
+import assert from "assert"
+import { RecordsConfig } from "./records"
 
-export class DomainConfig extends Base {
+export class DomainConfig extends RecordsConfig {
+
+  public static parse(source: any, type: string) {
+    let srcObj = source
+    if (typeof source === "string") {
+      srcObj = JSON.parse(source)
+    }
+
+    assert(typeof srcObj.name === "string")
+
+    let domain = new DomainConfig(srcObj.name, type)
+    domain = _.merge(domain, srcObj)
+    domain.records = new Configs<RecordConfig>()
+    if (srcObj.records) {
+      for (const record of srcObj.records) {
+        const newRecordObj = RecordConfig.parse(record, domain.name)
+        domain.records.set(newRecordObj.type, newRecordObj)
+      }
+    }
+    return domain
+  }
+
   public name: string
-  public records = new RecordsConfig()
-  public enabled = true
+  public serverType: string
   public timeout = 1000
-  public serverType = "unknown"
   public crawl?: boolean
 
-  constructor(name: string) {
-    super()
+  constructor(name: string, type: string) {
+    super(name)
     this.name = name
+    this.serverType = type
+  }
+
+  public merge(config?: DomainConfig) {
+    if (config) {
+      const name = this.name
+      _.merge(new DomainConfig(name, this.serverType), config)
+      this.name = name
+      super.merge(config)
+    }
+    return this
   }
 
   public getTimeout() {
@@ -26,11 +56,9 @@ export class DomainConfig extends Base {
       return false
     }
     if (this.records) {
-      const recordConfig = this.records.getConfig(type)
+      const recordConfig = this.records.getConfig(type, new RecordConfig(type, this.name))
       if (recordConfig) {
-        if (recordConfig.enabled !== undefined) {
-          return recordConfig.enabled
-        }
+        return recordConfig.isEnabled()
       }
     }
     return true
@@ -38,7 +66,7 @@ export class DomainConfig extends Base {
 
   public isReverseDNSEnabled(type: string): boolean {
     if (this.records) {
-      const recordConfig = this.records.getConfig(type)
+      const recordConfig = this.records.getConfig(type, new RecordConfig(type, this.name))
       if (recordConfig) {
         if (recordConfig.reverseDNS !== undefined && recordConfig.reverseDNS.enabled !== undefined) {
           return recordConfig.reverseDNS.enabled
