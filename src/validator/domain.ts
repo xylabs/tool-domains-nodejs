@@ -22,10 +22,6 @@ export class DomainValidator extends Validator<DomainConfig> {
     this.type = type
   }
 
-  public getKey() {
-    return this.config.name
-  }
-
   public async validate() {
     if (!this.config.isEnabled()) {
       console.log(chalk.gray(`Skipping Disabled Domain: ${this.config.name}`))

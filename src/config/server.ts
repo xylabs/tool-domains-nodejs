@@ -35,13 +35,9 @@ export class ServerConfig extends Config {
   public crawl?: boolean
 
   constructor(name: string) {
-    super()
+    super(name)
     this.name = name
     this.records = new Configs<RecordConfig>()
-  }
-
-  public getKey() {
-    return this.name
   }
 
   public merge(config: ServerConfig) {

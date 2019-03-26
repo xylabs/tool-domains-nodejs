@@ -34,7 +34,7 @@ export class DomainConfig extends Config {
   public crawl?: boolean
 
   constructor(name: string, type: string) {
-    super()
+    super(name)
     this.name = name
     this.serverType = type
   }
@@ -49,10 +49,6 @@ export class DomainConfig extends Config {
       return newItem
     }
     return this
-  }
-
-  public getKey() {
-    return this.name
   }
 
   public getTimeout() {

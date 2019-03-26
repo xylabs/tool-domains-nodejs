@@ -7,7 +7,6 @@ export declare class DomainValidator extends Validator<DomainConfig> {
     records: RecordValidator[];
     pages?: any;
     constructor(config: DomainConfig, type: string);
-    getKey(): string;
     validate(): Promise<number>;
     private getDomainUrls;
 }

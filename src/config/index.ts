@@ -16,7 +16,7 @@ export class MasterConfig extends Config {
     if (typeof source === "string") {
       srcObj = JSON.parse(source)
     }
-    const master = _.merge(new MasterConfig(), srcObj)
+    const master = _.merge(new MasterConfig("master"), srcObj)
     master.domains = new Configs<DomainConfig>()
     if (srcObj.domains) {
       for (const domain of srcObj.domains) {
@@ -35,7 +35,7 @@ export class MasterConfig extends Config {
     return master
   }
 
-  public aws = new AWSConfig()
+  public aws = new AWSConfig("aws")
   public domains = new Configs<DomainConfig>()
   public servers = new Configs<ServerConfig>()
 

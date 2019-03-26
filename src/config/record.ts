@@ -34,7 +34,7 @@ export class RecordConfig extends Config {
   public https?: any
 
   constructor(type: string, domain?: string) {
-    super()
+    super(type)
     this.type = type
     this.domain = domain
   }
@@ -50,10 +50,6 @@ export class RecordConfig extends Config {
       return newItem
     }
     return this
-  }
-
-  public getKey() {
-    return this.type
   }
 
   public isEnabled() {

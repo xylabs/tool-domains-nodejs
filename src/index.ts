@@ -13,8 +13,8 @@ import loadJsonFile from 'load-json-file'
 export class XyDomainScan {
 
   private aws = new AWS()
-  private config = new MasterConfig()
-  private validator = new MasterValidator(new MasterConfig())
+  private config = new MasterConfig("master")
+  private validator = new MasterValidator(new MasterConfig("master"))
 
   public async loadConfig(filename?: string) {
     try {
@@ -47,7 +47,7 @@ export class XyDomainScan {
     } catch (ex) {
       console.log(chalk.red(`Failed to load defaults: ${ex}`))
       console.error(ex.stack)
-      return new MasterConfig()
+      return new MasterConfig("master")
     }
   }
 
@@ -66,7 +66,7 @@ export class XyDomainScan {
         singleDomainConfig.name,
         singleDomainConfig
       )
-      this.config.aws = new AWSConfig()
+      this.config.aws = new AWSConfig("aws")
       this.config.aws.enabled = false
     }
 

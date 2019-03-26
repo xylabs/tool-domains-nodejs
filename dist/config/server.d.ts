@@ -10,6 +10,5 @@ export declare class ServerConfig extends Config {
     records?: Configs<RecordConfig>;
     crawl?: boolean;
     constructor(name: string);
-    getKey(): string;
     merge(config: ServerConfig): ServerConfig;
 }

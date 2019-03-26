@@ -1,12 +1,11 @@
 import _ from "lodash"
 
 export class Config {
+  public key: string
   public enabled?: boolean
 
-  // this must be implemented in derived class
-  public getKey() {
-    throw new Error("Should not reach this getKey!!")
-    return ''
+  constructor(key: string) {
+    this.key = key
   }
 
   public isEnabled() {
@@ -16,6 +15,7 @@ export class Config {
     return this.enabled
   }
 
+  // replace this in derived class for more advanced merge
   public merge(config?: any) {
     if (config) {
       return _.merge(this, config)
