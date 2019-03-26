@@ -49,7 +49,7 @@ class DomainConfig extends records_1.RecordsConfig {
             return false;
         }
         if (this.records) {
-            const recordConfig = this.records.getConfig(type);
+            const recordConfig = this.records.getConfig(type, new record_1.RecordConfig(type, this.name));
             if (recordConfig) {
                 return recordConfig.isEnabled();
             }
@@ -58,7 +58,7 @@ class DomainConfig extends records_1.RecordsConfig {
     }
     isReverseDNSEnabled(type) {
         if (this.records) {
-            const recordConfig = this.records.getConfig(type);
+            const recordConfig = this.records.getConfig(type, new record_1.RecordConfig(type, this.name));
             if (recordConfig) {
                 if (recordConfig.reverseDNS !== undefined && recordConfig.reverseDNS.enabled !== undefined) {
                     return recordConfig.reverseDNS.enabled;

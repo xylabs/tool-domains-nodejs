@@ -53,72 +53,36 @@ class MasterConfig extends config_1.Config {
         let serverRecord = new record_1.RecordConfig(recordType, domain);
         let domainRecord = new record_1.RecordConfig(recordType, domain);
         if (this.servers !== undefined) {
-            const serverConfig = this.servers.getConfig(serverType);
+            const serverConfig = this.servers.getConfig(serverType, new server_1.ServerConfig(domain));
             if (serverConfig && serverConfig.records) {
-                const record = serverConfig.records.getConfig(recordType);
+                const record = serverConfig.records.getConfig(recordType, new record_1.RecordConfig(recordType, domain));
                 if (record) {
-                    serverRecord = record;
+                    // create new object to prevent changing the authority object
+                    serverRecord = new record_1.RecordConfig(recordType, domain).merge(record);
                 }
             }
         }
         if (this.domains !== undefined) {
-            const domainConfig = this.domains.getConfig(domain);
+            const domainConfig = this.domains.getConfig(domain, new domain_1.DomainConfig(domain, this.getServerType(domain)));
             if (domainConfig && domainConfig.records) {
-                const record = domainConfig.records.getConfig(recordType);
+                const record = domainConfig.records.getConfig(recordType, new record_1.RecordConfig(recordType, domain));
                 if (record) {
-                    domainRecord = record;
+                    // create new object to prevent changing the authority object
+                    domainRecord = new record_1.RecordConfig(recordType, domain).merge(record);
                 }
             }
         }
         return serverRecord.merge(domainRecord);
     }
     getRecordConfigs(domain) {
-        const result = new configs_1.Configs();
-        const serverType = this.getServerType(domain);
-        if (this.servers !== undefined) {
-            const serverConfig = this.servers.getConfig(serverType);
-            if (serverConfig) {
-                const records = serverConfig.records;
-                if (records) {
-                    for (const record of records.values()) {
-                        if (record.type) {
-                            const existing = result.get(record.type);
-                            if (existing === undefined) {
-                                result.set(record.type, this.getRecordConfig(domain, record.type));
-                            }
-                            else {
-                                result.set(record.type, existing.merge(this.getRecordConfig(domain, record.type)));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (this.domains !== undefined) {
-            const domainConfig = this.domains.getConfig(domain);
-            if (domainConfig) {
-                const records = domainConfig.records;
-                if (records) {
-                    for (const record of records.values()) {
-                        if (record.type) {
-                            const existing = result.get(record.type);
-                            if (existing === undefined) {
-                                result.set(record.type, this.getRecordConfig(domain, record.type));
-                            }
-                            else {
-                                result.set(record.type, existing.merge(this.getRecordConfig(domain, record.type)));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return result;
+        const serverConfigs = this.getRecordConfigsFromServers(domain);
+        const domainConfigs = this.getRecordConfigsFromDomains(domain);
+        return serverConfigs.merge(domainConfigs);
     }
     getDomainConfig(domain) {
         let result = new domain_1.DomainConfig(domain, this.getServerType(domain));
         if (this.domains !== undefined) {
-            result = result.merge(this.domains.getConfig(domain));
+            result = this.domains.getConfig(domain, result) || result;
             result.records = this.getRecordConfigs(domain);
         }
         result.name = domain;
@@ -127,7 +91,7 @@ class MasterConfig extends config_1.Config {
     getServerConfig(server) {
         let result = new server_1.ServerConfig(server);
         if (this.servers !== undefined) {
-            result = lodash_1.default.merge(result, this.servers.getConfig(server));
+            result = this.servers.getConfig(server, result) || result;
         }
         return result;
     }
@@ -149,6 +113,41 @@ class MasterConfig extends config_1.Config {
             }
         }
         return defaultName;
+    }
+    resolveRecords(records, domain) {
+        const result = new configs_1.Configs();
+        if (records) {
+            for (const record of records.values()) {
+                if (record.type) {
+                    const existing = result.get(record.type);
+                    if (existing === undefined) {
+                        result.set(record.type, this.getRecordConfig(domain, record.type));
+                    }
+                    else {
+                        result.set(record.type, existing.merge(this.getRecordConfig(domain, record.type)));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    getRecordConfigsFromServers(domain) {
+        let result = new configs_1.Configs();
+        const serverType = this.getServerType(domain);
+        const serverConfig = this.servers.getConfig(serverType, new server_1.ServerConfig(serverType));
+        if (serverConfig) {
+            result = this.resolveRecords(serverConfig.records, domain);
+        }
+        return result;
+    }
+    getRecordConfigsFromDomains(domain) {
+        let result = new configs_1.Configs();
+        const serverType = this.getServerType(domain);
+        const domainConfig = this.domains.getConfig(domain, new domain_1.DomainConfig(domain, serverType));
+        if (domainConfig) {
+            result = this.resolveRecords(domainConfig.records, domain);
+        }
+        return result;
     }
 }
 exports.MasterConfig = MasterConfig;

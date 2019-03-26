@@ -15,4 +15,7 @@ export declare class MasterConfig extends Config {
     getDomainConfig(domain: string): DomainConfig;
     getServerConfig(server: string): ServerConfig;
     getServerType(domain: string): string;
+    private resolveRecords;
+    private getRecordConfigsFromServers;
+    private getRecordConfigsFromDomains;
 }
