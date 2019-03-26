@@ -31,10 +31,9 @@ export class DomainValidator extends Validator<DomainConfig> {
       this.records = []
       if (this.config.records) {
         for (const recordConfig of this.config.records.values()) {
-          const config = new RecordConfig(recordConfig.type, this.name).merge(recordConfig)
-          if (config.type !== "default") {
-            if (config.isEnabled()) {
-              const record = new RecordValidator(config)
+          if (recordConfig.type !== "default") {
+            if (recordConfig.isEnabled()) {
+              const record = new RecordValidator(recordConfig)
               this.records.push(record)
               this.errorCount += await record.validate()
             }

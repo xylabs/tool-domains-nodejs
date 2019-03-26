@@ -5,4 +5,6 @@ export declare class WebcallConfig extends Config {
     timeout?: number;
     html?: boolean;
     callTimeMax?: number;
+    headers?: any[];
+    statusCode?: number;
 }

@@ -4,12 +4,12 @@ class Configs extends Map {
     merge(items) {
         if (items) {
             for (const item of items.values()) {
-                const existingItem = this.get(item.getKey());
+                const existingItem = this.get(item.key);
                 if (existingItem) {
-                    this.set(existingItem.getKey(), existingItem.merge(item));
+                    this.set(existingItem.key, existingItem.merge(item));
                 }
                 else {
-                    this.set(item.getKey(), item);
+                    this.set(item.key, item);
                 }
             }
         }

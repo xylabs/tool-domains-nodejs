@@ -1,6 +1,7 @@
 export declare class Config {
+    key: string;
     enabled?: boolean;
-    getKey(): string;
+    constructor(key: string);
     isEnabled(): boolean;
     merge(config?: any): any;
 }

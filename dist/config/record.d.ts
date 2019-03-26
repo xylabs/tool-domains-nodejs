@@ -1,4 +1,5 @@
 import { Config } from "./config";
+import { WebcallConfig } from "./webcall";
 export declare class RecordConfig extends Config {
     static parse(source: any, domain: string): RecordConfig;
     type: string;
@@ -12,10 +13,8 @@ export declare class RecordConfig extends Config {
     };
     allowed?: number[];
     values?: any[];
-    http?: any;
-    https?: any;
+    http?: WebcallConfig;
+    https?: WebcallConfig;
     constructor(type: string, domain?: string);
     merge(config?: any): RecordConfig;
-    getKey(): string;
-    isEnabled(): boolean;
 }

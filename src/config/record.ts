@@ -1,6 +1,7 @@
 import { Config } from "./config"
 import assert from 'assert'
 import _ from 'lodash'
+import { WebcallConfig } from "./webcall"
 
 export class RecordConfig extends Config {
 
@@ -30,8 +31,8 @@ export class RecordConfig extends Config {
 
   public allowed?: number[]
   public values?: any[]
-  public http?: any
-  public https?: any
+  public http?: WebcallConfig
+  public https?: WebcallConfig
 
   constructor(type: string, domain?: string) {
     super(type)
@@ -50,12 +51,5 @@ export class RecordConfig extends Config {
       return newItem
     }
     return this
-  }
-
-  public isEnabled() {
-    if (this.enabled !== undefined) {
-      return this.enabled
-    }
-    return true
   }
 }

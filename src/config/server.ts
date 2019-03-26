@@ -1,11 +1,11 @@
 import _ from 'lodash'
-import { Config } from "./config"
 import { Configs } from './configs'
 import { RecordConfig } from './record'
 import chalk from 'chalk'
 import assert from 'assert'
+import { RecordsConfig } from './records'
 
-export class ServerConfig extends Config {
+export class ServerConfig extends RecordsConfig {
 
   public static parse(source: any) {
     let srcObj = source
@@ -31,7 +31,6 @@ export class ServerConfig extends Config {
   public default?: boolean
   public include?: string[]
   public exclude?: string[]
-  public records?: Configs<RecordConfig>
   public crawl?: boolean
 
   constructor(name: string) {
@@ -40,7 +39,7 @@ export class ServerConfig extends Config {
     this.records = new Configs<RecordConfig>()
   }
 
-  public merge(config: ServerConfig) {
+  public merge(config?: ServerConfig) {
     if (config) {
       const name = this.name
       const records = this.records
@@ -50,7 +49,7 @@ export class ServerConfig extends Config {
       newItem.records = _.merge(records, config.records)
       newItem.name = name
       console.log(chalk.gray(`server.merge[${config.name}]: ${newItem.records}`))
-      return newItem
+      super.merge(config)
     }
     return this
   }

@@ -22,8 +22,8 @@ const load_json_file_1 = __importDefault(require("load-json-file"));
 class XyDomainScan {
     constructor() {
         this.aws = new aws_1.AWS();
-        this.config = new config_1.MasterConfig();
-        this.validator = new master_1.MasterValidator(new config_1.MasterConfig());
+        this.config = new config_1.MasterConfig("master");
+        this.validator = new master_1.MasterValidator(new config_1.MasterConfig("master"));
     }
     loadConfig(filename) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -59,7 +59,7 @@ class XyDomainScan {
             catch (ex) {
                 console.log(chalk_1.default.red(`Failed to load defaults: ${ex}`));
                 console.error(ex.stack);
-                return new config_1.MasterConfig();
+                return new config_1.MasterConfig("master");
             }
         });
     }
@@ -74,7 +74,7 @@ class XyDomainScan {
                 console.log(chalk_1.default.yellow(`Configuring Single Domain: ${params.singleDomain}`));
                 const singleDomainConfig = this.config.getDomainConfig(params.singleDomain);
                 this.config.domains.set(singleDomainConfig.name, singleDomainConfig);
-                this.config.aws = new aws_2.AWSConfig();
+                this.config.aws = new aws_2.AWSConfig("aws");
                 this.config.aws.enabled = false;
             }
             this.validator = new master_1.MasterValidator(this.config);

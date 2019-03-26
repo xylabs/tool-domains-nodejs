@@ -5,10 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
 class Config {
-    // this must be implemented in derived class
-    getKey() {
-        throw new Error("Should not reach this getKey!!");
-        return '';
+    constructor(key) {
+        this.key = key;
     }
     isEnabled() {
         if (this.enabled === undefined) {
@@ -16,6 +14,7 @@ class Config {
         }
         return this.enabled;
     }
+    // replace this in derived class for more advanced merge
     merge(config) {
         if (config) {
             return lodash_1.default.merge(this, config);

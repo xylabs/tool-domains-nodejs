@@ -16,16 +16,12 @@ const validator_1 = require("./validator");
 const chalk_1 = __importDefault(require("chalk"));
 const crawler_1 = __importDefault(require("crawler"));
 const url_1 = __importDefault(require("url"));
-const record_2 = require("../config/record");
 class DomainValidator extends validator_1.Validator {
     constructor(config, type) {
         super(config);
         this.records = [];
         this.name = config.name;
         this.type = type;
-    }
-    getKey() {
-        return this.config.name;
     }
     validate() {
         const _super = Object.create(null, {
@@ -40,10 +36,9 @@ class DomainValidator extends validator_1.Validator {
                 this.records = [];
                 if (this.config.records) {
                     for (const recordConfig of this.config.records.values()) {
-                        const config = new record_2.RecordConfig(recordConfig.type, this.name).merge(recordConfig);
-                        if (config.type !== "default") {
-                            if (config.isEnabled()) {
-                                const record = new record_1.RecordValidator(config);
+                        if (recordConfig.type !== "default") {
+                            if (recordConfig.isEnabled()) {
+                                const record = new record_1.RecordValidator(recordConfig);
                                 this.records.push(record);
                                 this.errorCount += yield record.validate();
                             }

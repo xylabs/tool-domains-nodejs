@@ -1,11 +1,10 @@
 import { RecordConfig } from "./record"
 import _ from 'lodash'
-import { Config } from "./config"
 import { Configs } from "./configs"
-import chalk from "chalk"
 import assert from "assert"
+import { RecordsConfig } from "./records"
 
-export class DomainConfig extends Config {
+export class DomainConfig extends RecordsConfig {
 
   public static parse(source: any, type: string) {
     let srcObj = source
@@ -29,7 +28,6 @@ export class DomainConfig extends Config {
 
   public name: string
   public serverType: string
-  public records = new Configs<RecordConfig>()
   public timeout = 1000
   public crawl?: boolean
 
@@ -42,11 +40,9 @@ export class DomainConfig extends Config {
   public merge(config?: DomainConfig) {
     if (config) {
       const name = this.name
-      let newItem = new DomainConfig(name, this.serverType)
-      newItem = _.merge(newItem, config)
-      newItem.records = this.records.merge(config.records)
-      newItem.name = name
-      return newItem
+      _.merge(new DomainConfig(name, this.serverType), config)
+      this.name = name
+      super.merge(config)
     }
     return this
   }
@@ -60,7 +56,7 @@ export class DomainConfig extends Config {
       return false
     }
     if (this.records) {
-      const recordConfig = this.records.getConfig(type)
+      const recordConfig = this.records.getConfig(type, new RecordConfig(type, this.name))
       if (recordConfig) {
         return recordConfig.isEnabled()
       }
@@ -70,7 +66,7 @@ export class DomainConfig extends Config {
 
   public isReverseDNSEnabled(type: string): boolean {
     if (this.records) {
-      const recordConfig = this.records.getConfig(type)
+      const recordConfig = this.records.getConfig(type, new RecordConfig(type, this.name))
       if (recordConfig) {
         if (recordConfig.reverseDNS !== undefined && recordConfig.reverseDNS.enabled !== undefined) {
           return recordConfig.reverseDNS.enabled

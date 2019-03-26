@@ -17,17 +17,18 @@ export class Configs<T extends Config> extends Map<string, T> {
     return this
   }
 
-  public getConfig(key: string): T | undefined {
+  // we pass in a new object to prevent writing to authority objects
+  public getConfig(key: string, newObject: T): T | undefined {
     const defaultItem = this.get("default")
     const item = this.get(key)
     if (item) {
       if (defaultItem) {
-        return defaultItem.merge(item)
+        return newObject.merge(defaultItem).merge(item)
       }
       return item
     }
     if (defaultItem) {
-      return defaultItem
+      return newObject.merge(defaultItem)
     }
     return undefined
   }

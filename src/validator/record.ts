@@ -32,8 +32,10 @@ export class RecordValidator extends Validator<RecordConfig> {
         if (((this.config.http.enabled === undefined) && true) || this.config.http.enabled) {
           this.http = await this.checkAllHttp(this.config.http)
         }
-        if (((this.config.https.enabled === undefined) && true) || this.config.https.enabled) {
-          this.http = await this.checkAllHttps(this.config.https)
+        if (this.config.https) {
+          if (((this.config.https.enabled === undefined) && true) || this.config.https.enabled) {
+            this.http = await this.checkAllHttps(this.config.https)
+          }
         }
       }
       if (this.config.reverseDNS) {
@@ -132,24 +134,33 @@ export class RecordValidator extends Validator<RecordConfig> {
         result.headers = response.headers
         result.statusCode = response.status
         result.statusMessage = response.statusText
-        if (this.config.http.callTimeMax) {
-          if (result.callTime > this.config.http.callTimeMax) {
-            this.addError(
-              "https", `Call too slow [${value}]: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`)
+        if (this.config.http) {
+          if (this.config.http.callTimeMax) {
+            if (result.callTime > this.config.http.callTimeMax) {
+              this.addError(
+                "https",
+                `Call too slow [${value}]: ${result.callTime}ms [Expected < ${this.config.http.callTimeMax}ms]`
+              )
+            }
           }
-        }
-        if (result.headers) {
-          await this.validateHeaders(this.config.http.headers, result.headers)
-        }
-        result.ip = value
-        this.http.push(result)
-        const expectedCode = this.config.http.statusCode || 200
-        if (result.statusCode !== expectedCode) {
-          this.addError("http", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`)
-        } else {
-          if (this.config.html) {
-            if (result.statusCode === 200) {
-              await this.validateHtml(response.data, value)
+
+          if (result.headers && this.config.http.headers) {
+            await this.validateHeaders(this.config.http.headers, result.headers)
+          }
+
+          result.ip = value
+          this.http.push(result)
+          const expectedCode = this.config.http.statusCode || 200
+          if (result.statusCode !== expectedCode) {
+            this.addError(
+              "http",
+              `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`
+            )
+          } else {
+            if (this.config.html) {
+              if (result.statusCode === 200) {
+                await this.validateHtml(response.data, value)
+              }
             }
           }
         }
@@ -180,26 +191,28 @@ export class RecordValidator extends Validator<RecordConfig> {
         result.headers = response.headers
         result.statusCode = response.status
         result.statusMessage = response.statusText
-        if (this.config.https.callTimeMax) {
-          if (callTime > this.config.https.callTimeMax) {
-            this.addError(
-              "https", `Call too slow [${value}]: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
+        if (this.config.https) {
+          if (this.config.https.callTimeMax) {
+            if (callTime > this.config.https.callTimeMax) {
+              this.addError(
+                "https", `Call too slow [${value}]: ${callTime}ms [Expected < ${this.config.https.callTimeMax}ms]`)
+            }
           }
-        }
-        if (result.headers) {
-          await this.validateHeaders(this.config.https.headers, result.headers)
-        }
-        result.ip = value
-        this.https.push(result)
-        const expectedCode = this.config.https.statusCode || 200
-        if (result.statusCode !== expectedCode) {
-          this.addError(
-            "https", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`
-            )
-        } else {
-          if (result.statusCode === 200) {
-            if (this.config.html) {
-              await this.validateHtml(response.data, value)
+          if (result.headers && this.config.https.headers) {
+            await this.validateHeaders(this.config.https.headers, result.headers)
+          }
+          result.ip = value
+          this.https.push(result)
+          const expectedCode = this.config.https.statusCode || 200
+          if (result.statusCode !== expectedCode) {
+            this.addError(
+              "https", `Unexpected Response Code [${value}]: ${result.statusCode} [Expected: ${expectedCode}]`
+              )
+          } else {
+            if (result.statusCode === 200) {
+              if (this.config.html) {
+                await this.validateHtml(response.data, value)
+              }
             }
           }
         }

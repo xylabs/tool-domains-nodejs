@@ -54,21 +54,23 @@ export class MasterConfig extends Config {
     let domainRecord = new RecordConfig(recordType, domain)
 
     if (this.servers !== undefined) {
-      const serverConfig = this.servers.getConfig(serverType)
+      const serverConfig = this.servers.getConfig(serverType, new ServerConfig(domain))
       if (serverConfig && serverConfig.records) {
-        const record = serverConfig.records.getConfig(recordType)
+        const record = serverConfig.records.getConfig(recordType, new RecordConfig(recordType, domain))
         if (record) {
-          serverRecord = record
+          // create new object to prevent changing the authority object
+          serverRecord = new RecordConfig(recordType, domain).merge(record)
         }
       }
     }
 
     if (this.domains !== undefined) {
-      const domainConfig = this.domains.getConfig(domain)
+      const domainConfig = this.domains.getConfig(domain, new DomainConfig(domain, this.getServerType(domain)))
       if (domainConfig && domainConfig.records) {
-        const record = domainConfig.records.getConfig(recordType)
+        const record = domainConfig.records.getConfig(recordType, new RecordConfig(recordType, domain))
         if (record) {
-          domainRecord = record
+          // create new object to prevent changing the authority object
+          domainRecord = new RecordConfig(recordType, domain).merge(record)
         }
       }
     }
@@ -80,7 +82,7 @@ export class MasterConfig extends Config {
     const result = new Configs<RecordConfig>()
     const serverType = this.getServerType(domain)
     if (this.servers !== undefined) {
-      const serverConfig = this.servers.getConfig(serverType)
+      const serverConfig = this.servers.getConfig(serverType, new ServerConfig(serverType))
       if (serverConfig) {
         const records = serverConfig.records
         if (records) {
@@ -99,7 +101,7 @@ export class MasterConfig extends Config {
     }
 
     if (this.domains !== undefined) {
-      const domainConfig = this.domains.getConfig(domain)
+      const domainConfig = this.domains.getConfig(domain, new DomainConfig(domain, this.getServerType(domain)))
       if (domainConfig) {
         const records = domainConfig.records
         if (records) {
@@ -122,7 +124,7 @@ export class MasterConfig extends Config {
   public getDomainConfig(domain: string) {
     let result = new DomainConfig(domain, this.getServerType(domain))
     if (this.domains !== undefined) {
-      result = result.merge(this.domains.getConfig(domain))
+      result = this.domains.getConfig(domain, result) || result
       result.records = this.getRecordConfigs(domain)
     }
     result.name = domain
@@ -132,7 +134,7 @@ export class MasterConfig extends Config {
   public getServerConfig(server: string) {
     let result = new ServerConfig(server)
     if (this.servers !== undefined) {
-      result = _.merge(result, this.servers.getConfig(server))
+      result = this.servers.getConfig(server, result) || result
     }
     return result
   }

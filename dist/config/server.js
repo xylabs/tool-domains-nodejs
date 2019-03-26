@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
-const config_1 = require("./config");
 const configs_1 = require("./configs");
 const record_1 = require("./record");
 const chalk_1 = __importDefault(require("chalk"));
 const assert_1 = __importDefault(require("assert"));
-class ServerConfig extends config_1.Config {
+const records_1 = require("./records");
+class ServerConfig extends records_1.RecordsConfig {
     static parse(source) {
         let srcObj = source;
         if (typeof source === "string") {
@@ -28,12 +28,9 @@ class ServerConfig extends config_1.Config {
         return server;
     }
     constructor(name) {
-        super();
+        super(name);
         this.name = name;
         this.records = new configs_1.Configs();
-    }
-    getKey() {
-        return this.name;
     }
     merge(config) {
         if (config) {
@@ -42,10 +39,10 @@ class ServerConfig extends config_1.Config {
             let newItem = new ServerConfig(name);
             newItem = lodash_1.default.merge(newItem, this);
             newItem = lodash_1.default.merge(newItem, config);
-            newItem.records = lodash_1.default.merge(newItem.records, records);
+            newItem.records = lodash_1.default.merge(records, config.records);
             newItem.name = name;
             console.log(chalk_1.default.gray(`server.merge[${config.name}]: ${newItem.records}`));
-            return newItem;
+            super.merge(config);
         }
         return this;
     }

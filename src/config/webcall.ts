@@ -6,4 +6,6 @@ export class WebcallConfig extends Config {
   public timeout?: number
   public html?: boolean
   public callTimeMax?: number
+  public headers?: any[]
+  public statusCode?: number
 }

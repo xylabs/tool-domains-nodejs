@@ -18,7 +18,7 @@ class RecordConfig extends config_1.Config {
         return newObj;
     }
     constructor(type, domain) {
-        super();
+        super(type);
         this.type = type;
         this.domain = domain;
     }
@@ -33,15 +33,6 @@ class RecordConfig extends config_1.Config {
             return newItem;
         }
         return this;
-    }
-    getKey() {
-        return this.type;
-    }
-    isEnabled() {
-        if (this.enabled !== undefined) {
-            return this.enabled;
-        }
-        return true;
     }
 }
 exports.RecordConfig = RecordConfig;

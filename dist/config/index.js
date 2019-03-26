@@ -13,7 +13,7 @@ const server_1 = require("./server");
 class MasterConfig extends config_1.Config {
     constructor() {
         super(...arguments);
-        this.aws = new aws_1.AWSConfig();
+        this.aws = new aws_1.AWSConfig("aws");
         this.domains = new configs_1.Configs();
         this.servers = new configs_1.Configs();
     }
@@ -22,7 +22,7 @@ class MasterConfig extends config_1.Config {
         if (typeof source === "string") {
             srcObj = JSON.parse(source);
         }
-        const master = lodash_1.default.merge(new MasterConfig(), srcObj);
+        const master = lodash_1.default.merge(new MasterConfig("master"), srcObj);
         master.domains = new configs_1.Configs();
         if (srcObj.domains) {
             for (const domain of srcObj.domains) {

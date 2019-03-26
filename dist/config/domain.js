@@ -5,13 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const record_1 = require("./record");
 const lodash_1 = __importDefault(require("lodash"));
-const config_1 = require("./config");
 const configs_1 = require("./configs");
 const assert_1 = __importDefault(require("assert"));
-class DomainConfig extends config_1.Config {
+const records_1 = require("./records");
+class DomainConfig extends records_1.RecordsConfig {
     constructor(name, type) {
-        super();
-        this.records = new configs_1.Configs();
+        super(name);
         this.timeout = 1000;
         this.name = name;
         this.serverType = type;
@@ -36,16 +35,11 @@ class DomainConfig extends config_1.Config {
     merge(config) {
         if (config) {
             const name = this.name;
-            let newItem = new DomainConfig(name, this.serverType);
-            newItem = lodash_1.default.merge(newItem, config);
-            newItem.records = this.records.merge(config.records);
-            newItem.name = name;
-            return newItem;
+            lodash_1.default.merge(new DomainConfig(name, this.serverType), config);
+            this.name = name;
+            super.merge(config);
         }
         return this;
-    }
-    getKey() {
-        return this.name;
     }
     getTimeout() {
         return this.timeout || 1000;
