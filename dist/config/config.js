@@ -17,7 +17,6 @@ class Config {
         return this.enabled;
     }
     merge(config) {
-        throw new Error("Should never get here!");
         if (config) {
             return lodash_1.default.merge(this, config);
         }

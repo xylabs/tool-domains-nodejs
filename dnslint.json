@@ -10,7 +10,8 @@
         "enabled": false
       },
       "records": [{
-        "type": "default"
+        "type": "default",
+        "html": false
       }]
     },
     {
@@ -33,7 +34,7 @@
   "servers": [
     {
       "name": "website",
-      "crawl": true,
+      "crawl": false,
       "records": [
         {
           "type": "default",

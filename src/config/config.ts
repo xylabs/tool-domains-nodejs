@@ -17,7 +17,6 @@ export class Config {
   }
 
   public merge(config?: any) {
-    throw new Error("Should never get here!")
     if (config) {
       return _.merge(this, config)
     }

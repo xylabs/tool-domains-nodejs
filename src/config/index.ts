@@ -138,15 +138,12 @@ export class MasterConfig extends Config {
   }
 
   public getServerType(domain: string) {
-    console.log(chalk.magenta(`getServerType: ${domain}: ${this.servers.size}`))
     let defaultName = "unknown"
     if (this.servers) {
       for (const server of this.servers.values()) {
-        console.log(chalk.magenta(`getServerType: ${server.name}`))
         const include = server.include
         if (include) {
           for (const filter of include) {
-            console.log(chalk.magenta(`getServerType.filter: ${filter}`))
             if (domain.match(filter)) {
               return server.name
             }
@@ -157,7 +154,6 @@ export class MasterConfig extends Config {
         }
       }
     }
-    console.log(chalk.magenta(`getServerType.result: ${defaultName}`))
     return defaultName
   }
 }

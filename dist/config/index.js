@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const aws_1 = require("./aws");
 const domain_1 = require("./domain");
-const chalk_1 = __importDefault(require("chalk"));
 const lodash_1 = __importDefault(require("lodash"));
 const record_1 = require("./record");
 const config_1 = require("./config");
@@ -133,15 +132,12 @@ class MasterConfig extends config_1.Config {
         return result;
     }
     getServerType(domain) {
-        console.log(chalk_1.default.magenta(`getServerType: ${domain}: ${this.servers.size}`));
         let defaultName = "unknown";
         if (this.servers) {
             for (const server of this.servers.values()) {
-                console.log(chalk_1.default.magenta(`getServerType: ${server.name}`));
                 const include = server.include;
                 if (include) {
                     for (const filter of include) {
-                        console.log(chalk_1.default.magenta(`getServerType.filter: ${filter}`));
                         if (domain.match(filter)) {
                             return server.name;
                         }
@@ -152,7 +148,6 @@ class MasterConfig extends config_1.Config {
                 }
             }
         }
-        console.log(chalk_1.default.magenta(`getServerType.result: ${defaultName}`));
         return defaultName;
     }
 }
