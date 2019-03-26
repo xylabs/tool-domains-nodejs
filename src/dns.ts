@@ -1,4 +1,5 @@
 import dns, { MxRecord, AnyTxtRecord } from 'dns'
+import chalk from 'chalk'
 
 export class Dns {
 
@@ -14,9 +15,9 @@ export class Dns {
     })
   }
 
-  public static async resolve(name: string, type: string): Promise < any[] > {
+  public static async resolve(domain: string, type: string): Promise < any[] > {
     return new Promise((resolve, reject) => {
-      return dns.resolve(name, type, (err, addresses: any) => {
+      return dns.resolve(domain, type, (err, addresses: any) => {
         if (err) {
           if (err.code !== 'ENODATA' && err.code !== 'ENOTFOUND') {
             reject(err)

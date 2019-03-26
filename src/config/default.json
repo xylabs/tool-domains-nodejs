@@ -22,150 +22,165 @@
             "enabled": true,
             "value": ".r.cloudfront.net$"
           },
-          "http": {
-            "statusCode": 301,
-            "callTimeMax": 200,
-            "headers": [
-              {
-                "required": true,
-                "name": "location"
-              }
-            ]
-          },
-          "https": {
-            "statusCode": 200,
-            "callTimeMax": 200,
-            "headers": [
-              {
-                "required": true,
-                "name": "content-type"
-              },
-              {
-                "required": true,
-                "name": "content-encoding",
-                "value": "gzip"
-              },
-              {
-                "required": true,
-                "name": "content-security-policy",
-                "value": "object-src 'none'"
-              },
-              {
-                "required": true,
-                "name": "x-content-type-options",
-                "value": "nosniff"
-              },
-              {
-                "required": true,
-                "name": "x-frame-options",
-                "value": "DENY"
-              },
-              {
-                "required": true,
-                "name": "x-xss-protection",
-                "value": "1; mode=block"
-              },
-              {
-                "required": true,
-                "name": "referrer-policy",
-                "value": "same-origin"
-              }
-            ]
-          }
+          "webcalls":
+          [
+            {
+              "protocol": "http",
+              "statusCode": 301,
+              "callTimeMax": 200,
+              "headers": [
+                {
+                  "required": true,
+                  "name": "location"
+                }
+              ]
+            },
+            {
+              "protocol": "https",
+              "statusCode": 200,
+              "callTimeMax": 200,
+              "headers": [
+                {
+                  "required": true,
+                  "name": "content-type"
+                },
+                {
+                  "required": true,
+                  "name": "content-encoding",
+                  "value": "gzip"
+                },
+                {
+                  "required": true,
+                  "name": "content-security-policy",
+                  "value": "object-src 'none'"
+                },
+                {
+                  "required": true,
+                  "name": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "required": true,
+                  "name": "x-frame-options",
+                  "value": "DENY"
+                },
+                {
+                  "required": true,
+                  "name": "x-xss-protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "required": true,
+                  "name": "referrer-policy",
+                  "value": "same-origin"
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "AAAA",
           "enabled": true,
-          "http": {
-            "statusCode": 301,
-            "headers": [
-              {
-                "required": true,
-                "name": "location"
-              }
-            ]
-          },
-          "https": {
-            "statusCode": 200,
-            "headers": [
-              {
-                "required": true,
-                "name": "content-type"
-              },
-              {
-                "required": true,
-                "name": "content-security-policy",
-                "value": "object-src 'none'"
-              },
-              {
-                "required": true,
-                "name": "x-content-type-options",
-                "value": "nosniff"
-              },
-              {
-                "required": true,
-                "name": "x-frame-options",
-                "value": "DENY"
-              },
-              {
-                "required": true,
-                "name": "x-xss-protection",
-                "value": "1; mode=block"
-              },
-              {
-                "required": true,
-                "name": "referrer-policy",
-                "value": "same-origin"
-              }
-            ]
-          }
+          "webcalls":
+          [
+            {
+              "protocol": "http",
+              "statusCode": 301,
+              "headers": [
+                {
+                  "required": true,
+                  "name": "location"
+                }
+              ]
+            },
+            {
+              "protocol": "https",
+              "statusCode": 200,
+              "headers": [
+                {
+                  "required": true,
+                  "name": "content-type"
+                },
+                {
+                  "required": true,
+                  "name": "content-security-policy",
+                  "value": "object-src 'none'"
+                },
+                {
+                  "required": true,
+                  "name": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "required": true,
+                  "name": "x-frame-options",
+                  "value": "DENY"
+                },
+                {
+                  "required": true,
+                  "name": "x-xss-protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "required": true,
+                  "name": "referrer-policy",
+                  "value": "same-origin"
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "CNAME",
           "enabled": true,
-          "http": {
-            "statusCode": 301,
-            "headers": [
-              {
-                "required": true,
-                "name": "location"
-              }
-            ]
-          },
-          "https": {
-            "statusCode": 200,
-            "headers": [
-              {
-                "required": true,
-                "name": "content-type"
-              },
-              {
-                "required": true,
-                "name": "content-security-policy",
-                "value": "object-src 'none'"
-              },
-              {
-                "required": true,
-                "name": "x-content-type-options",
-                "value": "nosniff"
-              },
-              {
-                "required": true,
-                "name": "x-frame-options",
-                "value": "DENY"
-              },
-              {
-                "required": true,
-                "name": "x-xss-protection",
-                "value": "1; mode=block"
-              },
-              {
-                "required": true,
-                "name": "referrer-policy",
-                "value": "same-origin"
-              }
-            ]
-          }
+          "webcalls":
+          [
+            {
+              "protocol": "http",
+              "statusCode": 301,
+              "headers": [
+                {
+                  "required": true,
+                  "name": "location"
+                }
+              ]
+            },
+            {
+              "protocol": "https",
+              "statusCode": 200,
+              "headers": [
+                {
+                  "required": true,
+                  "name": "content-type"
+                },
+                {
+                  "required": true,
+                  "name": "content-security-policy",
+                  "value": "object-src 'none'"
+                },
+                {
+                  "required": true,
+                  "name": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "required": true,
+                  "name": "x-frame-options",
+                  "value": "DENY"
+                },
+                {
+                  "required": true,
+                  "name": "x-xss-protection",
+                  "value": "1; mode=block"
+                },
+                {
+                  "required": true,
+                  "name": "referrer-policy",
+                  "value": "same-origin"
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "MX",
@@ -212,21 +227,45 @@
       "records": [
         {
           "type": "A",
-          "http": {
-            "enabled": false
-          }
+          "webcalls":
+          [
+            {
+              "protocol": "http",
+              "enabled": false
+            },
+            {
+              "protocol": "https",
+              "enabled": false
+            }
+          ]
         },
         {
           "type": "AAAA",
-          "http": {
-            "enabled": false
-          }
+          "webcalls":
+          [
+            {
+              "protocol": "http",
+              "enabled": false
+            },
+            {
+              "protocol": "https",
+              "enabled": false
+            }
+          ]
         },
         {
           "type": "CNAME",
-          "http": {
-            "enabled": false
-          }
+          "webcalls":
+          [
+            {
+              "protocol": "http",
+              "enabled": false
+            },
+            {
+              "protocol": "https",
+              "enabled": false
+            }
+          ]
         },
         {
           "type": "TXT",

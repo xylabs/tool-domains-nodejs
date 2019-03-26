@@ -15,17 +15,18 @@ class Configs extends Map {
         }
         return this;
     }
-    getConfig(key) {
+    // we pass in a new object to prevent writing to authority objects
+    getConfig(key, newObject) {
         const defaultItem = this.get("default");
         const item = this.get(key);
         if (item) {
             if (defaultItem) {
-                return defaultItem.merge(item);
+                return newObject.merge(defaultItem).merge(item);
             }
             return item;
         }
         if (defaultItem) {
-            return defaultItem;
+            return newObject.merge(defaultItem);
         }
         return undefined;
     }

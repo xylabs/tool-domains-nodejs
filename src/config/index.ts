@@ -8,6 +8,7 @@ import { RecordConfig } from './record'
 import { Config } from './config'
 import { Configs } from './configs'
 import { ServerConfig } from './server'
+import { RecordsConfig } from './records'
 
 export class MasterConfig extends Config {
 
@@ -79,46 +80,9 @@ export class MasterConfig extends Config {
   }
 
   public getRecordConfigs(domain: string): Configs<RecordConfig> {
-    const result = new Configs<RecordConfig>()
-    const serverType = this.getServerType(domain)
-    if (this.servers !== undefined) {
-      const serverConfig = this.servers.getConfig(serverType, new ServerConfig(serverType))
-      if (serverConfig) {
-        const records = serverConfig.records
-        if (records) {
-          for (const record of records.values()) {
-            if (record.type) {
-              const existing = result.get(record.type)
-              if (existing === undefined) {
-                result.set(record.type, this.getRecordConfig(domain, record.type))
-              } else {
-                result.set(record.type, existing.merge(this.getRecordConfig(domain, record.type)))
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (this.domains !== undefined) {
-      const domainConfig = this.domains.getConfig(domain, new DomainConfig(domain, this.getServerType(domain)))
-      if (domainConfig) {
-        const records = domainConfig.records
-        if (records) {
-          for (const record of records.values()) {
-            if (record.type) {
-              const existing = result.get(record.type)
-              if (existing === undefined) {
-                result.set(record.type, this.getRecordConfig(domain, record.type))
-              } else {
-                result.set(record.type, existing.merge(this.getRecordConfig(domain, record.type)))
-              }
-            }
-          }
-        }
-      }
-    }
-    return result
+    const serverConfigs = this.getRecordConfigsFromServers(domain)
+    const domainConfigs = this.getRecordConfigsFromDomains(domain)
+    return serverConfigs.merge(domainConfigs)
   }
 
   public getDomainConfig(domain: string) {
@@ -157,5 +121,42 @@ export class MasterConfig extends Config {
       }
     }
     return defaultName
+  }
+
+  private resolveRecords(records: Configs<RecordConfig>, domain: string) {
+    const result = new Configs<RecordConfig>()
+    if (records) {
+      for (const record of records.values()) {
+        if (record.type) {
+          const existing = result.get(record.type)
+          if (existing === undefined) {
+            result.set(record.type, this.getRecordConfig(domain, record.type))
+          } else {
+            result.set(record.type, existing.merge(this.getRecordConfig(domain, record.type)))
+          }
+        }
+      }
+    }
+    return result
+  }
+
+  private getRecordConfigsFromServers(domain: string) {
+    let result = new Configs<RecordConfig>()
+    const serverType = this.getServerType(domain)
+    const serverConfig = this.servers.getConfig(serverType, new ServerConfig(serverType))
+    if (serverConfig) {
+      result = this.resolveRecords(serverConfig.records, domain)
+    }
+    return result
+  }
+
+  private getRecordConfigsFromDomains(domain: string) {
+    let result = new Configs<RecordConfig>()
+    const serverType = this.getServerType(domain)
+    const domainConfig = this.domains.getConfig(domain, new DomainConfig(domain, serverType))
+    if (domainConfig) {
+      result = this.resolveRecords(domainConfig.records, domain)
+    }
+    return result
   }
 }

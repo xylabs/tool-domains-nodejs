@@ -2,6 +2,7 @@ import { Config } from "./config"
 import assert from 'assert'
 import _ from 'lodash'
 import { WebcallConfig } from "./webcall"
+import { Configs } from "./configs"
 
 export class RecordConfig extends Config {
 
@@ -13,15 +14,21 @@ export class RecordConfig extends Config {
 
     assert(typeof srcObj.type === "string")
 
-    let newObj = new RecordConfig(srcObj.type, domain)
-    newObj = _.merge(newObj, srcObj)
-    return newObj
+    let record = new RecordConfig(srcObj.type, domain)
+    record = _.merge(record, srcObj)
+    record.webcalls = new Configs<WebcallConfig>()
+    if (srcObj.webcalls) {
+      for (const webcall of srcObj.webcalls) {
+        const newWebcallObj = WebcallConfig.parse(webcall)
+        record.webcalls.set(newWebcallObj.protocol, newWebcallObj)
+      }
+    }
+    return record
   }
 
   public type: string
   public domain?: string
   public timeout?: number
-  public html?: boolean
   public callTimeMax?: number
 
   public reverseDNS?: {
@@ -31,8 +38,7 @@ export class RecordConfig extends Config {
 
   public allowed?: number[]
   public values?: any[]
-  public http?: WebcallConfig
-  public https?: WebcallConfig
+  public webcalls?: Configs<WebcallConfig>
 
   constructor(type: string, domain?: string) {
     super(type)
