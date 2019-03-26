@@ -50,9 +50,15 @@ export class RecordValidator extends Validator<RecordConfig> {
     const result: any[] = []
     try {
       for (const record of this.records) {
-        const domains = await Dns.reverse(record) // TODO: Figure out what to send
+        let domains: string[] | undefined
         let valid = true
-        if (value) {
+        try {
+          domains = await Dns.reverse(record)
+        } catch (ex) {
+          this.addError("reverse", ex.message)
+          valid = false
+        }
+        if (value && domains) {
           for (const domain of domains) {
             if (!domain.match(value)) {
               valid = false

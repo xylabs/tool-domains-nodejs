@@ -1,6 +1,6 @@
 {
   "name": "dnslint",
-  "version": "1.1.69",
+  "version": "1.1.70",
   "description": "XYO Internal Domain Tool",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

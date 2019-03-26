@@ -14,10 +14,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const validator_1 = require("./validator");
 const axios_1 = __importDefault(require("axios"));
 const html_validator_1 = __importDefault(require("html-validator"));
+const chalk_1 = __importDefault(require("chalk"));
 class WebcallValidator extends validator_1.Validator {
-    constructor(config, address) {
+    constructor(config, address, host) {
         super(config);
         this.address = address;
+        this.host = host;
     }
     validate() {
         const _super = Object.create(null, {
@@ -104,6 +106,7 @@ class WebcallValidator extends validator_1.Validator {
     }
     get(protocol, address) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(chalk_1.default.gray(`get: ${protocol}:${address}:${this.host}`));
             const timeout = this.config.timeout || 1000;
             let response;
             try {
@@ -113,7 +116,7 @@ class WebcallValidator extends validator_1.Validator {
                     validateStatus: (status) => true,
                     transformResponse: (data) => data,
                     timeout, headers: {
-                        Host: this.config.host
+                        Host: this.host
                     }
                 });
             }

@@ -20,7 +20,7 @@ class RecordConfig extends config_1.Config {
         record.webcalls = new configs_1.Configs();
         if (srcObj.webcalls) {
             for (const webcall of srcObj.webcalls) {
-                const newWebcallObj = webcall_1.WebcallConfig.parse(webcall, domain);
+                const newWebcallObj = webcall_1.WebcallConfig.parse(webcall);
                 record.webcalls.set(newWebcallObj.protocol, newWebcallObj);
             }
         }

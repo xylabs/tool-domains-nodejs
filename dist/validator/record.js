@@ -16,12 +16,12 @@ const dns_1 = require("../dns");
 const chalk_1 = __importDefault(require("chalk"));
 const webcall_1 = require("./webcall");
 class RecordValidator extends validator_1.Validator {
-    constructor(config) {
+    constructor(config, domain) {
         super(config);
-        this.addresses = [];
+        this.records = [];
         this.webcalls = [];
+        this.domain = domain;
         this.type = config.type;
-        this.domain = config.domain;
     }
     validate() {
         const _super = Object.create(null, {
@@ -29,7 +29,7 @@ class RecordValidator extends validator_1.Validator {
         });
         return __awaiter(this, void 0, void 0, function* () {
             if (this.type.split('|').length === 1) {
-                this.addresses = yield this.resolve();
+                yield this.resolve();
                 this.webcalls = yield this.validateWebcalls();
                 if (this.config.reverseDNS) {
                     if (((this.config.reverseDNS.enabled === undefined) && true) || this.config.reverseDNS.enabled) {
@@ -45,8 +45,8 @@ class RecordValidator extends validator_1.Validator {
             const result = [];
             if (this.config.webcalls) {
                 for (const webcall of this.config.webcalls.values()) {
-                    for (const address of this.addresses) {
-                        const validator = new webcall_1.WebcallValidator(webcall, address);
+                    for (const record of this.records) {
+                        const validator = new webcall_1.WebcallValidator(webcall, record, this.domain);
                         result.push(validator);
                         yield validator.validate();
                         this.errorCount += validator.errorCount;
@@ -60,10 +60,17 @@ class RecordValidator extends validator_1.Validator {
         return __awaiter(this, void 0, void 0, function* () {
             const result = [];
             try {
-                for (const address of this.addresses) {
-                    const domains = yield dns_1.Dns.reverse(address); // TODO: Figure out what to send
+                for (const record of this.records) {
+                    let domains;
                     let valid = true;
-                    if (value) {
+                    try {
+                        domains = yield dns_1.Dns.reverse(record);
+                    }
+                    catch (ex) {
+                        this.addError("reverse", ex.message);
+                        valid = false;
+                    }
+                    if (value && domains) {
                         for (const domain of domains) {
                             if (!domain.match(value)) {
                                 valid = false;
@@ -72,7 +79,7 @@ class RecordValidator extends validator_1.Validator {
                         }
                     }
                     result.push({
-                        ip: address,
+                        ip: record,
                         domains,
                         valid
                     });
@@ -87,17 +94,22 @@ class RecordValidator extends validator_1.Validator {
     }
     resolve() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.records = [];
             try {
-                if (this.type && this.domain) {
-                    this.addresses = yield dns_1.Dns.resolve(this.domain, this.type);
+                if (!this.type) {
+                    this.addError("resolve", "Missing Type");
+                    return;
                 }
-                this.addError("resolve", "Missing Type");
+                if (!this.domain) {
+                    this.addError("resolve", "Missing Domain");
+                    return;
+                }
+                this.records = yield dns_1.Dns.resolve(this.domain, this.type);
             }
             catch (ex) {
                 this.addError("resolve", ex.message);
                 console.error(chalk_1.default.red(ex.stack));
             }
-            return [];
         });
     }
 }

@@ -66,6 +66,14 @@ export class XyDomainScan {
         singleDomainConfig.name,
         singleDomainConfig
       )
+
+      // since we are only doing one, remove the rest
+      for (const domain of this.config.domains.values()) {
+        if (domain.name !== "default" && domain.name !== params.singleDomain) {
+          this.config.domains.delete(domain.key)
+        }
+      }
+
       this.config.aws = new AWSConfig("aws")
       this.config.aws.enabled = false
     }

@@ -2,6 +2,7 @@ import { Validator } from "./validator"
 import { WebcallConfig } from "../config/webcall"
 import Axios from "axios"
 import htmlValidator from 'html-validator'
+import chalk from "chalk"
 
 export class WebcallValidator extends Validator<WebcallConfig> {
 
@@ -105,7 +106,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
   }
 
   private async get(protocol: string, address: string) {
-    console.log(`get: ${protocol}:${address}`)
+    console.log(chalk.gray(`get: ${protocol}:${address}:${this.host}`))
     const timeout = this.config.timeout || 1000
     let response: any
     try {

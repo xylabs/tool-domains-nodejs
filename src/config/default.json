@@ -45,7 +45,7 @@
                   "name": "content-type"
                 },
                 {
-                  "required": true,
+                  "required": false,
                   "name": "content-encoding",
                   "value": "gzip"
                 },

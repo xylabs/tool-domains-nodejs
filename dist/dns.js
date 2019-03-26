@@ -27,10 +27,10 @@ class Dns {
             });
         });
     }
-    static resolve(name, type) {
+    static resolve(domain, type) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                return dns_1.default.resolve(name, type, (err, addresses) => {
+                return dns_1.default.resolve(domain, type, (err, addresses) => {
                     if (err) {
                         if (err.code !== 'ENODATA' && err.code !== 'ENOTFOUND') {
                             reject(err);
