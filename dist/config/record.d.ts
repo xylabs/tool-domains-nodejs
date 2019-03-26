@@ -1,11 +1,11 @@
 import { Config } from "./config";
 import { WebcallConfig } from "./webcall";
+import { Configs } from "./configs";
 export declare class RecordConfig extends Config {
     static parse(source: any, domain: string): RecordConfig;
     type: string;
     domain?: string;
     timeout?: number;
-    html?: boolean;
     callTimeMax?: number;
     reverseDNS?: {
         "enabled": true;
@@ -13,8 +13,7 @@ export declare class RecordConfig extends Config {
     };
     allowed?: number[];
     values?: any[];
-    http?: WebcallConfig;
-    https?: WebcallConfig;
+    webcalls?: Configs<WebcallConfig>;
     constructor(type: string, domain?: string);
     merge(config?: any): RecordConfig;
 }

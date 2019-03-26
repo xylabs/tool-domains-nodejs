@@ -57,8 +57,10 @@
             "minimum": {"type": "number"}
           }
         },
-        "http": {"$ref": "#/definitions/webcall"},
-        "https": {"$ref": "#/definitions/webcall"},
+        "webcalls": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/webcall"}
+        },
         "reverseDNS": {
           "type": "object",
           "properties": {
@@ -86,7 +88,7 @@
         "statusCode": {"type": "number"},
         "httpVersion": {"type": "string"},
         "callTimeMax": {"type": "number"},
-        "ssl": {"type": "boolean"},
+        "protocol": {"type": "string"},
         "port": {"type": "number"},
         "headers": {
           "type": "array",
