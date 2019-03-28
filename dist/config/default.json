@@ -163,6 +163,33 @@
                                 "value": "^amazon.com$",
                                 "issuerCritical": false
                             }
+                        },
+                        {
+                            "disposition": "required",
+                            "filter": {
+                                "flags": 0,
+                                "tag": "^issue$",
+                                "value": "^amazonaws.com$",
+                                "issuerCritical": false
+                            }
+                        },
+                        {
+                            "disposition": "required",
+                            "filter": {
+                                "flags": 0,
+                                "tag": "^issue$",
+                                "value": "^amazontrust.com$",
+                                "issuerCritical": false
+                            }
+                        },
+                        {
+                            "disposition": "required",
+                            "filter": {
+                                "flags": 0,
+                                "tag": "^issue$",
+                                "value": "^awstrust.com$",
+                                "issuerCritical": false
+                            }
                         }
                     ]
                 },

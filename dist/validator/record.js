@@ -63,20 +63,37 @@ class RecordValidator extends validator_1.Validator {
     }
     validateValues() {
         return __awaiter(this, void 0, void 0, function* () {
+            let valueErrorCount = 0;
             const result = [];
             if (this.config.values) {
                 for (const values of this.config.values.values()) {
                     const dataArray = [];
                     for (const record of this.records) {
                         if (record.data) {
-                            dataArray.push(record.data);
+                            if (Array.isArray(record.data)) {
+                                for (const innerRecord of record.data) {
+                                    if (Buffer.isBuffer(innerRecord)) {
+                                        dataArray.push(innerRecord.toString());
+                                    }
+                                }
+                            }
+                            else {
+                                dataArray.push(record.data);
+                            }
                         }
                     }
                     const validator = new value_1.ValueValidator(values, dataArray);
                     result.push(validator);
                     yield validator.validate();
                     this.errorCount += validator.errorCount;
+                    valueErrorCount += validator.errorCount;
                 }
+            }
+            if (valueErrorCount === 0) {
+                console.log(chalk_1.default.green('validateValues', `Passed`));
+            }
+            else {
+                console.log(chalk_1.default.red('validateValues', `Errors: ${valueErrorCount}`));
             }
             return result;
         });

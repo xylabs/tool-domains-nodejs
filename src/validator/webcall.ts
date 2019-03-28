@@ -3,6 +3,7 @@ import { WebcallConfig } from "../config/webcall"
 import Axios from "axios"
 import htmlValidator from 'html-validator'
 import chalk from "chalk"
+import { ValueValidator } from "./value"
 
 export class WebcallValidator extends Validator<WebcallConfig> {
 
@@ -38,7 +39,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         }
 
         if (this.headers && this.config.headers) {
-          await this.validateHeaders(this.config.headers)
+          await this.validateHeaders()
         }
 
         const expectedCode = this.config.statusCode || 200
@@ -67,30 +68,29 @@ export class WebcallValidator extends Validator<WebcallConfig> {
     return super.validate()
   }
 
-  private validateHeaders(expected: any[]) {
-    if (this.headers) {
-      if (Array.isArray(expected)) {
-        for (const item of expected) {
-          const value = this.headers[item.name]
-          if (item.required && value === undefined) {
-            this.addError("validateHeaders", `Missing: ${item.name}`)
-          } else if (value === undefined) {
-            if (item.value === undefined) {
-              this.addError("validateHeaders", `Invalid Value Configured: ${item.name}`)
-            } else {
-              if (!item.value.match(this.headers[item.name])) {
-                this.addError(
-                  "validateHeaders",
-                  `Invalid Value [${item.name}]: ${this.headers[item.name]} [Expected: ${item.value}]`
-                )
-              }
-            }
-          }
+  protected async validateHeaders() {
+    const result: ValueValidator[] = []
+    let headerErrorCount = 0
+    if (this.config.headers && this.headers) {
+      for (const value of this.config.headers.values()) {
+        const dataArray: string[] | object[] | number[] = []
+        const data = this.headers[value.name]
+        if (data) {
+          dataArray.push(data)
         }
+        const validator = new ValueValidator(value, dataArray)
+        result.push(validator)
+        await validator.validate()
+        headerErrorCount += validator.errorCount
+        this.errorCount += validator.errorCount
       }
-    } else {
-      this.addError("validateHeaders", "No headers found")
     }
+    if (headerErrorCount === 0) {
+      console.log(chalk.green('validateHeaders', `Passed`))
+    } else {
+      console.log(chalk.red('validateHeaders', `Errors: ${headerErrorCount}`))
+    }
+    return result
   }
 
   private async validateHtml(data: string) {

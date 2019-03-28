@@ -25,11 +25,9 @@ class DnsClient {
             });
             const client = new net_1.default.Socket();
             client.connect(53, this.host, () => {
-                console.log('Connected');
                 client.write(buf);
             });
             client.on('data', (data) => {
-                console.log('Received response: %d bytes', data.byteLength);
                 if (response == null) {
                     if (data.byteLength > 1) {
                         const plen = data.readUInt16BE(0);
@@ -49,7 +47,6 @@ class DnsClient {
                 }
             });
             client.on('close', () => {
-                console.log('Connection closed');
                 resolve(result);
             });
         });

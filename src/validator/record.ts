@@ -52,20 +52,35 @@ export class RecordValidator extends Validator<RecordConfig> {
   }
 
   protected async validateValues() {
+    let valueErrorCount = 0
     const result: ValueValidator[] = []
     if (this.config.values) {
       for (const values of this.config.values.values()) {
-        const dataArray: string[] | object[] | number[] = []
+        const dataArray: any[] = []
         for (const record of this.records) {
           if (record.data) {
-            dataArray.push(record.data)
+            if (Array.isArray(record.data)) {
+              for (const innerRecord of record.data) {
+                if (Buffer.isBuffer(innerRecord)) {
+                  dataArray.push(innerRecord.toString())
+                }
+              }
+            } else {
+              dataArray.push(record.data)
+            }
           }
         }
         const validator = new ValueValidator(values, dataArray)
         result.push(validator)
         await validator.validate()
         this.errorCount += validator.errorCount
+        valueErrorCount += validator.errorCount
       }
+    }
+    if (valueErrorCount === 0) {
+      console.log(chalk.green('validateValues', `Passed`))
+    } else {
+      console.log(chalk.red('validateValues', `Errors: ${valueErrorCount}`))
     }
     return result
   }

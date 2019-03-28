@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dns_1 = __importDefault(require("dns"));
 const dnsclient_1 = require("./dnsclient");
-const chalk_1 = __importDefault(require("chalk"));
 class Dns {
     static lookup(name) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,9 +30,7 @@ class Dns {
     }
     static resolve(domain, type) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(chalk_1.default.magenta(`resolve: ${domain}:${type}`));
             const result = yield this.client.resolve(domain, type);
-            console.log(chalk_1.default.magenta(`resolve: ${JSON.stringify(result.answers)}`));
             return result.answers;
         });
     }

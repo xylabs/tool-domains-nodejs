@@ -11,7 +11,7 @@ class ValueConfig extends config_1.Config {
         if (typeof source === "string") {
             srcObj = JSON.parse(source);
         }
-        let value = new ValueConfig(srcObj.name);
+        let value = new ValueConfig(srcObj.name || JSON.stringify(srcObj));
         value = lodash_1.default.merge(value, srcObj);
         return value;
     }

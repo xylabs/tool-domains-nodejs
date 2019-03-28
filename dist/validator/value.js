@@ -27,7 +27,6 @@ class ValueValidator extends validator_1.Validator {
                 switch (this.config.disposition) {
                     case 'required':
                         return this.validateRequired();
-                        break;
                 }
             }
             console.log(chalk_1.default.gray(`Value Check Passed: ${this.config.name || this.config.filter}:${this.data}`));
@@ -46,14 +45,12 @@ class ValueValidator extends validator_1.Validator {
                 console.log(chalk_1.default.gray(`Required Value Check Passed: ${this.config}`));
             }
             else {
-                this.addError("value", `Required value missing: ${this.config}`);
-                console.log(chalk_1.default.magenta(`${this.config}: ${JSON.stringify(this.data)}`));
+                this.addError("value", `Required value missing: ${this.config}:${JSON.stringify(this.data)}`);
             }
         }
         return super.validate();
     }
     checkValue(filter, data) {
-        console.log(chalk_1.default.gray(`checkValue: ${JSON.stringify(filter)}:${JSON.stringify(data)}`));
         let matched = false;
         if (typeof filter === typeof data) {
             if (typeof data === "string") {
@@ -62,24 +59,21 @@ class ValueValidator extends validator_1.Validator {
                 }
             }
             else if (typeof data === "object") {
+                matched = true;
                 for (const key of Object.keys(filter)) {
-                    matched = true;
                     if (!this.checkValue(filter[key], data[key])) {
                         matched = false;
                     }
                 }
             }
-            else if (typeof data === "number") {
-                if (data === filter) {
-                    matched = true;
-                }
+            else if (data === filter) {
+                matched = true;
             }
         }
         else {
             this.addError("validate", `Value type mismatch [${typeof data} should be ${typeof filter}]`);
             this.addError("validate", `Value type mismatch [${JSON.stringify(data)} should be ${JSON.stringify(filter)}]`);
         }
-        console.log(chalk_1.default.gray(`checkValue: matched:${matched}`));
         return matched;
     }
 }

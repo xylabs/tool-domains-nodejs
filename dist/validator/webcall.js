@@ -15,6 +15,7 @@ const validator_1 = require("./validator");
 const axios_1 = __importDefault(require("axios"));
 const html_validator_1 = __importDefault(require("html-validator"));
 const chalk_1 = __importDefault(require("chalk"));
+const value_1 = require("./value");
 class WebcallValidator extends validator_1.Validator {
     constructor(config, address, host) {
         super(config);
@@ -40,7 +41,7 @@ class WebcallValidator extends validator_1.Validator {
                         }
                     }
                     if (this.headers && this.config.headers) {
-                        yield this.validateHeaders(this.config.headers);
+                        yield this.validateHeaders();
                     }
                     const expectedCode = this.config.statusCode || 200;
                     if (this.statusCode !== expectedCode) {
@@ -62,33 +63,38 @@ class WebcallValidator extends validator_1.Validator {
                 this.addError("validate", ex.message);
                 console.error(ex.stack);
             }
+            if (this.errorCount === 0) {
+                console.log(chalk_1.default.gray(`Webcall Check Passed: ${this.address} [${this.host}]`));
+            }
             return _super.validate.call(this);
         });
     }
-    validateHeaders(expected) {
-        if (this.headers) {
-            if (Array.isArray(expected)) {
-                for (const item of expected) {
-                    const value = this.headers[item.name];
-                    if (item.required && value === undefined) {
-                        this.addError("validateHeaders", `Missing: ${item.name}`);
+    validateHeaders() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = [];
+            let headerErrorCount = 0;
+            if (this.config.headers && this.headers) {
+                for (const value of this.config.headers.values()) {
+                    const dataArray = [];
+                    const data = this.headers[value.name];
+                    if (data) {
+                        dataArray.push(data);
                     }
-                    else if (value === undefined) {
-                        if (item.value === undefined) {
-                            this.addError("validateHeaders", `Invalid Value Configured: ${item.name}`);
-                        }
-                        else {
-                            if (!item.value.match(this.headers[item.name])) {
-                                this.addError("validateHeaders", `Invalid Value [${item.name}]: ${this.headers[item.name]} [Expected: ${item.value}]`);
-                            }
-                        }
-                    }
+                    const validator = new value_1.ValueValidator(value, dataArray);
+                    result.push(validator);
+                    yield validator.validate();
+                    headerErrorCount += validator.errorCount;
+                    this.errorCount += validator.errorCount;
                 }
             }
-        }
-        else {
-            this.addError("validateHeaders", "No headers found");
-        }
+            if (headerErrorCount === 0) {
+                console.log(chalk_1.default.green('validateHeaders', `Passed`));
+            }
+            else {
+                console.log(chalk_1.default.red('validateHeaders', `Errors: ${headerErrorCount}`));
+            }
+            return result;
+        });
     }
     validateHtml(data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -106,7 +112,6 @@ class WebcallValidator extends validator_1.Validator {
     }
     get(protocol, address) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(chalk_1.default.gray(`get: ${protocol}:${address}:${this.host}`));
             const timeout = this.config.timeout || 1000;
             let response;
             try {
