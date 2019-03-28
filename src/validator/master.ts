@@ -65,7 +65,7 @@ export class MasterValidator extends Validator<MasterConfig> {
           }
         }
 
-        if (!domainConfig.enabled) {
+        if (!domainConfig.isEnabled()) {
           continue
         }
 
