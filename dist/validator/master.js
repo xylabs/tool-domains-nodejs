@@ -69,6 +69,14 @@ class MasterValidator extends validator_1.Validator {
                     // remove trailing '.'
                     const cleanDomain = domain.slice(0, domain.length - 1);
                     const domainConfig = this.config.getDomainConfig(cleanDomain);
+                    if (this.config.aws.filter) {
+                        if (!domainConfig.name.match(this.config.aws.filter)) {
+                            continue;
+                        }
+                    }
+                    if (!domainConfig.enabled) {
+                        continue;
+                    }
                     this.domains.push(new domain_1.DomainValidator(domainConfig, this.config.getServerType(cleanDomain)));
                 }
             }

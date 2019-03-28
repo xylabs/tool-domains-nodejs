@@ -31,7 +31,13 @@ class Dns {
     static resolve(domain, type) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield this.client.resolve(domain, type);
-            return result.answers;
+            const items = [];
+            for (const answer of result.answers) {
+                if (answer.type === type) {
+                    items.push(answer);
+                }
+            }
+            return items;
         });
     }
     static resolve4(name) {

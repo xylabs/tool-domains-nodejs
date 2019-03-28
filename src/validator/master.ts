@@ -21,10 +21,10 @@ export class MasterValidator extends Validator<MasterConfig> {
     let completedDomains = 0
     for (const domain of Object.values(this.domains)) {
       try {
-        await domain.validate()
+        const errors = await domain.validate()
         completedDomains++
         console.log(`Domain:[${completedDomains}/${this.domains.length}]: ${domain.name} [${domain.type}]`)
-        this.errorCount += await domain.validate()
+        this.errorCount += errors
       } catch (ex) {
         this.addError("MasterValidator.validate", `Unexpected Error: ${ex.message}`)
         console.error(chalk.red(ex.message))
@@ -58,6 +58,17 @@ export class MasterValidator extends Validator<MasterConfig> {
         // remove trailing '.'
         const cleanDomain = domain.slice(0, domain.length - 1)
         const domainConfig = this.config.getDomainConfig(cleanDomain)
+
+        if (this.config.aws.filter) {
+          if (!domainConfig.name.match(this.config.aws.filter)) {
+            continue
+          }
+        }
+
+        if (!domainConfig.enabled) {
+          continue
+        }
+
         this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(cleanDomain)))
       }
     } catch (ex) {

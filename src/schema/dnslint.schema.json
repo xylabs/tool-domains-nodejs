@@ -10,7 +10,8 @@
       "title": "Source",
       "type": "object",
       "properties": {
-        "enabled": {"type": "boolean"}
+        "enabled": {"type": "boolean"},
+        "filter": {"type": "string"}
       }
     },
     "value": {
