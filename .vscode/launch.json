@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}/src/cli.ts",
-      "args": ["-d", "zendesk2._domainkey.zendesk.com"],
+      "args": ["-d", "geohackers.xyo.network"],
       "preLaunchTask": "tsc: build - tsconfig.json",
       "outFiles": [
         "${workspaceFolder}/dist/**/*.js"

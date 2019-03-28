@@ -341,7 +341,7 @@
                     "values": [
                         {
                             "disposition": "required",
-                            "filter": "^v=DKIM1; k=rsa; "
+                            "filter": "^v=DKIM1; "
                         }
                     ]
                 }

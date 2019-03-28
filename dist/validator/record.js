@@ -82,7 +82,7 @@ class RecordValidator extends validator_1.Validator {
                             }
                         }
                     }
-                    const validator = new value_1.ValueValidator(values, dataArray);
+                    const validator = new value_1.ValueValidator(values, dataArray, `${this.domain}:${this.type}`);
                     result.push(validator);
                     yield validator.validate();
                     this.errorCount += validator.errorCount;

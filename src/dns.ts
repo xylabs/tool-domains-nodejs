@@ -19,7 +19,13 @@ export class Dns {
 
   public static async resolve(domain: string, type: string): Promise < any[] > {
     const result = await this.client.resolve(domain, type)
-    return result.answers
+    const items = []
+    for (const answer of result.answers) {
+      if (answer.type === type) {
+        items.push(answer)
+      }
+    }
+    return items
   }
 
   public static async resolve4(name: string): Promise < string[] > {

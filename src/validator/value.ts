@@ -5,10 +5,12 @@ import chalk from "chalk"
 export class ValueValidator extends Validator<ValueConfig> {
 
   public data: string[] | object[] | number[]
+  private context: string
 
-  constructor(config: ValueConfig, data: string[] | object[] | number[]) {
+  constructor(config: ValueConfig, data: string[] | object[] | number[], context?: string) {
     super(config)
     this.data = data
+    this.context = context || "ValueValidator"
   }
 
   public async validate() {
@@ -18,7 +20,8 @@ export class ValueValidator extends Validator<ValueConfig> {
           return this.validateRequired()
       }
     }
-    console.log(chalk.gray(`Value Check Passed: ${this.config.name || this.config.filter}:${this.data}`))
+    console.log(chalk.gray(
+      `Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`))
     return super.validate()
   }
 
@@ -31,9 +34,9 @@ export class ValueValidator extends Validator<ValueConfig> {
         }
       }
       if (matchesFound > 0) {
-        console.log(chalk.gray(`Required Value Check Passed: ${this.config}`))
+        console.log(chalk.gray(`Required Value Check Passed [${this.context}]: ${this.config}`))
       } else {
-        this.addError("value", `Required value missing: ${this.config}:${JSON.stringify(this.data)}`)
+        this.addError(this.context, `Required value missing: ${this.config}:${JSON.stringify(this.data)}`)
       }
     }
     return super.validate()
@@ -57,8 +60,9 @@ export class ValueValidator extends Validator<ValueConfig> {
         matched = true
       }
     } else {
-      this.addError("validate", `Value type mismatch [${ typeof data } should be ${ typeof filter }]`)
-      this.addError("validate", `Value type mismatch [${ JSON.stringify(data) } should be ${ JSON.stringify(filter) }]`)
+      this.addError(this.context, `Value type mismatch [${ typeof data } should be ${ typeof filter }]`)
+      this.addError(
+        this.context, `Value type mismatch [${ JSON.stringify(data) } should be ${ JSON.stringify(filter) }]`)
     }
     return matched
   }

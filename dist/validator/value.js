@@ -14,9 +14,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const validator_1 = require("./validator");
 const chalk_1 = __importDefault(require("chalk"));
 class ValueValidator extends validator_1.Validator {
-    constructor(config, data) {
+    constructor(config, data, context) {
         super(config);
         this.data = data;
+        this.context = context || "ValueValidator";
     }
     validate() {
         const _super = Object.create(null, {
@@ -29,7 +30,7 @@ class ValueValidator extends validator_1.Validator {
                         return this.validateRequired();
                 }
             }
-            console.log(chalk_1.default.gray(`Value Check Passed: ${this.config.name || this.config.filter}:${this.data}`));
+            console.log(chalk_1.default.gray(`Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`));
             return _super.validate.call(this);
         });
     }
@@ -42,10 +43,10 @@ class ValueValidator extends validator_1.Validator {
                 }
             }
             if (matchesFound > 0) {
-                console.log(chalk_1.default.gray(`Required Value Check Passed: ${this.config}`));
+                console.log(chalk_1.default.gray(`Required Value Check Passed [${this.context}]: ${this.config}`));
             }
             else {
-                this.addError("value", `Required value missing: ${this.config}:${JSON.stringify(this.data)}`);
+                this.addError(this.context, `Required value missing: ${this.config}:${JSON.stringify(this.data)}`);
             }
         }
         return super.validate();
@@ -71,8 +72,8 @@ class ValueValidator extends validator_1.Validator {
             }
         }
         else {
-            this.addError("validate", `Value type mismatch [${typeof data} should be ${typeof filter}]`);
-            this.addError("validate", `Value type mismatch [${JSON.stringify(data)} should be ${JSON.stringify(filter)}]`);
+            this.addError(this.context, `Value type mismatch [${typeof data} should be ${typeof filter}]`);
+            this.addError(this.context, `Value type mismatch [${JSON.stringify(data)} should be ${JSON.stringify(filter)}]`);
         }
         return matched;
     }

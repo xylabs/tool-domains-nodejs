@@ -70,7 +70,7 @@ export class RecordValidator extends Validator<RecordConfig> {
             }
           }
         }
-        const validator = new ValueValidator(values, dataArray)
+        const validator = new ValueValidator(values, dataArray, `${this.domain}:${this.type}`)
         result.push(validator)
         await validator.validate()
         this.errorCount += validator.errorCount
