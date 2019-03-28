@@ -21,7 +21,8 @@ class DomainConfig extends records_1.RecordsConfig {
             srcObj = JSON.parse(source);
         }
         assert_1.default(typeof srcObj.name === "string");
-        let domain = new DomainConfig(srcObj.name, type);
+        assert_1.default(type);
+        let domain = new DomainConfig(srcObj.name, type || "unknown");
         domain = lodash_1.default.merge(domain, srcObj);
         domain.records = new configs_1.Configs();
         if (srcObj.records) {

@@ -66,6 +66,7 @@ class XyDomainScan {
     start(params) {
         return __awaiter(this, void 0, void 0, function* () {
             this.config = yield this.loadConfig();
+            this.preflight = params.preflight;
             for (const domain of this.config.domains.values()) {
                 domain.serverType = this.config.getServerType(domain.name);
             }
@@ -74,8 +75,17 @@ class XyDomainScan {
                 console.log(chalk_1.default.yellow(`Configuring Single Domain: ${params.singleDomain}`));
                 const singleDomainConfig = this.config.getDomainConfig(params.singleDomain);
                 this.config.domains.set(singleDomainConfig.name, singleDomainConfig);
+                // since we are only doing one, remove the rest
+                for (const domain of this.config.domains.values()) {
+                    if (domain.name !== "default" && domain.name !== params.singleDomain) {
+                        this.config.domains.delete(domain.key);
+                    }
+                }
                 this.config.aws = new aws_2.AWSConfig("aws");
                 this.config.aws.enabled = false;
+            }
+            if (this.preflight) {
+                yield this.saveToFile(this.preflight, this.config);
             }
             this.validator = new master_1.MasterValidator(this.config);
             console.log(`Domains Found: ${this.config.domains.size}`);
@@ -84,7 +94,7 @@ class XyDomainScan {
                 this.saveToAws(params.bucket);
             }
             console.log(`Saving to File: ${params.output}`);
-            this.saveToFile(params.output);
+            this.saveToFile(params.output, this.validator);
             if (this.validator.errorCount === 0) {
                 console.log(chalk_1.default.green("Congratulations, all tests passed!"));
             }
@@ -114,14 +124,14 @@ class XyDomainScan {
             }
         });
     }
-    saveToFile(filename) {
+    saveToFile(filename, obj) {
         return __awaiter(this, void 0, void 0, function* () {
             fs_1.default.open(filename, 'w', (err, fd) => {
                 if (err) {
                     console.log(`failed to open file: ${err}`);
                 }
                 else {
-                    fs_1.default.write(fd, JSON.stringify(this.validator), (errWrite) => {
+                    fs_1.default.write(fd, JSON.stringify(obj), (errWrite) => {
                         if (errWrite) {
                             console.log(`failed to write file: ${errWrite}`);
                         }

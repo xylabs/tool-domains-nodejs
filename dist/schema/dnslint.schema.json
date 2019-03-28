@@ -13,6 +13,17 @@
                 "enabled": { "type": "boolean" }
             }
         },
+        "value": {
+            "$id": "#definitions/value",
+            "additionalProperties": false,
+            "title": "Record",
+            "type": "object",
+            "properties": {
+                "name": { "type": "string" },
+                "disposition": { "type": "string", "enum": ["required", "optional", "disallowed"] },
+                "filter": { "type": ["string", "object"] }
+            }
+        },
         "record": {
             "$id": "#definitions/record",
             "additionalProperties": false,
@@ -23,32 +34,9 @@
                 "enabled": { "type": "boolean" },
                 "timeout": { "type": "number" },
                 "html": { "type": "boolean" },
-                "allowed": {
-                    "type": "array",
-                    "items": {}
-                },
                 "values": {
-                    "type": "object",
-                    "properties": {
-                        "optional": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "required": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "notallowed": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    }
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/value" }
                 },
                 "addresses": {
                     "type": "object",
@@ -74,9 +62,8 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "required": { "type": "boolean" },
                 "name": { "type": "string" },
-                "value": { "type": "string" }
+                "value": { "$ref": "#/definitions/value" }
             }
         },
         "webcall": {

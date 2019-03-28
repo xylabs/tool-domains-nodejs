@@ -6,15 +6,16 @@ import { RecordsConfig } from "./records"
 
 export class DomainConfig extends RecordsConfig {
 
-  public static parse(source: any, type: string) {
+  public static parse(source: any, type?: string) {
     let srcObj = source
     if (typeof source === "string") {
       srcObj = JSON.parse(source)
     }
 
     assert(typeof srcObj.name === "string")
+    assert(type)
 
-    let domain = new DomainConfig(srcObj.name, type)
+    let domain = new DomainConfig(srcObj.name, type || "unknown")
     domain = _.merge(domain, srcObj)
     domain.records = new Configs<RecordConfig>()
     if (srcObj.records) {

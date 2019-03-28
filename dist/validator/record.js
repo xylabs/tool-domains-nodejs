@@ -15,11 +15,13 @@ const validator_1 = require("./validator");
 const dns_1 = require("../dns");
 const chalk_1 = __importDefault(require("chalk"));
 const webcall_1 = require("./webcall");
+const value_1 = require("./value");
 class RecordValidator extends validator_1.Validator {
     constructor(config, domain) {
         super(config);
         this.records = [];
         this.webcalls = [];
+        this.values = [];
         this.domain = domain;
         this.type = config.type;
     }
@@ -31,6 +33,7 @@ class RecordValidator extends validator_1.Validator {
             if (this.type.split('|').length === 1) {
                 yield this.resolve();
                 this.webcalls = yield this.validateWebcalls();
+                this.values = yield this.validateValues();
                 if (this.config.reverseDNS) {
                     if (((this.config.reverseDNS.enabled === undefined) && true) || this.config.reverseDNS.enabled) {
                         this.reverseDns = yield this.reverseLookup(this.config.reverseDNS.value);
@@ -46,11 +49,33 @@ class RecordValidator extends validator_1.Validator {
             if (this.config.webcalls) {
                 for (const webcall of this.config.webcalls.values()) {
                     for (const record of this.records) {
-                        const validator = new webcall_1.WebcallValidator(webcall, record, this.domain);
-                        result.push(validator);
-                        yield validator.validate();
-                        this.errorCount += validator.errorCount;
+                        if (record.data) {
+                            const validator = new webcall_1.WebcallValidator(webcall, record.data, this.domain);
+                            result.push(validator);
+                            yield validator.validate();
+                            this.errorCount += validator.errorCount;
+                        }
                     }
+                }
+            }
+            return result;
+        });
+    }
+    validateValues() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = [];
+            if (this.config.values) {
+                for (const values of this.config.values.values()) {
+                    const dataArray = [];
+                    for (const record of this.records) {
+                        if (record.data) {
+                            dataArray.push(record.data);
+                        }
+                    }
+                    const validator = new value_1.ValueValidator(values, dataArray);
+                    result.push(validator);
+                    yield validator.validate();
+                    this.errorCount += validator.errorCount;
                 }
             }
             return result;
@@ -61,28 +86,30 @@ class RecordValidator extends validator_1.Validator {
             const result = [];
             try {
                 for (const record of this.records) {
-                    let domains;
-                    let valid = true;
-                    try {
-                        domains = yield dns_1.Dns.reverse(record);
-                    }
-                    catch (ex) {
-                        this.addError("reverse", ex.message);
-                        valid = false;
-                    }
-                    if (value && domains) {
-                        for (const domain of domains) {
-                            if (!domain.match(value)) {
-                                valid = false;
-                                this.addError("reverse", `Unexpected Domain: ${domain} [Expected: ${value}]`);
+                    if (record.data) {
+                        let domains;
+                        let valid = true;
+                        try {
+                            domains = yield dns_1.Dns.reverse(record.data);
+                        }
+                        catch (ex) {
+                            this.addError("reverse", ex.message);
+                            valid = false;
+                        }
+                        if (value && domains) {
+                            for (const domain of domains) {
+                                if (!domain.match(value)) {
+                                    valid = false;
+                                    this.addError("reverse", `Unexpected Domain: ${domain} [Expected: ${value}]`);
+                                }
                             }
                         }
+                        result.push({
+                            ip: record,
+                            domains,
+                            valid
+                        });
                     }
-                    result.push({
-                        ip: record,
-                        domains,
-                        valid
-                    });
                 }
             }
             catch (ex) {

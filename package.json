@@ -1,6 +1,6 @@
 {
   "name": "dnslint",
-  "version": "1.1.70",
+  "version": "1.1.71",
   "description": "XYO Internal Domain Tool",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,6 +29,7 @@
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
     "crawler": "^1.2.0",
+    "dns-packet": "^5.2.1",
     "dotenv-expand": "^5.1.0",
     "html-validator": "^4.0.0",
     "is-circular": "^1.0.2",

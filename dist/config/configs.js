@@ -15,6 +15,13 @@ class Configs extends Map {
         }
         return this;
     }
+    toJSON() {
+        const obj = [];
+        for (const item of this.values()) {
+            obj.push(item);
+        }
+        return obj;
+    }
     // we pass in a new object to prevent writing to authority objects
     getConfig(key, newObject) {
         const defaultItem = this.get("default");

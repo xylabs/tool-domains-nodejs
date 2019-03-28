@@ -61,6 +61,9 @@ export class WebcallValidator extends Validator<WebcallConfig> {
       this.addError("validate", ex.message)
       console.error(ex.stack)
     }
+    if (this.errorCount === 0) {
+      console.log(chalk.gray(`Webcall Check Passed: ${this.address} [${this.host}]`))
+    }
     return super.validate()
   }
 
@@ -106,7 +109,6 @@ export class WebcallValidator extends Validator<WebcallConfig> {
   }
 
   private async get(protocol: string, address: string) {
-    console.log(chalk.gray(`get: ${protocol}:${address}:${this.host}`))
     const timeout = this.config.timeout || 1000
     let response: any
     try {

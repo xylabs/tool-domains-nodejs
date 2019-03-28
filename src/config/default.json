@@ -30,8 +30,10 @@
               "callTimeMax": 200,
               "headers": [
                 {
-                  "required": true,
-                  "name": "location"
+                  "name": "location",
+                  "value": {
+                    "disposition": "required"
+                  }
                 }
               ]
             },
@@ -41,38 +43,45 @@
               "callTimeMax": 200,
               "headers": [
                 {
-                  "required": true,
-                  "name": "content-type"
+                  "name": "content-type",
+                  "value": {
+                    "disposition": "required"
+                  }
                 },
                 {
-                  "required": false,
-                  "name": "content-encoding",
-                  "value": "gzip"
-                },
-                {
-                  "required": true,
                   "name": "content-security-policy",
-                  "value": "object-src 'none'"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "object-src 'none'"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-content-type-options",
-                  "value": "nosniff"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "nosniff"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-frame-options",
-                  "value": "DENY"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "DENY"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-xss-protection",
-                  "value": "1; mode=block"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "1; mode=block"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "referrer-policy",
-                  "value": "same-origin"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "same-origin"
+                  }
                 }
               ]
             }
@@ -88,8 +97,10 @@
               "statusCode": 301,
               "headers": [
                 {
-                  "required": true,
-                  "name": "location"
+                  "name": "location",
+                  "value": {
+                    "disposition": "required"
+                  }
                 }
               ]
             },
@@ -98,35 +109,89 @@
               "statusCode": 200,
               "headers": [
                 {
-                  "required": true,
-                  "name": "content-type"
+                  "name": "content-type",
+                  "value": {
+                    "disposition": "required"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "content-security-policy",
-                  "value": "object-src 'none'"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "object-src 'none'"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-content-type-options",
-                  "value": "nosniff"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "nosniff"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-frame-options",
-                  "value": "DENY"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "DENY"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-xss-protection",
-                  "value": "1; mode=block"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "1; mode=block"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "referrer-policy",
-                  "value": "same-origin"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "same-origin"
+                  }
                 }
               ]
+            }
+          ]
+        },
+        {
+          "type": "CAA",
+          "enabled": true,
+          "values": [
+            {
+              "disposition": "required",
+              "filter": {
+                "flags": 0,
+                "tag": "^issue$",
+                "value": "^amazon.com$",
+                "issuerCritical": false
+              }
+            },
+            {
+              "disposition": "required",
+              "filter": {
+                "flags": 0,
+                "tag": "^issue$",
+                "value": "^amazonaws.com$",
+                "issuerCritical": false
+              }
+            },
+            {
+              "disposition": "required",
+              "filter": {
+                "flags": 0,
+                "tag": "^issue$",
+                "value": "^amazontrust.com$",
+                "issuerCritical": false
+              }
+            },
+            {
+              "disposition": "required",
+              "filter": {
+                "flags": 0,
+                "tag": "^issue$",
+                "value": "^awstrust.com$",
+                "issuerCritical": false
+              }
             }
           ]
         },
@@ -140,8 +205,10 @@
               "statusCode": 301,
               "headers": [
                 {
-                  "required": true,
-                  "name": "location"
+                  "name": "location",
+                  "value": {
+                    "disposition": "required"
+                  }
                 }
               ]
             },
@@ -150,33 +217,45 @@
               "statusCode": 200,
               "headers": [
                 {
-                  "required": true,
-                  "name": "content-type"
+                  "name": "content-type",
+                  "value": {
+                    "disposition": "required"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "content-security-policy",
-                  "value": "object-src 'none'"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "object-src 'none'"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-content-type-options",
-                  "value": "nosniff"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "nosniff"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-frame-options",
-                  "value": "DENY"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "DENY"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-xss-protection",
-                  "value": "1; mode=block"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "1; mode=block"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "referrer-policy",
-                  "value": "same-origin"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "same-origin"
+                  }
                 }
               ]
             }
@@ -202,20 +281,16 @@
       ],
       "records": [
         {
-          "type": "A|CNAME",
-          "allowed": [1]
+          "type": "A|CNAME"
         },
         {
-          "type": "A",
-          "allowed": [0, 4]
+          "type": "A"
         },
         {
-          "type": "CNAME",
-          "allowed": [0, 1]
+          "type": "CNAME"
         },
         {
-          "type": "TXT",
-          "allowed": [0, 1, 2, 3]
+          "type": "TXT"
         }
       ]
     },
@@ -269,12 +344,12 @@
         },
         {
           "type": "TXT",
-          "allowed": [1],
-          "values": {
-            "required": [
-              "^v=DKIM1; k=rsa; "
-            ]
-          }
+          "values": [
+            {
+              "disposition": "required",
+              "filter": "^v=DKIM1; k=rsa; "
+            }
+          ]
         }
       ]
     },
@@ -286,12 +361,12 @@
       "records": [
         {
           "type": "TXT",
-          "allowed": [1],
-          "values": {
-            "required": [
-              "^v=DMARC1; "
-            ]
-          }
+          "values": [
+            {
+              "disposition": "required",
+              "filter": "^v=DMARC1; "
+            }
+          ]
         }
       ]
     },
@@ -303,31 +378,24 @@
       ],
       "records": [
         {
-          "type": "A|CNAME",
-          "allowed": [1]
+          "type": "A|CNAME"
         },
         {
-          "type": "A",
-          "allowed": [0, 1]
+          "type": "A"
         },
         {
-          "type": "CNAME",
-          "allowed": [0, 1]
+          "type": "CNAME"
         },
         {
           "type": "MX",
-          "allowed": [0, 5],
-          "values": {
-            "optional": [
-              "google"
-            ],
-            "required": [
-              "google"
-            ],
-            "notallowed": [
-              "ms"
-            ]
-          }
+          "values": [{
+              "disposition": "required",
+              "filter": {
+                "preference": 5,
+                "exchange": "alt1.aspmx.l.google.com"
+              }
+            }
+          ]
         },
         {
           "type": "TXT"

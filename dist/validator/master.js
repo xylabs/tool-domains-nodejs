@@ -53,7 +53,6 @@ class MasterValidator extends validator_1.Validator {
                 if (domain.name !== "default") {
                     console.log(chalk_1.default.yellow(`Adding Domain from Config: ${domain.name}`));
                     const domainConfig = this.config.getDomainConfig(domain.name);
-                    console.log(`Adding Config: ${JSON.stringify(domainConfig)}`);
                     this.domains.push(new domain_1.DomainValidator(domainConfig, this.config.getServerType(domainConfig.name)));
                 }
             }

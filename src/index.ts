@@ -15,6 +15,7 @@ export class XyDomainScan {
   private aws = new AWS()
   private config = new MasterConfig("master")
   private validator = new MasterValidator(new MasterConfig("master"))
+  private preflight?: string
 
   public async loadConfig(filename?: string) {
     try {
@@ -51,8 +52,11 @@ export class XyDomainScan {
     }
   }
 
-  public async start(params: {output: string, singleDomain?: string, bucket?: string, config?: MasterConfig}) {
+  public async start(
+    params: {output: string, singleDomain?: string, bucket?: string, config?: MasterConfig, preflight?: string}
+  ) {
     this.config = await this.loadConfig()
+    this.preflight = params.preflight
 
     for (const domain of this.config.domains.values()) {
       domain.serverType = this.config.getServerType(domain.name)
@@ -78,6 +82,10 @@ export class XyDomainScan {
       this.config.aws.enabled = false
     }
 
+    if (this.preflight) {
+      await this.saveToFile(this.preflight, this.config)
+    }
+
     this.validator = new MasterValidator(this.config)
 
     console.log(`Domains Found: ${this.config.domains.size}`)
@@ -89,7 +97,7 @@ export class XyDomainScan {
     }
 
     console.log(`Saving to File: ${params.output}`)
-    this.saveToFile(params.output)
+    this.saveToFile(params.output, this.validator)
     if (this.validator.errorCount === 0) {
       console.log(chalk.green("Congratulations, all tests passed!"))
     } else {
@@ -118,12 +126,12 @@ export class XyDomainScan {
     }
   }
 
-  private async saveToFile(filename: string) {
+  private async saveToFile(filename: string, obj: any) {
     fs.open(filename, 'w', (err, fd) => {
       if (err) {
         console.log(`failed to open file: ${err}`)
       } else {
-        fs.write(fd, JSON.stringify(this.validator), (errWrite) => {
+        fs.write(fd, JSON.stringify(obj), (errWrite) => {
           if (errWrite) {
             console.log(`failed to write file: ${errWrite}`)
           }

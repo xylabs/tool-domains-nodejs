@@ -42,7 +42,6 @@ export class MasterValidator extends Validator<MasterConfig> {
         if (domain.name !== "default") {
           console.log(chalk.yellow(`Adding Domain from Config: ${domain.name}`))
           const domainConfig = this.config.getDomainConfig(domain.name)
-          console.log(`Adding Config: ${JSON.stringify(domainConfig)}`)
           this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(domainConfig.name)))
         }
       }
