@@ -29,8 +29,7 @@ export class ServerConfig extends RecordsConfig {
 
   public name: string
   public default?: boolean
-  public include?: string[]
-  public exclude?: string[]
+  public filters?: string[]
   public crawl?: boolean
 
   constructor(name: string) {

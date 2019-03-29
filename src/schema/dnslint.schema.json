@@ -14,6 +14,10 @@
         "filter": {"type": "string"}
       }
     },
+    "disposition": {
+        "type": "string",
+        "enum": ["required", "optional", "disallowed"]
+    },
     "value": {
       "$id": "#definitions/value",
       "additionalProperties": false,
@@ -21,7 +25,7 @@
       "type": "object",
       "properties": {
         "name": {"type": "string"},
-        "disposition": {"type": "string", "enum": ["required", "optional", "disallowed"]},
+        "disposition": {"$ref": "#/definitions/disposition"},
         "filter": {"type": ["string", "object"]}
       }
     },
@@ -48,13 +52,7 @@
         },
         "webcalls": {
           "type": "array",
-          "items": {"$ref": "#/definitions/webcall"}
-        },
-        "reverseDNS": {
-          "type": "object",
-          "properties": {
-            "enabled": {"type": "boolean"}
-          }
+          "items": {"$ref": "#/definitions/validation/webcall"}
         }
       }
     },
@@ -67,20 +65,88 @@
         "value": {"$ref": "#/definitions/value"}
       }
     },
-    "webcall": {
-      "$id": "#definitions/webcall",
-      "type": "object",
-      "additionalProperties": false,
+    "validations": {
+      "$id": "#definitions/validations",
       "properties": {
         "enabled": {"type": "boolean"},
-        "statusCode": {"type": "number"},
-        "httpVersion": {"type": "string"},
-        "callTimeMax": {"type": "number"},
-        "protocol": {"type": "string"},
-        "port": {"type": "number"},
-        "headers": {
-          "type": "array",
-          "items": {"$ref": "#/definitions/header"}
+        "crawl": {"type": "array", "items": {"$ref": "#/definitions/validation/crawl"}},
+        "favicon": {"type": "array", "items": {"$ref": "#/definitions/validation/favicon"}},
+        "robots": {"type": "array", "items": {"$ref": "#/definitions/validation/robots"}},
+        "seo": {"type": "array", "items": {"$ref": "#/definitions/validation/seo"}},
+        "sitemap": {"type": "array", "items": {"$ref": "#/definitions/validation/sitemap"}},
+        "social": {"type": "array", "items": {"$ref": "#/definitions/validation/social"}}
+      }
+    },
+    "validation": {
+      "crawl": {
+        "$id": "#definitions/validation/crawl",
+        "properties": {
+          "enabled": {"type": "boolean"}
+        }
+      },
+      "robots": {
+        "$id": "#definitions/validation/robots",
+        "properties": {
+          "enabled": {"type": "boolean"}
+        }
+      },
+      "favicon": {
+        "$id": "#definitions/validation/favicon",
+        "properties": {
+          "enabled": {"type": "boolean"}
+        }
+      },
+      "sitemap": {
+        "$id": "#definitions/validation/sitemap",
+        "properties": {
+          "enabled": {"type": "boolean"},
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": [
+                {
+                  "name": {"type": "string"},
+                  "dispositioon": {"$ref": "#/definitions/disposition"}
+                }
+              ]
+            }
+          }
+        }
+      },
+      "seo": {
+        "$id": "#definitions/validation/seo",
+        "properties": {
+          "enabled": {"type": "boolean"}
+        }
+      },
+      "social": {
+        "$id": "#definitions/validation/social",
+        "properties": {
+          "enabled": {"type": "boolean"}
+        }
+      },
+      "reverseDns": {
+        "$id": "#definitions/validation/reverseDns",
+        "properties": {
+          "enabled": {"type": "boolean"}
+        }
+      },
+      "webcall": {
+        "$id": "#definitions/validation/webcall",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {"type": "boolean"},
+          "statusCode": {"type": "number"},
+          "httpVersion": {"type": "string"},
+          "callTimeMax": {"type": "number"},
+          "protocol": {"type": "string"},
+          "port": {"type": "number"},
+          "headers": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/header"}
+          }
         }
       }
     },
@@ -91,10 +157,7 @@
       "properties": {
         "name": {"type": "string"},
         "enabled": {"type": "boolean"},
-        "crawl": {"type": "boolean"},
-        "reverseDNS": {
-          "enabled": "boolean"
-        },
+        "validations": {"$ref": "#/definitions/validations"},
         "type": {"type": "string"},
         "records": {
           "type": "array",
@@ -111,8 +174,8 @@
       "properties": {
         "name": {"type": "string"},
         "default": {"type": "boolean"},
-        "crawl": {"type": "boolean"},
-        "include": {
+        "validations": {"$ref": "#/definitions/validations"},
+        "filters": {
           "type": "array",
           "items": {"type": "string"}
         },

@@ -7,6 +7,7 @@ import { ValueValidator } from "./value"
 
 export class WebcallValidator extends Validator<WebcallConfig> {
 
+  public protocol: string
   public address: string
   public host: string
   public headers?: any[]
@@ -16,6 +17,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
 
   constructor(config: WebcallConfig, address: string, host: string) {
     super(config)
+    this.protocol = this.config.protocol
     this.address = address
     this.host = host
   }
@@ -39,7 +41,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         }
 
         if (this.headers && this.config.headers) {
-          await this.validateHeaders()
+          this.validations.concat(await this.validateHeaders())
         }
 
         const expectedCode = this.config.statusCode || 200
@@ -51,7 +53,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         } else {
           if (this.config.html) {
             if (this.statusCode === 200) {
-              await this.validateHtml(response.data)
+              this.validations.concat(await this.validateHtml(response.data))
             }
           }
         }
@@ -70,7 +72,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
 
   protected async validateHeaders() {
     const result: ValueValidator[] = []
-    let headerErrorCount = 0
+    let errorCount = 0
     if (this.config.headers && this.headers) {
       for (const value of this.config.headers.values()) {
         const dataArray: string[] | object[] | number[] = []
@@ -81,14 +83,13 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         const validator = new ValueValidator(value, dataArray)
         result.push(validator)
         await validator.validate()
-        headerErrorCount += validator.errorCount
-        this.errorCount += validator.errorCount
+        errorCount += validator.errorCount
       }
     }
-    if (headerErrorCount === 0) {
+    if (errorCount === 0) {
       console.log(chalk.green('validateHeaders', `Passed`))
     } else {
-      console.log(chalk.red('validateHeaders', `Errors: ${headerErrorCount}`))
+      console.log(chalk.red('validateHeaders', `Errors: ${errorCount}`))
     }
     return result
   }

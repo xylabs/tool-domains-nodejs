@@ -19,6 +19,7 @@ const value_1 = require("./value");
 class WebcallValidator extends validator_1.Validator {
     constructor(config, address, host) {
         super(config);
+        this.protocol = this.config.protocol;
         this.address = address;
         this.host = host;
     }
@@ -41,7 +42,7 @@ class WebcallValidator extends validator_1.Validator {
                         }
                     }
                     if (this.headers && this.config.headers) {
-                        yield this.validateHeaders();
+                        this.validations.concat(yield this.validateHeaders());
                     }
                     const expectedCode = this.config.statusCode || 200;
                     if (this.statusCode !== expectedCode) {
@@ -50,7 +51,7 @@ class WebcallValidator extends validator_1.Validator {
                     else {
                         if (this.config.html) {
                             if (this.statusCode === 200) {
-                                yield this.validateHtml(response.data);
+                                this.validations.concat(yield this.validateHtml(response.data));
                             }
                         }
                     }
@@ -72,7 +73,7 @@ class WebcallValidator extends validator_1.Validator {
     validateHeaders() {
         return __awaiter(this, void 0, void 0, function* () {
             const result = [];
-            let headerErrorCount = 0;
+            let errorCount = 0;
             if (this.config.headers && this.headers) {
                 for (const value of this.config.headers.values()) {
                     const dataArray = [];
@@ -83,15 +84,14 @@ class WebcallValidator extends validator_1.Validator {
                     const validator = new value_1.ValueValidator(value, dataArray);
                     result.push(validator);
                     yield validator.validate();
-                    headerErrorCount += validator.errorCount;
-                    this.errorCount += validator.errorCount;
+                    errorCount += validator.errorCount;
                 }
             }
-            if (headerErrorCount === 0) {
+            if (errorCount === 0) {
                 console.log(chalk_1.default.green('validateHeaders', `Passed`));
             }
             else {
-                console.log(chalk_1.default.red('validateHeaders', `Errors: ${headerErrorCount}`));
+                console.log(chalk_1.default.red('validateHeaders', `Errors: ${errorCount}`));
             }
             return result;
         });

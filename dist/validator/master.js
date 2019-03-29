@@ -32,10 +32,10 @@ class MasterValidator extends validator_1.Validator {
             let completedDomains = 0;
             for (const domain of Object.values(this.domains)) {
                 try {
-                    yield domain.validate();
+                    const errors = yield domain.validate();
                     completedDomains++;
                     console.log(`Domain:[${completedDomains}/${this.domains.length}]: ${domain.name} [${domain.type}]`);
-                    this.errorCount += yield domain.validate();
+                    this.errorCount += errors;
                 }
                 catch (ex) {
                     this.addError("MasterValidator.validate", `Unexpected Error: ${ex.message}`);
@@ -74,7 +74,7 @@ class MasterValidator extends validator_1.Validator {
                             continue;
                         }
                     }
-                    if (!domainConfig.enabled) {
+                    if (!domainConfig.isEnabled()) {
                         continue;
                     }
                     this.domains.push(new domain_1.DomainValidator(domainConfig, this.config.getServerType(cleanDomain)));

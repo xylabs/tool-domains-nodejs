@@ -16,6 +16,7 @@ const error_1 = require("./error");
 const lodash_1 = __importDefault(require("lodash"));
 class Validator {
     constructor(config) {
+        this.validations = [];
         this.errorCount = 0;
         this.config = config;
     }

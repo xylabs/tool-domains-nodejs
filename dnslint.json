@@ -1,8 +1,7 @@
 {
   "$schema": "./src/schema/dnslint.schema.json#",
   "aws": {
-    "enabled": true,
-    "filter": "xyfindit.com$"
+    "enabled": true
   },
   "domains": [
     {

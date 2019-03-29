@@ -7,21 +7,17 @@
         {
             "name": "default",
             "enabled": true,
+            "validations": [
+                {}
+            ],
             "records": [
                 {
                     "type": "default",
-                    "timeout": 1000,
-                    "reverseDNS": {
-                        "enabled": false
-                    }
+                    "timeout": 1000
                 },
                 {
                     "type": "A",
                     "enabled": true,
-                    "reverseDNS": {
-                        "enabled": true,
-                        "value": ".r.cloudfront.net$"
-                    },
                     "webcalls": [
                         {
                             "protocol": "http",
@@ -272,7 +268,7 @@
     "servers": [
         {
             "name": "api",
-            "include": [
+            "filter": [
                 "^api\\.",
                 "^devapi\\."
             ],
@@ -293,7 +289,7 @@
         },
         {
             "name": "domainkey",
-            "include": [
+            "filter": [
                 "._domainkey."
             ],
             "records": [
@@ -349,7 +345,7 @@
         },
         {
             "name": "dmarc",
-            "include": [
+            "filter": [
                 "^_dmarc."
             ],
             "records": [
@@ -367,9 +363,104 @@
         {
             "name": "website",
             "default": true,
-            "include": [
+            "filters": [
                 "^www\\."
             ],
+            "validations": {
+                "crawl": [
+                    {
+                        "enabled": true
+                    }
+                ],
+                "favicon": [
+                    {
+                        "enabled": true,
+                        "files": [
+                            {
+                                "disposition": "required",
+                                "path": "/favicon.ico"
+                            }
+                        ]
+                    }
+                ],
+                "robots": [
+                    {
+                        "enabled": true,
+                        "files": [
+                            {
+                                "disposition": "required",
+                                "path": "/robots.txt"
+                            }
+                        ]
+                    }
+                ],
+                "scripts": [
+                    {
+                        "enabled": true,
+                        "tags": [
+                            {
+                                "disposition": "required",
+                                "tags": [
+                                    {
+                                        "disposition": "required",
+                                        "path": "/html/head/script",
+                                        "filter": ""
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "seo": [
+                    {
+                        "enabled": true
+                    }
+                ],
+                "sitmap": [
+                    {
+                        "enabled": true,
+                        "files": [
+                            {
+                                "disposition": "required",
+                                "path": "/sitemap.xml"
+                            }
+                        ]
+                    }
+                ],
+                "social": [
+                    {
+                        "enabled": true,
+                        "files": [
+                            {
+                                "disposition": "required",
+                                "path": "/",
+                                "tags": [
+                                    {
+                                        "path": "/html/head/meta[@property='og:url']",
+                                        "disposition": "required"
+                                    },
+                                    {
+                                        "path": "/html/head/meta[@property='og:title']",
+                                        "disposition": "required"
+                                    },
+                                    {
+                                        "path": "/html/head/meta[@property='og:description']",
+                                        "disposition": "required"
+                                    },
+                                    {
+                                        "path": "/html/head/meta[@property='og:image']",
+                                        "disposition": "required"
+                                    },
+                                    {
+                                        "path": "/html/head/meta[@property='fb:app_id']",
+                                        "disposition": "required"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
             "records": [
                 {
                     "type": "A|CNAME"

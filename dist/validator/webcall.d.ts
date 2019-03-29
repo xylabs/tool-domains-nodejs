@@ -2,6 +2,7 @@ import { Validator } from "./validator";
 import { WebcallConfig } from "../config/webcall";
 import { ValueValidator } from "./value";
 export declare class WebcallValidator extends Validator<WebcallConfig> {
+    protocol: string;
     address: string;
     host: string;
     headers?: any[];
