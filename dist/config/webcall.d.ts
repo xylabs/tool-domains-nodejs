@@ -1,13 +1,12 @@
 import { Config } from "./config";
 export declare class WebcallConfig extends Config {
-    static parse(source: any, host: string): WebcallConfig;
+    static parse(source: any): WebcallConfig;
     protocol: string;
     port?: number;
-    host?: string;
     timeout?: number;
     html?: boolean;
     callTimeMax?: number;
     headers?: any[];
     statusCode?: number;
-    constructor(protocol: string, host?: string);
+    constructor(protocol: string);
 }

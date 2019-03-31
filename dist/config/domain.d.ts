@@ -1,6 +1,6 @@
 import { RecordsConfig } from "./records";
 export declare class DomainConfig extends RecordsConfig {
-    static parse(source: any, type: string): DomainConfig;
+    static parse(source: any, type?: string): DomainConfig;
     name: string;
     serverType: string;
     timeout: number;

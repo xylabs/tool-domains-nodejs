@@ -3,8 +3,7 @@ export declare class ServerConfig extends RecordsConfig {
     static parse(source: any): ServerConfig;
     name: string;
     default?: boolean;
-    include?: string[];
-    exclude?: string[];
+    filters?: string[];
     crawl?: boolean;
     constructor(name: string);
     merge(config?: ServerConfig): this;

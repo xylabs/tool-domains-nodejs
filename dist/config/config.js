@@ -5,6 +5,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
 class Config {
+    static parse(source) {
+        if (source) {
+            let srcObj = source;
+            if (typeof source === "string") {
+                srcObj = JSON.parse(source);
+            }
+            let config = new Config(srcObj.key);
+            config = lodash_1.default.merge(config, srcObj);
+            return config;
+        }
+        return undefined;
+    }
     constructor(key) {
         this.key = key;
     }

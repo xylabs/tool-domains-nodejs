@@ -17,6 +17,14 @@ export class Configs<T extends Config> extends Map<string, T> {
     return this
   }
 
+  public toJSON() {
+    const obj: T[] = []
+    for (const item of this.values()) {
+      obj.push(item)
+    }
+    return obj
+  }
+
   // we pass in a new object to prevent writing to authority objects
   public getConfig(key: string, newObject: T): T | undefined {
     const defaultItem = this.get("default")

@@ -1,8 +1,9 @@
 import { Config } from "./config";
 import { WebcallConfig } from "./webcall";
 import { Configs } from "./configs";
+import { ValueConfig } from "./value";
 export declare class RecordConfig extends Config {
-    static parse(source: any, domain: string): RecordConfig;
+    static parse(source: any, domain?: string): RecordConfig;
     type: string;
     domain?: string;
     timeout?: number;
@@ -11,8 +12,7 @@ export declare class RecordConfig extends Config {
         "enabled": true;
         "value": string;
     };
-    allowed?: number[];
-    values?: any[];
+    values?: Configs<ValueConfig>;
     webcalls?: Configs<WebcallConfig>;
     constructor(type: string, domain?: string);
     merge(config?: any): RecordConfig;

@@ -7,21 +7,19 @@
     {
       "name": "default",
       "enabled": true,
+      "validations": [
+        {
+
+        }
+      ],
       "records": [
         {
           "type": "default",
-          "timeout": 1000,
-          "reverseDNS": {
-            "enabled": false
-          }
+          "timeout": 1000
         },
         {
           "type": "A",
           "enabled": true,
-          "reverseDNS": {
-            "enabled": true,
-            "value": ".r.cloudfront.net$"
-          },
           "webcalls":
           [
             {
@@ -30,8 +28,10 @@
               "callTimeMax": 200,
               "headers": [
                 {
-                  "required": true,
-                  "name": "location"
+                  "name": "location",
+                  "value": {
+                    "disposition": "required"
+                  }
                 }
               ]
             },
@@ -41,38 +41,45 @@
               "callTimeMax": 200,
               "headers": [
                 {
-                  "required": true,
-                  "name": "content-type"
+                  "name": "content-type",
+                  "value": {
+                    "disposition": "required"
+                  }
                 },
                 {
-                  "required": true,
-                  "name": "content-encoding",
-                  "value": "gzip"
-                },
-                {
-                  "required": true,
                   "name": "content-security-policy",
-                  "value": "object-src 'none'"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "object-src 'none'"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-content-type-options",
-                  "value": "nosniff"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "nosniff"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-frame-options",
-                  "value": "DENY"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "DENY"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-xss-protection",
-                  "value": "1; mode=block"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "1; mode=block"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "referrer-policy",
-                  "value": "same-origin"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "same-origin"
+                  }
                 }
               ]
             }
@@ -88,8 +95,10 @@
               "statusCode": 301,
               "headers": [
                 {
-                  "required": true,
-                  "name": "location"
+                  "name": "location",
+                  "value": {
+                    "disposition": "required"
+                  }
                 }
               ]
             },
@@ -98,35 +107,89 @@
               "statusCode": 200,
               "headers": [
                 {
-                  "required": true,
-                  "name": "content-type"
+                  "name": "content-type",
+                  "value": {
+                    "disposition": "required"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "content-security-policy",
-                  "value": "object-src 'none'"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "object-src 'none'"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-content-type-options",
-                  "value": "nosniff"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "nosniff"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-frame-options",
-                  "value": "DENY"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "DENY"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-xss-protection",
-                  "value": "1; mode=block"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "1; mode=block"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "referrer-policy",
-                  "value": "same-origin"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "same-origin"
+                  }
                 }
               ]
+            }
+          ]
+        },
+        {
+          "type": "CAA",
+          "enabled": true,
+          "values": [
+            {
+              "disposition": "required",
+              "filter": {
+                "flags": 0,
+                "tag": "^issue$",
+                "value": "^amazon.com$",
+                "issuerCritical": false
+              }
+            },
+            {
+              "disposition": "required",
+              "filter": {
+                "flags": 0,
+                "tag": "^issue$",
+                "value": "^amazonaws.com$",
+                "issuerCritical": false
+              }
+            },
+            {
+              "disposition": "required",
+              "filter": {
+                "flags": 0,
+                "tag": "^issue$",
+                "value": "^amazontrust.com$",
+                "issuerCritical": false
+              }
+            },
+            {
+              "disposition": "required",
+              "filter": {
+                "flags": 0,
+                "tag": "^issue$",
+                "value": "^awstrust.com$",
+                "issuerCritical": false
+              }
             }
           ]
         },
@@ -140,8 +203,10 @@
               "statusCode": 301,
               "headers": [
                 {
-                  "required": true,
-                  "name": "location"
+                  "name": "location",
+                  "value": {
+                    "disposition": "required"
+                  }
                 }
               ]
             },
@@ -150,33 +215,45 @@
               "statusCode": 200,
               "headers": [
                 {
-                  "required": true,
-                  "name": "content-type"
+                  "name": "content-type",
+                  "value": {
+                    "disposition": "required"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "content-security-policy",
-                  "value": "object-src 'none'"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "object-src 'none'"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-content-type-options",
-                  "value": "nosniff"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "nosniff"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-frame-options",
-                  "value": "DENY"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "DENY"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "x-xss-protection",
-                  "value": "1; mode=block"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "1; mode=block"
+                  }
                 },
                 {
-                  "required": true,
                   "name": "referrer-policy",
-                  "value": "same-origin"
+                  "value": {
+                    "disposition": "required",
+                    "filter": "same-origin"
+                  }
                 }
               ]
             }
@@ -196,32 +273,28 @@
   "servers": [
     {
       "name": "api",
-      "include": [
+      "filter": [
         "^api\\.",
         "^devapi\\."
       ],
       "records": [
         {
-          "type": "A|CNAME",
-          "allowed": [1]
+          "type": "A|CNAME"
         },
         {
-          "type": "A",
-          "allowed": [0, 4]
+          "type": "A"
         },
         {
-          "type": "CNAME",
-          "allowed": [0, 1]
+          "type": "CNAME"
         },
         {
-          "type": "TXT",
-          "allowed": [0, 1, 2, 3]
+          "type": "TXT"
         }
       ]
     },
     {
       "name": "domainkey",
-      "include": [
+      "filter": [
         "._domainkey."
       ],
       "records": [
@@ -269,65 +342,153 @@
         },
         {
           "type": "TXT",
-          "allowed": [1],
-          "values": {
-            "required": [
-              "^v=DKIM1; k=rsa; "
-            ]
-          }
+          "values": [
+            {
+              "disposition": "required",
+              "filter": "^v=DKIM1; "
+            }
+          ]
         }
       ]
     },
     {
       "name": "dmarc",
-      "include": [
+      "filter": [
         "^_dmarc."
       ],
       "records": [
         {
           "type": "TXT",
-          "allowed": [1],
-          "values": {
-            "required": [
-              "^v=DMARC1; "
-            ]
-          }
+          "values": [
+            {
+              "disposition": "required",
+              "filter": "^v=DMARC1; "
+            }
+          ]
         }
       ]
     },
     {
       "name": "website",
       "default": true,
-      "include": [
+      "filters": [
         "^www\\."
       ],
+      "validations": {
+        "crawl": [
+          {
+            "enabled": true
+          }
+        ],
+        "favicon": [
+          {
+            "enabled": true,
+            "files": [
+              {
+                "disposition": "required",
+                "path": "/favicon.ico"
+              }
+            ]
+          }
+        ],
+        "robots": [
+          {
+            "enabled": true,
+            "files": [
+              {
+                "disposition": "required",
+                "path": "/robots.txt"
+              }
+            ]
+          }
+        ],
+        "scripts": [
+          {
+            "enabled": true,
+            "tags": [
+              {
+                "disposition": "required",
+                "tags": [
+                  {
+                    "disposition": "required",
+                    "path": "/html/head/script",
+                    "filter": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "seo": [
+          {
+            "enabled": true
+          }
+        ],
+        "sitmap": [
+          {
+            "enabled": true,
+            "files": [
+              {
+                "disposition": "required",
+                "path": "/sitemap.xml"
+              }
+            ]
+          }
+        ],
+        "social": [
+          {
+            "enabled": true,
+            "files": [
+              {
+                "disposition": "required",
+                "path": "/",
+                "tags": [
+                  {
+                    "path": "/html/head/meta[@property='og:url']",
+                    "disposition": "required"
+                  },
+                  {
+                    "path": "/html/head/meta[@property='og:title']",
+                    "disposition": "required"
+                  },
+                  {
+                    "path": "/html/head/meta[@property='og:description']",
+                    "disposition": "required"
+                  },
+                  {
+                    "path": "/html/head/meta[@property='og:image']",
+                    "disposition": "required"
+                  },
+                  {
+                    "path": "/html/head/meta[@property='fb:app_id']",
+                    "disposition": "required"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
       "records": [
         {
-          "type": "A|CNAME",
-          "allowed": [1]
+          "type": "A|CNAME"
         },
         {
-          "type": "A",
-          "allowed": [0, 1]
+          "type": "A"
         },
         {
-          "type": "CNAME",
-          "allowed": [0, 1]
+          "type": "CNAME"
         },
         {
           "type": "MX",
-          "allowed": [0, 5],
-          "values": {
-            "optional": [
-              "google"
-            ],
-            "required": [
-              "google"
-            ],
-            "notallowed": [
-              "ms"
-            ]
-          }
+          "values": [{
+              "disposition": "required",
+              "filter": {
+                "preference": 5,
+                "exchange": "alt1.aspmx.l.google.com"
+              }
+            }
+          ]
         },
         {
           "type": "TXT"

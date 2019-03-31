@@ -1,6 +1,21 @@
 import _ from "lodash"
-
+import assert from 'assert'
 export class Config {
+
+  public static parse(source: any) {
+    if (source) {
+      let srcObj = source
+      if (typeof source === "string") {
+        srcObj = JSON.parse(source)
+      }
+
+      let config = new Config(srcObj.key)
+      config = _.merge(config, srcObj)
+      return config
+    }
+    return undefined
+  }
+
   public key: string
   public enabled?: boolean
 

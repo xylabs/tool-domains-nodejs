@@ -2,9 +2,12 @@ import { Validator } from "./validator"
 import { WebcallConfig } from "../config/webcall"
 import Axios from "axios"
 import htmlValidator from 'html-validator'
+import chalk from "chalk"
+import { ValueValidator } from "./value"
 
 export class WebcallValidator extends Validator<WebcallConfig> {
 
+  public protocol: string
   public address: string
   public host: string
   public headers?: any[]
@@ -14,6 +17,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
 
   constructor(config: WebcallConfig, address: string, host: string) {
     super(config)
+    this.protocol = this.config.protocol
     this.address = address
     this.host = host
   }
@@ -37,7 +41,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         }
 
         if (this.headers && this.config.headers) {
-          await this.validateHeaders(this.config.headers)
+          this.validations.concat(await this.validateHeaders())
         }
 
         const expectedCode = this.config.statusCode || 200
@@ -49,7 +53,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         } else {
           if (this.config.html) {
             if (this.statusCode === 200) {
-              await this.validateHtml(response.data)
+              this.validations.concat(await this.validateHtml(response.data))
             }
           }
         }
@@ -60,33 +64,34 @@ export class WebcallValidator extends Validator<WebcallConfig> {
       this.addError("validate", ex.message)
       console.error(ex.stack)
     }
+    if (this.errorCount === 0) {
+      console.log(chalk.gray(`Webcall Check Passed: ${this.address} [${this.host}]`))
+    }
     return super.validate()
   }
 
-  private validateHeaders(expected: any[]) {
-    if (this.headers) {
-      if (Array.isArray(expected)) {
-        for (const item of expected) {
-          const value = this.headers[item.name]
-          if (item.required && value === undefined) {
-            this.addError("validateHeaders", `Missing: ${item.name}`)
-          } else if (value === undefined) {
-            if (item.value === undefined) {
-              this.addError("validateHeaders", `Invalid Value Configured: ${item.name}`)
-            } else {
-              if (!item.value.match(this.headers[item.name])) {
-                this.addError(
-                  "validateHeaders",
-                  `Invalid Value [${item.name}]: ${this.headers[item.name]} [Expected: ${item.value}]`
-                )
-              }
-            }
-          }
+  protected async validateHeaders() {
+    const result: ValueValidator[] = []
+    let errorCount = 0
+    if (this.config.headers && this.headers) {
+      for (const value of this.config.headers.values()) {
+        const dataArray: string[] | object[] | number[] = []
+        const data = this.headers[value.name]
+        if (data) {
+          dataArray.push(data)
         }
+        const validator = new ValueValidator(value, dataArray)
+        result.push(validator)
+        await validator.validate()
+        errorCount += validator.errorCount
       }
-    } else {
-      this.addError("validateHeaders", "No headers found")
     }
+    if (errorCount === 0) {
+      console.log(chalk.green('validateHeaders', `Passed`))
+    } else {
+      console.log(chalk.red('validateHeaders', `Errors: ${errorCount}`))
+    }
+    return result
   }
 
   private async validateHtml(data: string) {
@@ -105,7 +110,6 @@ export class WebcallValidator extends Validator<WebcallConfig> {
   }
 
   private async get(protocol: string, address: string) {
-    console.log(`get: ${protocol}:${address}`)
     const timeout = this.config.timeout || 1000
     let response: any
     try {

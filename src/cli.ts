@@ -18,6 +18,7 @@ const program = commander
 program
   .version(getVersion())
   .option("-o, --output [value]", "output file path", "dnslint-report.json")
+  .option("-p, --preflight [value]", "generates preflight report")
   .option("-d, --domainToCheck [value]", "domain to check")
   .option("-b, --bucket [value]", "s3 bucket to write result to")
 
@@ -25,4 +26,11 @@ program.parse(process.argv)
 
 // start
 const tool = new XyDomainScan()
-tool.start({ output: program.output, singleDomain: program.domainToCheck, bucket: program.bucket })
+tool.start(
+  {
+    output: program.output,
+    singleDomain: program.domainToCheck,
+    bucket: program.bucket,
+    preflight: program.preflight
+  }
+)

@@ -99,9 +99,9 @@ class MasterConfig extends config_1.Config {
         let defaultName = "unknown";
         if (this.servers) {
             for (const server of this.servers.values()) {
-                const include = server.include;
-                if (include) {
-                    for (const filter of include) {
+                const filters = server.filters;
+                if (filters) {
+                    for (const filter of filters) {
                         if (domain.match(filter)) {
                             return server.name;
                         }

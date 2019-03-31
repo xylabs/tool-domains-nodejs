@@ -38,7 +38,7 @@ class DomainValidator extends validator_1.Validator {
                     for (const recordConfig of this.config.records.values()) {
                         if (recordConfig.type !== "default") {
                             if (recordConfig.isEnabled()) {
-                                const record = new record_1.RecordValidator(recordConfig);
+                                const record = new record_1.RecordValidator(recordConfig, this.name);
                                 this.records.push(record);
                                 this.errorCount += yield record.validate();
                             }

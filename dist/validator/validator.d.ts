@@ -2,6 +2,7 @@ import { ValidationError } from './error';
 import { Config } from '../config/config';
 export declare class Validator<T extends Config> {
     config: T;
+    validations: any[];
     errors?: ValidationError[];
     errorCount: number;
     constructor(config: T);

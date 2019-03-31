@@ -5,6 +5,7 @@ import { Config } from '../config/config'
 
 export class Validator<T extends Config> {
   public config: T
+  public validations: any[] = []
   public errors?: ValidationError[]
   public errorCount = 0
 

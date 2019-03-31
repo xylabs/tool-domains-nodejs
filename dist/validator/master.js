@@ -32,10 +32,10 @@ class MasterValidator extends validator_1.Validator {
             let completedDomains = 0;
             for (const domain of Object.values(this.domains)) {
                 try {
-                    yield domain.validate();
+                    const errors = yield domain.validate();
                     completedDomains++;
                     console.log(`Domain:[${completedDomains}/${this.domains.length}]: ${domain.name} [${domain.type}]`);
-                    this.errorCount += yield domain.validate();
+                    this.errorCount += errors;
                 }
                 catch (ex) {
                     this.addError("MasterValidator.validate", `Unexpected Error: ${ex.message}`);
@@ -53,7 +53,6 @@ class MasterValidator extends validator_1.Validator {
                 if (domain.name !== "default") {
                     console.log(chalk_1.default.yellow(`Adding Domain from Config: ${domain.name}`));
                     const domainConfig = this.config.getDomainConfig(domain.name);
-                    console.log(`Adding Config: ${JSON.stringify(domainConfig)}`);
                     this.domains.push(new domain_1.DomainValidator(domainConfig, this.config.getServerType(domainConfig.name)));
                 }
             }
@@ -70,6 +69,14 @@ class MasterValidator extends validator_1.Validator {
                     // remove trailing '.'
                     const cleanDomain = domain.slice(0, domain.length - 1);
                     const domainConfig = this.config.getDomainConfig(cleanDomain);
+                    if (this.config.aws.filter) {
+                        if (!domainConfig.name.match(this.config.aws.filter)) {
+                            continue;
+                        }
+                    }
+                    if (!domainConfig.isEnabled()) {
+                        continue;
+                    }
                     this.domains.push(new domain_1.DomainValidator(domainConfig, this.config.getServerType(cleanDomain)));
                 }
             }

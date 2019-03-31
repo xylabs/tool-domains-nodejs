@@ -1,8 +1,10 @@
 /// <reference types="node" />
 import { MxRecord } from 'dns';
+import { DnsClient } from './dnsclient';
 export declare class Dns {
+    static client: DnsClient;
     static lookup(name: string): Promise<string>;
-    static resolve(name: string, type: string): Promise<any[]>;
+    static resolve(domain: string, type: string): Promise<any[]>;
     static resolve4(name: string): Promise<string[]>;
     static resolveCname(name: string): Promise<string[]>;
     static resolveMx(name: string): Promise<MxRecord[]>;
