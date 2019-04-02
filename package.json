@@ -1,6 +1,6 @@
 {
   "name": "dnslint",
-  "version": "1.1.86",
+  "version": "1.1.87",
   "description": "XYO Internal Domain Tool",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,6 +25,10 @@
   },
   "author": "Arie Trouw",
   "license": "INTERNAL XY USE ONLY",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "dependencies": {
     "assert": "^1.4.1",
     "aws-sdk": "^2.431.0",
