@@ -23,6 +23,8 @@ phases:
       - yarn build
       - yarn test
       - echo Build completed on `date`
+  post_build:
+    commands:
       - yarn publish-npm
       - echo Publish completed on `date`
 
