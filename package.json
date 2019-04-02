@@ -1,6 +1,6 @@
 {
   "name": "dnslint",
-  "version": "1.1.80",
+  "version": "1.1.81",
   "description": "XYO Internal Domain Tool",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,6 +16,9 @@
   "bin": {
     "dnslint": "bin/dnslint"
   },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/XYOracleNetwork/tool-domains-nodejs.git"
