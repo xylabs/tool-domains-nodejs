@@ -22,10 +22,9 @@ phases:
       - echo Compiling the Node.js code
       - yarn build
       - yarn test
-  post_build:
-    commands:
       - echo Build completed on `date`
       - yarn publish-npm
+      - echo Publish completed on `date`
 
 artifacts:
   files:
