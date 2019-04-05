@@ -6,35 +6,27 @@
   "domains": [
     {
       "name": "default",
-      "reverseDNS": {
-        "enabled": false
-      },
       "records": [{
         "type": "default",
         "html": false
       }]
     },
     {
-      "name": "support.xyfindit.com",
-      "crawl": false
+      "name": "support.xyfindit.com"
     },
     {
-      "name": "geohackers.xyo.network",
-      "crawl": false
+      "name": "geohackers.xyo.network"
     },
     {
-      "name": "geohacker.xyo.network",
-      "crawl": false
+      "name": "geohacker.xyo.network"
     },
     {
-      "name": "community.xyo.network",
-      "crawl": false
+      "name": "community.xyo.network"
     }
   ],
   "servers": [
     {
       "name": "website",
-      "crawl": false,
       "records": [
         {
           "type": "default",
