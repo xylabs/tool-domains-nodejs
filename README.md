@@ -53,13 +53,13 @@ Make sure you put the config file in the same folder from where you are running 
   },
   "domains": [
     {
-      "name": "default",
+      "name": "*",
       "reverseDNS": {
         "enabled": false
       },
       "records": [
         {
-          "type": "default",
+          "type": "*",
           "html": true
         }
       ]

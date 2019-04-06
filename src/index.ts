@@ -73,7 +73,7 @@ export class XyDomainScan {
 
       // since we are only doing one, remove the rest
       for (const domain of this.config.domains.values()) {
-        if (domain.name !== "default" && domain.name !== params.singleDomain) {
+        if (domain.name !== "*" && domain.name !== params.singleDomain) {
           this.config.domains.delete(domain.key)
         }
       }

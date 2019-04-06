@@ -39,7 +39,7 @@ export class MasterValidator extends Validator<MasterConfig> {
   private addDomainsFromConfig() {
     if (this.config.domains) {
       for (const domain of this.config.domains.values()) {
-        if (domain.name !== "default") {
+        if (domain.name !== "*") {
           console.log(chalk.yellow(`Adding Domain from Config: ${domain.name}`))
           const domainConfig = this.config.getDomainConfig(domain.name)
           this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(domainConfig.name)))
