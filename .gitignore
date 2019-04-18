@@ -79,3 +79,4 @@ dnslint-report.json
 dnslint-preflight.json
 
 dist/
+.scannerwork/
