@@ -173,7 +173,7 @@
       "type": "object",
       "properties": {
         "name": {"type": "string"},
-        "default": {"type": "boolean"},
+        "*": {"type": "boolean"},
         "validations": {"$ref": "#/definitions/validations"},
         "filters": {
           "type": "array",

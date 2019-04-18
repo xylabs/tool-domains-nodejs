@@ -5,7 +5,7 @@
   },
   "domains": [
     {
-      "name": "default",
+      "name": "*",
       "enabled": true,
       "validations": [
         {
@@ -14,7 +14,7 @@
       ],
       "records": [
         {
-          "type": "default",
+          "type": "*",
           "timeout": 1000
         },
         {
@@ -370,7 +370,7 @@
     },
     {
       "name": "website",
-      "default": true,
+      "*": true,
       "filters": [
         "^www\\."
       ],

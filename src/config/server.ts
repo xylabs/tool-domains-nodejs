@@ -20,7 +20,7 @@ export class ServerConfig extends RecordsConfig {
     server.records = new Configs<RecordConfig>()
     if (srcObj.records) {
       for (const record of srcObj.records) {
-        const newRecordObj = RecordConfig.parse(record, "default")
+        const newRecordObj = RecordConfig.parse(record, "*")
         server.records.set(newRecordObj.type, newRecordObj)
       }
     }
