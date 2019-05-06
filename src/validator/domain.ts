@@ -4,7 +4,6 @@ import { Validator } from './validator'
 import chalk from 'chalk'
 import { MasterConfig } from '../config'
 import _ from 'lodash'
-import Crawler from 'crawler'
 import url from 'url'
 import { inspect } from 'util'
 import { DomainConfig } from '../config/domain'
@@ -16,7 +15,7 @@ export class DomainValidator extends Validator<DomainConfig> {
   public records: RecordValidator[] = []
   public pages?: any
 
-  constructor (config: DomainConfig, type: string) {
+  constructor(config: DomainConfig, type: string) {
     super(config)
     this.name = config.name
     this.type = type
@@ -55,7 +54,7 @@ export class DomainValidator extends Validator<DomainConfig> {
     return super.validate()
   }
 
-  private async getDomainUrls() {
+  /*private async getDomainUrls() {
     const foundUrls: any = {}
     const scannedUrls: any = {}
     return new Promise((resolve, reject) => {
@@ -63,7 +62,7 @@ export class DomainValidator extends Validator<DomainConfig> {
         rateLimit: 100,
         timeout: 1000,
         retries: 0,
-        callback: async (error: any, res: any, done: any) => {
+        callback: async(error: any, res: any, done: any) => {
           try {
             scannedUrls[res.options.uri] = true
             if (error) {
@@ -115,6 +114,6 @@ export class DomainValidator extends Validator<DomainConfig> {
       foundUrls[startingUrl] = true
       crawler.queue(startingUrl)
     })
-  }
+  }*/
 
 }
