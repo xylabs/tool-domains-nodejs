@@ -1,4 +1,4 @@
-import { Config } from "./config"
+import { Config } from './config'
 import assert from 'assert'
 import _ from 'lodash'
 
@@ -6,11 +6,11 @@ export class WebcallConfig extends Config {
 
   public static parse(source: any) {
     let srcObj = source
-    if (typeof source === "string") {
+    if (typeof source === 'string') {
       srcObj = JSON.parse(source)
     }
 
-    assert(typeof srcObj.protocol === "string")
+    assert(typeof srcObj.protocol === 'string')
 
     let webcall = new WebcallConfig(srcObj.protocol)
     webcall = _.merge(webcall, srcObj)

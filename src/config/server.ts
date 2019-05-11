@@ -9,18 +9,18 @@ export class ServerConfig extends RecordsConfig {
 
   public static parse(source: any) {
     let srcObj = source
-    if (typeof source === "string") {
+    if (typeof source === 'string') {
       srcObj = JSON.parse(source)
     }
 
-    assert(typeof srcObj.name === "string")
+    assert(typeof srcObj.name === 'string')
 
     let server = new ServerConfig(srcObj.name)
     server = _.merge(server, srcObj)
     server.records = new Configs<RecordConfig>()
     if (srcObj.records) {
       for (const record of srcObj.records) {
-        const newRecordObj = RecordConfig.parse(record, "*")
+        const newRecordObj = RecordConfig.parse(record, '*')
         server.records.set(newRecordObj.type, newRecordObj)
       }
     }

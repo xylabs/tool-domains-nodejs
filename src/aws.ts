@@ -21,14 +21,14 @@ export class AWS {
   }
 
   public saveFileToS3(bucket: string, filename: string, data: object) {
-    console.log(chalk.gray(`Saving to S3`))
+    console.log(chalk.gray('Saving to S3'))
     return new Promise((resolve, reject) => {
       const buffer = Buffer.from(JSON.stringify(data))
       const params = {
         Bucket: bucket,
         Key: filename,
         Body: buffer,
-        ContentType: "application/json"
+        ContentType: 'application/json'
       }
 
       this.s3.upload(params, (err: any, result: any) => {
@@ -44,7 +44,7 @@ export class AWS {
   }
 
   private async getZones(): Promise<Route53.Types.ListHostedZonesResponse> {
-    console.log(chalk.gray(`Getting AWS Zones`))
+    console.log(chalk.gray('Getting AWS Zones'))
     return new Promise((resolve, reject) => {
       const params = {}
 

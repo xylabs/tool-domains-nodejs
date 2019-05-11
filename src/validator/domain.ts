@@ -30,7 +30,7 @@ export class DomainValidator extends Validator<DomainConfig> {
       this.records = []
       if (this.config.records) {
         for (const recordConfig of this.config.records.values()) {
-          if (recordConfig.type !== "*") {
+          if (recordConfig.type !== '*') {
             if (recordConfig.isEnabled()) {
               const record = new RecordValidator(recordConfig, this.name)
               this.records.push(record)
@@ -40,7 +40,7 @@ export class DomainValidator extends Validator<DomainConfig> {
         }
       }
     } catch (ex) {
-      this.addError("DomainValidator.validate", ex.message)
+      this.addError('DomainValidator.validate', ex.message)
       console.error(chalk.red(ex.stack)) // since this is unexpected, show the stack
     }
     if (this.errorCount) {

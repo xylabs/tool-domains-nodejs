@@ -1,4 +1,4 @@
-import { Config } from "./config"
+import { Config } from './config'
 import assert from 'assert'
 import _ from 'lodash'
 
@@ -6,7 +6,7 @@ export class ValueConfig extends Config {
 
   public static parse(source: any) {
     let srcObj = source
-    if (typeof source === "string") {
+    if (typeof source === 'string') {
       srcObj = JSON.parse(source)
     }
 
@@ -28,7 +28,7 @@ export class ValueConfig extends Config {
     if (this.name) {
       return this.name
     }
-    if (typeof this.filter === "object") {
+    if (typeof this.filter === 'object') {
       return JSON.stringify(this.filter)
     }
     return this.filter

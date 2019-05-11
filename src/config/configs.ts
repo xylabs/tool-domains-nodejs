@@ -27,7 +27,7 @@ export class Configs<T extends Config> extends Map<string, T> {
 
   // we pass in a new object to prevent writing to authority objects
   public getConfig(key: string, newObject: T): T | undefined {
-    const defaultItem = this.get("*")
+    const defaultItem = this.get('*')
     const item = this.get(key)
     if (item) {
       if (defaultItem) {

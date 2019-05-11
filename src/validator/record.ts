@@ -78,7 +78,7 @@ export class RecordValidator extends Validator<RecordConfig> {
       }
     }
     if (valueErrorCount === 0) {
-      console.log(chalk.green('validateValues', `Passed`))
+      console.log(chalk.green('validateValues', 'Passed'))
     } else {
       console.log(chalk.red('validateValues', `Errors: ${valueErrorCount}`))
     }
@@ -95,26 +95,26 @@ export class RecordValidator extends Validator<RecordConfig> {
           try {
             domains = await Dns.reverse(record.data)
           } catch (ex) {
-            this.addError("reverse", ex.message)
+            this.addError('reverse', ex.message)
             valid = false
           }
           if (value && domains) {
             for (const domain of domains) {
               if (!domain.match(value)) {
                 valid = false
-                this.addError("reverse", `Unexpected Domain: ${domain} [Expected: ${value}]`)
+                this.addError('reverse', `Unexpected Domain: ${domain} [Expected: ${value}]`)
               }
             }
           }
           result.push({
-            ip: record,
             domains,
-            valid
+            valid,
+            ip: record
           })
         }
       }
     } catch (ex) {
-      this.addError("RecordValidator.reverseLookup", ex.message)
+      this.addError('RecordValidator.reverseLookup', ex.message)
       console.error(chalk.red(ex.stack))
     }
     return result
@@ -124,16 +124,16 @@ export class RecordValidator extends Validator<RecordConfig> {
     this.records = []
     try {
       if (!this.type) {
-        this.addError("resolve", "Missing Type")
+        this.addError('resolve', 'Missing Type')
         return
       }
       if (!this.domain) {
-        this.addError("resolve", "Missing Domain")
+        this.addError('resolve', 'Missing Domain')
         return
       }
       this.records = await Dns.resolve(this.domain, this.type)
     } catch (ex) {
-      this.addError("resolve", ex.message)
+      this.addError('resolve', ex.message)
       console.error(chalk.red(ex.stack))
     }
   }

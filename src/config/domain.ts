@@ -1,21 +1,21 @@
-import { RecordConfig } from "./record"
+import { RecordConfig } from './record'
 import _ from 'lodash'
-import { Configs } from "./configs"
-import assert from "assert"
-import { RecordsConfig } from "./records"
+import { Configs } from './configs'
+import assert from 'assert'
+import { RecordsConfig } from './records'
 
 export class DomainConfig extends RecordsConfig {
 
   public static parse(source: any, type?: string) {
     let srcObj = source
-    if (typeof source === "string") {
+    if (typeof source === 'string') {
       srcObj = JSON.parse(source)
     }
 
-    assert(typeof srcObj.name === "string")
+    assert(typeof srcObj.name === 'string')
     assert(type)
 
-    let domain = new DomainConfig(srcObj.name, type || "unknown")
+    let domain = new DomainConfig(srcObj.name, type || 'unknown')
     domain = _.merge(domain, srcObj)
     domain.records = new Configs<RecordConfig>()
     if (srcObj.records) {

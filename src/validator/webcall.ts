@@ -1,9 +1,9 @@
-import { Validator } from "./validator"
-import { WebcallConfig } from "../config/webcall"
-import Axios from "axios"
+import { Validator } from './validator'
+import { WebcallConfig } from '../config/webcall'
+import axios from 'axios'
 import htmlValidator from 'html-validator'
-import chalk from "chalk"
-import { ValueValidator } from "./value"
+import chalk from 'chalk'
+import { ValueValidator } from './value'
 
 export class WebcallValidator extends Validator<WebcallConfig> {
 
@@ -34,7 +34,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         if (this.config.callTimeMax && this.callTime) {
           if (this.callTime > this.config.callTimeMax) {
             this.addError(
-                "validate",
+                'validate',
                 `Call too slow: ${this.callTime}ms [Expected < ${this.config.callTimeMax}ms]`
               )
           }
@@ -47,7 +47,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         const expectedCode = this.config.statusCode || 200
         if (this.statusCode !== expectedCode) {
           this.addError(
-              "validate",
+              'validate',
               `Unexpected Response Code: ${this.statusCode} [Expected: ${expectedCode}]`
             )
         } else {
@@ -58,10 +58,10 @@ export class WebcallValidator extends Validator<WebcallConfig> {
           }
         }
       } else {
-        this.addError("validate", `Failed to get Response: ${response.code}: ${response.message}`)
+        this.addError('validate', `Failed to get Response: ${response.code}: ${response.message}`)
       }
     } catch (ex) {
-      this.addError("validate", ex.message)
+      this.addError('validate', ex.message)
       console.error(ex.stack)
     }
     if (this.errorCount === 0) {
@@ -87,7 +87,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
       }
     }
     if (errorCount === 0) {
-      console.log(chalk.green('validateHeaders', `Passed`))
+      console.log(chalk.green('validateHeaders', 'Passed'))
     } else {
       console.log(chalk.red('validateHeaders', `Errors: ${errorCount}`))
     }
@@ -100,9 +100,9 @@ export class WebcallValidator extends Validator<WebcallConfig> {
       format: 'json'
     })
     for (const item of results.messages) {
-      if (item.type === "error") {
+      if (item.type === 'error') {
         this.addError(
-          "validateHtml",
+          'validateHtml',
           `[L:${item.lastLine}, C:${item.lastColumn}]: ${item.message}`)
       }
     }
@@ -113,19 +113,21 @@ export class WebcallValidator extends Validator<WebcallConfig> {
     const timeout = this.config.timeout || 1000
     let response: any
     try {
-      response = await Axios.get(`${protocol}://${this.address}`,
+      response = await axios.get(
+        `${protocol}://${this.address}`,
         {
+          timeout,
           responseType: 'text',
           maxRedirects: 0,
           validateStatus: (status: any) => true,
           transformResponse: (data: any) => data,
-          timeout, headers: {
+          headers: {
             Host: this.host
           }
         }
       )
     } catch (ex) {
-      this.addError("get", `Failed [${protocol}://${this.address}]:${ex.code}`)
+      this.addError('get', `Failed [${protocol}://${this.address}]:${ex.code}`)
       response = {
         code: ex.code,
         message: ex.message

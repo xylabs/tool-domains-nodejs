@@ -2,19 +2,16 @@ import { AWS } from './aws'
 import fs from 'fs'
 import { MasterConfig } from './config'
 import chalk from 'chalk'
-import { DomainValidator } from './validator'
-import { DomainConfig } from './config/domain'
-import { Configs } from './config/configs'
 import { MasterValidator } from './validator/master'
 import { AWSConfig } from './config/aws'
-import defaultConfigJson from './config/default.json'
 import loadJsonFile from 'load-json-file'
+import _ from 'lodash'
 
 export class XyDomainScan {
 
   private aws = new AWS()
-  private config = new MasterConfig("master")
-  private validator = new MasterValidator(new MasterConfig("master"))
+  private config = new MasterConfig('master')
+  private validator = new MasterValidator(new MasterConfig('master'))
   private preflight?: string
 
   public async loadConfig(filename?: string) {
@@ -27,8 +24,8 @@ export class XyDomainScan {
       } else {
         console.log(chalk.green("Default Config Validated"))
       }*/
-      const defaultConfig = MasterConfig.parse(defaultConfigJson)
-      console.log(chalk.gray("Loaded Default Config"))
+      const defaultConfig = await loadJsonFile('../config/default.json')
+      console.log(chalk.gray('Loaded Default Config'))
       try {
         const userConfigJson = await loadJsonFile(filenameToLoad)
         const userConfig = MasterConfig.parse(userConfigJson)
@@ -37,9 +34,11 @@ export class XyDomainScan {
         } else {
           console.log(chalk.green("User Config Validated"))
         }*/
-        console.log(chalk.gray("Loaded User Config"))
-        const result = defaultConfig.merge(userConfig)
-        return result
+        console.log(chalk.gray('Loaded User Config'))
+        if (defaultConfig) {
+          return _.merge({}, defaultConfig, userConfig)
+        }
+        return userConfig
       } catch (ex) {
         console.log(chalk.yellow(`No dnslint.json config file found.  Using defaults: ${ex.message}`))
         console.error(ex.stack)
@@ -48,7 +47,7 @@ export class XyDomainScan {
     } catch (ex) {
       console.log(chalk.red(`Failed to load defaults: ${ex}`))
       console.error(ex.stack)
-      return new MasterConfig("master")
+      return new MasterConfig('master')
     }
   }
 
@@ -73,12 +72,12 @@ export class XyDomainScan {
 
       // since we are only doing one, remove the rest
       for (const domain of this.config.domains.values()) {
-        if (domain.name !== "*" && domain.name !== params.singleDomain) {
+        if (domain.name !== '*' && domain.name !== params.singleDomain) {
           this.config.domains.delete(domain.key)
         }
       }
 
-      this.config.aws = new AWSConfig("aws")
+      this.config.aws = new AWSConfig('aws')
       this.config.aws.enabled = false
     }
 
@@ -99,7 +98,7 @@ export class XyDomainScan {
     console.log(`Saving to File: ${params.output}`)
     this.saveToFile(params.output, this.validator)
     if (this.validator.errorCount === 0) {
-      console.log(chalk.green("Congratulations, all tests passed!"))
+      console.log(chalk.green('Congratulations, all tests passed!'))
     } else {
       console.error(chalk.yellow(`Total Errors Found: ${this.validator.errorCount}`))
     }
@@ -107,7 +106,7 @@ export class XyDomainScan {
   }
 
   private getLatestS3FileName() {
-    return `latest.json`
+    return 'latest.json'
   }
 
   private getHistoricS3FileName() {
