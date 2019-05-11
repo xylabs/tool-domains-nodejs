@@ -1,14 +1,12 @@
 {
   "name": "dnslint",
-  "version": "1.1.95",
+  "version": "1.1.96",
   "description": "XYO Internal Domain Tool",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "pretest": "yarn install",
-    "lint": "tslint --config tslint.json src/**/*.ts",
     "test": "yarn lint",
-    "build": "tsc",
     "cli": "node dist/cli.js",
     "develop": "ts-node --files src/cli.ts"
   },
@@ -17,21 +15,23 @@
   },
   "files": [
     "dist",
-    "bin"
+    "bin",
+    "config"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/XYOracleNetwork/tool-domains-nodejs.git"
   },
   "author": "Arie Trouw",
-  "license": "INTERNAL XY USE ONLY",
+  "license": "LGPL-3.0",
   "engineStrict": true,
   "engines": {
     "node": ">=8.0.0"
   },
   "dependencies": {
-    "assert": "^1.4.1",
-    "aws-sdk": "^2.450.0",
+    "@xyo-network/sdk-base-nodejs": "^0.3.10",
+    "assert": "^1.5.0",
+    "aws-sdk": "^2.453.0",
     "axios": "^0.18.0",
     "chalk": "^2.4.2",
     "commander": "^2.20.0",
@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@types/aws-sdk": "^2.7.0",
-    "@types/lodash": "^4.14.123",
+    "@types/lodash": "^4.14.126",
     "@types/node": "^12.0.0",
     "@types/stream-buffers": "^3.0.3",
     "@xyo-network/config-tslint": "^0.1.31",
@@ -53,6 +53,6 @@
     "tslint": "^5.16.0",
     "tslint-config-airbnb": "^5.11.1",
     "typescript": "^3.4.5",
-    "yarn": "^1.15.2"
+    "yarn": "^1.16.0"
   }
 }

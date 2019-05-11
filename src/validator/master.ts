@@ -26,7 +26,7 @@ export class MasterValidator extends Validator<MasterConfig> {
         console.log(`Domain:[${completedDomains}/${this.domains.length}]: ${domain.name} [${domain.type}]`)
         this.errorCount += errors
       } catch (ex) {
-        this.addError("MasterValidator.validate", `Unexpected Error: ${ex.message}`)
+        this.addError('MasterValidator.validate', `Unexpected Error: ${ex.message}`)
         console.error(chalk.red(ex.message))
         console.error(chalk.red(ex.stack))
         this.errorCount++
@@ -39,7 +39,7 @@ export class MasterValidator extends Validator<MasterConfig> {
   private addDomainsFromConfig() {
     if (this.config.domains) {
       for (const domain of this.config.domains.values()) {
-        if (domain.name !== "*") {
+        if (domain.name !== '*') {
           console.log(chalk.yellow(`Adding Domain from Config: ${domain.name}`))
           const domainConfig = this.config.getDomainConfig(domain.name)
           this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(domainConfig.name)))
@@ -49,7 +49,7 @@ export class MasterValidator extends Validator<MasterConfig> {
   }
 
   private async addDomainsFromAws() {
-    console.log(chalk.gray("Getting AWS Domains"))
+    console.log(chalk.gray('Getting AWS Domains'))
     try {
       const aws = new AWS()
       const awsDomains = await aws.getDomains()

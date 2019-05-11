@@ -13,8 +13,8 @@ export class Validator<T extends Config> {
     this.config = config
   }
 
-  public toJSON () {
-    return _.omit(this, ["config"])
+  public toJSON() {
+    return _.omit(this, ['config'])
   }
 
   public async validate() {

@@ -1,6 +1,6 @@
-import { Validator } from "./validator"
-import { ValueConfig } from "../config/value"
-import chalk from "chalk"
+import { Validator } from './validator'
+import { ValueConfig } from '../config/value'
+import chalk from 'chalk'
 
 export class ValueValidator extends Validator<ValueConfig> {
 
@@ -10,7 +10,7 @@ export class ValueValidator extends Validator<ValueConfig> {
   constructor(config: ValueConfig, data: string[] | object[] | number[], context?: string) {
     super(config)
     this.data = data
-    this.context = context || "ValueValidator"
+    this.context = context || 'ValueValidator'
   }
 
   public async validate() {
@@ -45,11 +45,11 @@ export class ValueValidator extends Validator<ValueConfig> {
   private checkValue(filter: any, data: any) {
     let matched = false
     if (typeof filter === typeof data) {
-      if (typeof data === "string") {
+      if (typeof data === 'string') {
         if ((data.match(filter as string))) {
           matched = true
         }
-      } else if (typeof data === "object") {
+      } else if (typeof data === 'object') {
         matched = true
         for (const key of Object.keys(filter)) {
           if (!this.checkValue(filter[key], data[key])) {

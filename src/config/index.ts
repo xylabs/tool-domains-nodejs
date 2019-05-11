@@ -1,9 +1,6 @@
 import { AWSConfig } from './aws'
 import { DomainConfig } from './domain'
-import chalk from 'chalk'
 import _ from 'lodash'
-import Ajv from 'ajv'
-import schema from '../schema/dnslint.schema.json'
 import { RecordConfig } from './record'
 import { Config } from './config'
 import { Configs } from './configs'
@@ -14,10 +11,10 @@ export class MasterConfig extends Config {
 
   public static parse(source: any) {
     let srcObj = source
-    if (typeof source === "string") {
+    if (typeof source === 'string') {
       srcObj = JSON.parse(source)
     }
-    const master = _.merge(new MasterConfig("master"), srcObj)
+    const master = _.merge(new MasterConfig('master'), srcObj)
     master.domains = new Configs<DomainConfig>()
     if (srcObj.domains) {
       for (const domain of srcObj.domains) {
@@ -36,7 +33,7 @@ export class MasterConfig extends Config {
     return master
   }
 
-  public aws = new AWSConfig("aws")
+  public aws = new AWSConfig('aws')
   public domains = new Configs<DomainConfig>()
   public servers = new Configs<ServerConfig>()
 
@@ -104,7 +101,7 @@ export class MasterConfig extends Config {
   }
 
   public getServerType(domain: string) {
-    let defaultName = "unknown"
+    let defaultName = 'unknown'
     if (this.servers) {
       for (const server of this.servers.values()) {
         const filters = server.filters

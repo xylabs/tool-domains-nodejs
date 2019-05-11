@@ -1,6 +1,6 @@
-import { Config } from "./config"
-import { Configs } from "./configs"
-import { RecordConfig } from "./record"
+import { Config } from './config'
+import { Configs } from './configs'
+import { RecordConfig } from './record'
 
 export class RecordsConfig extends Config {
   public records = new Configs<RecordConfig>()

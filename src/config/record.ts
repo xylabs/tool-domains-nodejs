@@ -1,20 +1,20 @@
-import { Config } from "./config"
+import { Config } from './config'
 import assert from 'assert'
 import _ from 'lodash'
-import { WebcallConfig } from "./webcall"
-import { Configs } from "./configs"
-import chalk from "chalk"
-import { ValueConfig } from "./value"
+import { WebcallConfig } from './webcall'
+import { Configs } from './configs'
+import chalk from 'chalk'
+import { ValueConfig } from './value'
 
 export class RecordConfig extends Config {
 
   public static parse(source: any, domain?: string) {
     let srcObj = source
-    if (typeof source === "string") {
+    if (typeof source === 'string') {
       srcObj = JSON.parse(source)
     }
 
-    assert(typeof srcObj.type === "string")
+    assert(typeof srcObj.type === 'string')
     assert(domain)
 
     let record = new RecordConfig(srcObj.type, domain)
@@ -43,8 +43,8 @@ export class RecordConfig extends Config {
   public callTimeMax?: number
 
   public reverseDNS?: {
-    "enabled": true,
-    "value": string
+    'enabled': true,
+    'value': string
   }
 
   public values?: Configs<ValueConfig>

@@ -1,11 +1,11 @@
-import _ from "lodash"
+import _ from 'lodash'
 import assert from 'assert'
 export class Config {
 
   public static parse(source: any) {
     if (source) {
       let srcObj = source
-      if (typeof source === "string") {
+      if (typeof source === 'string') {
         srcObj = JSON.parse(source)
       }
 
