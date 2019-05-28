@@ -10,6 +10,20 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6fecaa016b2a4f3da64cee1b680085c1)](https://app.codacy.com/app/arietrouw/tool-domains-nodejs?utm_source=github.com&utm_medium=referral&utm_content=XYOracleNetwork/tool-domains-nodejs&utm_campaign=Badge_Grade_Dashboard) [![Maintainability](https://api.codeclimate.com/v1/badges/7b4591ab55a5c83f0a86/maintainability)](https://codeclimate.com/repos/5c74a1ecac0eba026f00a686/maintainability) [![BCH compliance](https://bettercodehub.com/edge/badge/XYOracleNetwork/tool-domains-nodejs?branch=master)](https://bettercodehub.com/results/XYOracleNetwork/tool-domains-nodejs)
 
+## Table of Contents
+
+-   [Title](#dnslint-tool-domains-nodejs)
+-   [Description](#description)
+-   [Getting Started](#getting-started)
+-   [CLI Options](#cli-options)
+-   [Config File](#config-file)
+-   [AWS Support](#aws-support)
+-   [Developer Guide](#developer-guide)
+-   [License](#license)
+-   [Credits](#credits)
+
+## Description
+
 Internal XY tool for checking domain configurations in AWS
 
 ## Getting started
@@ -101,9 +115,8 @@ i.e.
 
 ## License
 
-Only for internal XY Company use at this time
+See the [LICENSE.md](LICENSE) file for license details.
 
 ## Credits
 
-Made with ❤️
-by [XYO](https://xyo.network)
+Made with 🔥and ❄️ by [XY - The Persistent Company](https://www.xy.company)
