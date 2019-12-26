@@ -8,7 +8,9 @@
     "pretest": "yarn install",
     "test": "yarn lint",
     "cli": "node dist/cli.js",
-    "develop": "ts-node --files src/cli.ts"
+    "develop": "ts-node --files src/cli.ts",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "bin": {
     "dnslint": "bin/dnslint"
@@ -40,7 +42,8 @@
     "html-validator": "^4.0.2",
     "is-circular": "^1.0.2",
     "load-json-file": "^6.0.0",
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "@types/aws-sdk": "^2.7.0",
@@ -54,5 +57,6 @@
     "tslint-config-airbnb": "^5.11.1",
     "typescript": "^3.4.5",
     "yarn": "^1.16.0"
-  }
+  },
+  "snyk": true
 }
