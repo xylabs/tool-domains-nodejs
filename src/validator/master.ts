@@ -12,7 +12,7 @@ export class MasterValidator extends Validator<MasterConfig> {
     super(config)
   }
 
-  public async validate() {
+  public async validate(verbose: boolean) {
     this.addDomainsFromConfig()
     if (this.config.aws && this.config.aws.enabled) {
       await this.addDomainsFromAws()
@@ -21,7 +21,7 @@ export class MasterValidator extends Validator<MasterConfig> {
     let completedDomains = 0
     for (const domain of Object.values(this.domains)) {
       try {
-        const errors = await domain.validate()
+        const errors = await domain.validate(verbose)
         completedDomains++
         console.log(`Domain:[${completedDomains}/${this.domains.length}]: ${domain.name} [${domain.type}]`)
         this.errorCount += errors
@@ -33,7 +33,7 @@ export class MasterValidator extends Validator<MasterConfig> {
       }
     }
 
-    return super.validate()
+    return super.validate(verbose)
   }
 
   private addDomainsFromConfig() {

@@ -13,19 +13,19 @@ export class ValueValidator extends Validator<ValueConfig> {
     this.context = context || 'ValueValidator'
   }
 
-  public async validate() {
+  public async validate(verbose: boolean) {
     if (this.config.filter) {
       switch (this.config.disposition) {
         case 'required':
-          return this.validateRequired()
+          return this.validateRequired(verbose)
       }
     }
     console.log(chalk.gray(
       `Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`))
-    return super.validate()
+    return super.validate(verbose)
   }
 
-  private validateRequired() {
+  private validateRequired(verbose: boolean) {
     if (this.config.filter) {
       let matchesFound = 0
       for (const data of this.data) {
@@ -39,7 +39,7 @@ export class ValueValidator extends Validator<ValueConfig> {
         this.addError(this.context, `Required value missing: ${this.config}:${JSON.stringify(this.data)}`)
       }
     }
-    return super.validate()
+    return super.validate(verbose)
   }
 
   private checkValue(filter: any, data: any) {

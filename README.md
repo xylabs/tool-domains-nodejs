@@ -12,15 +12,15 @@
 
 ## Table of Contents
 
--   [Title](#dnslint-tool-domains-nodejs)
--   [Description](#description)
--   [Getting Started](#getting-started)
--   [CLI Options](#cli-options)
--   [Config File](#config-file)
--   [AWS Support](#aws-support)
--   [Developer Guide](#developer-guide)
--   [License](#license)
--   [Credits](#credits)
+- [Title](#dnslint-tool-domains-nodejs)
+- [Description](#description)
+- [Getting Started](#getting-started)
+- [CLI Options](#cli-options)
+- [Config File](#config-file)
+- [AWS Support](#aws-support)
+- [Developer Guide](#developer-guide)
+- [License](#license)
+- [Credits](#credits)
 
 ## Description
 

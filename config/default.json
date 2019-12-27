@@ -154,6 +154,7 @@
         {
           "type": "CAA",
           "enabled": true,
+          "inheritable": true,
           "values": [
             {
               "disposition": "required",

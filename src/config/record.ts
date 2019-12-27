@@ -3,7 +3,6 @@ import assert from 'assert'
 import _ from 'lodash'
 import { WebcallConfig } from './webcall'
 import { Configs } from './configs'
-import chalk from 'chalk'
 import { ValueConfig } from './value'
 
 export class RecordConfig extends Config {
@@ -41,6 +40,7 @@ export class RecordConfig extends Config {
   public domain?: string
   public timeout?: number
   public callTimeMax?: number
+  public inheritable?: boolean
 
   public reverseDNS?: {
     'enabled': true,
