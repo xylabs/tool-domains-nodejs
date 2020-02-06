@@ -54,6 +54,14 @@ Options:
   -h, --help                   output usage information
 ```
 
+## Other Scanning Sites
+
+[Apple Search Validator](https://search.developer.apple.com/appsearch-validation-tool)
+
+[SecurityHeaders](https://securityheaders.com)
+
+[MX Toolbax Super Tool](https://mxtoolbox.com/SuperTool.aspx)
+
 ## Config File [dnslint.json]
 
 Make sure you put the config file in the same folder from where you are running the tool.
