@@ -34,7 +34,7 @@
     "@xyo-network/sdk-base-nodejs": "^0.6.1",
     "assert": "^2.0.0",
     "aws-sdk": "^2.453.0",
-    "axios": "^0.19.0",
+    "axios": "^0.19.2",
     "chalk": "^3.0.0",
     "commander": "^4.0.1",
     "dns-packet": "^5.2.1",
@@ -42,8 +42,8 @@
     "html-validator": "^5.0.0",
     "is-circular": "^1.0.2",
     "load-json-file": "^6.0.0",
-    "lodash": "^4.17.11",
-    "snyk": "^1.189.0"
+    "lodash": "^4.17.15",
+    "snyk": "^1.290.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.126",
