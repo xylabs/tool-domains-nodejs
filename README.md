@@ -6,9 +6,23 @@
 
 [![NPM](https://nodei.co/npm/dnslint.png)](https://nodei.co/npm/dnslint/)
 
-[![npm version](https://badge.fury.io/js/dnslint.svg)](https://badge.fury.io/js/dnslint) [![Build Status](https://travis-ci.com/XYOracleNetwork/tool-domains-nodejs.svg?token=A85R2pDnngMDyWoqeLUG&branch=master)](https://travis-ci.com/XYOracleNetwork/tool-domains-nodejs) [![DepShield Badge](https://depshield.sonatype.org/badges/XYOracleNetwork/tool-domains-nodejs/depshield.svg)](https://depshield.github.io) ![npm](https://img.shields.io/npm/dt/dnslint.svg)
+[![npm version](https://badge.fury.io/js/dnslint.svg)](https://badge.fury.io/js/dnslint) ![](https://github.com/xycorp/app-matrix-react/workflows/CI/badge.svg?branch=develop)[![DepShield Badge](https://depshield.sonatype.org/badges/XYOracleNetwork/tool-domains-nodejs/depshield.svg)](https://depshield.github.io) ![npm](https://img.shields.io/npm/dt/dnslint.svg)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6fecaa016b2a4f3da64cee1b680085c1)](https://app.codacy.com/app/arietrouw/tool-domains-nodejs?utm_source=github.com&utm_medium=referral&utm_content=XYOracleNetwork/tool-domains-nodejs&utm_campaign=Badge_Grade_Dashboard) [![Maintainability](https://api.codeclimate.com/v1/badges/7b4591ab55a5c83f0a86/maintainability)](https://codeclimate.com/repos/5c74a1ecac0eba026f00a686/maintainability) [![BCH compliance](https://bettercodehub.com/edge/badge/XYOracleNetwork/tool-domains-nodejs?branch=master)](https://bettercodehub.com/results/XYOracleNetwork/tool-domains-nodejs)
+
+## Table of Contents
+
+- [Title](#dnslint-tool-domains-nodejs)
+- [Description](#description)
+- [Getting Started](#getting-started)
+- [CLI Options](#cli-options)
+- [Config File](#config-file)
+- [AWS Support](#aws-support)
+- [Developer Guide](#developer-guide)
+- [License](#license)
+- [Credits](#credits)
+
+## Description
 
 Internal XY tool for checking domain configurations in AWS
 
@@ -39,6 +53,14 @@ Options:
   -d, --domainToCheck [value]  Domain to Check
   -h, --help                   output usage information
 ```
+
+## Other Scanning Sites
+
+[Apple Search Validator](https://search.developer.apple.com/appsearch-validation-tool)
+
+[SecurityHeaders](https://securityheaders.com)
+
+[MX Toolbax Super Tool](https://mxtoolbox.com/SuperTool.aspx)
 
 ## Config File [dnslint.json]
 
@@ -101,9 +123,8 @@ i.e.
 
 ## License
 
-Only for internal XY Company use at this time
+See the [LICENSE.md](LICENSE) file for license details.
 
 ## Credits
 
-Made with ❤️
-by [XYO](https://xyo.network)
+Made with 🔥and ❄️ by [XY - The Persistent Company](https://www.xy.company)

@@ -13,10 +13,25 @@ export class XyDomainScan {
   private config = new MasterConfig('master')
   private validator = new MasterValidator(new MasterConfig('master'))
   private preflight?: string
+  private verbose = false
 
-  public async loadConfig(filename?: string) {
+  public async loadConfig(filename: string, defaultConfigFilename: string) {
+
+    function customizer(objValue: any, srcValue: any) {
+      if (_.isArray(objValue)) {
+        return objValue.concat(srcValue)
+      }
+      if (_.isMap(objValue)) {
+        if (_.isMap(srcValue)) {
+          srcValue.forEach((k, v) => {
+            objValue.set(k, v)
+          })
+          return objValue
+        }
+      }
+    }
+
     try {
-      const filenameToLoad = filename || './dnslint.json'
       /*const ajv = new Ajv({ schemaId: 'id' })
       const validate = ajv.compile(schema)
       if (!validate(defaultConfig)) {
@@ -24,10 +39,11 @@ export class XyDomainScan {
       } else {
         console.log(chalk.green("Default Config Validated"))
       }*/
-      const defaultConfig = await loadJsonFile('../config/default.json')
+      const defaultConfigJson = await loadJsonFile(defaultConfigFilename)
+      const defaultConfig = MasterConfig.parse(defaultConfigJson)
       console.log(chalk.gray('Loaded Default Config'))
       try {
-        const userConfigJson = await loadJsonFile(filenameToLoad)
+        const userConfigJson = await loadJsonFile(filename)
         const userConfig = MasterConfig.parse(userConfigJson)
         /*if (!validate(userJson)) {
           console.error(chalk.red(`${validate.errors}`))
@@ -36,7 +52,8 @@ export class XyDomainScan {
         }*/
         console.log(chalk.gray('Loaded User Config'))
         if (defaultConfig) {
-          return _.merge({}, defaultConfig, userConfig)
+          // _.mergeWith(userConfig, defaultConfig, customizer)
+          return defaultConfig
         }
         return userConfig
       } catch (ex) {
@@ -52,9 +69,10 @@ export class XyDomainScan {
   }
 
   public async start(
-    params: {output: string, singleDomain?: string, bucket?: string, config?: MasterConfig, preflight?: string}
+    params: {defaultConfig: string, verbose: boolean, output: string, singleDomain?: string, bucket?: string, config?: MasterConfig, preflight?: string}
   ) {
-    this.config = await this.loadConfig()
+    this.verbose = params.verbose
+    this.config = await this.loadConfig('./dnslint.json', params.defaultConfig)
     this.preflight = params.preflight
 
     for (const domain of this.config.domains.values()) {
@@ -89,7 +107,7 @@ export class XyDomainScan {
 
     console.log(`Domains Found: ${this.config.domains.size}`)
 
-    await this.validator.validate()
+    await this.validator.validate(this.verbose)
 
     if (params.bucket) {
       this.saveToAws(params.bucket)

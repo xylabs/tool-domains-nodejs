@@ -4,11 +4,13 @@ import chalk from 'chalk'
 import { RecordConfig } from '../config/record'
 import { WebcallValidator } from './webcall'
 import { ValueValidator } from './value'
+import assert from 'assert'
 
 export class RecordValidator extends Validator<RecordConfig> {
 
   public type: string
   public domain: string
+  public inheritable: boolean
   public records: any[] = []
   public webcalls: WebcallValidator[] = []
   public values: ValueValidator[] = []
@@ -18,23 +20,24 @@ export class RecordValidator extends Validator<RecordConfig> {
     super(config)
     this.domain = domain
     this.type = config.type
+    this.inheritable = config.inheritable ?? false
   }
 
-  public async validate() {
+  public async validate(verbose: boolean) {
     if (this.type.split('|').length === 1) {
       await this.resolve()
-      this.webcalls = await this.validateWebcalls()
-      this.values = await this.validateValues()
+      this.webcalls = await this.validateWebcalls(verbose)
+      this.values = await this.validateValues(verbose)
       if (this.config.reverseDNS) {
         if (((this.config.reverseDNS.enabled === undefined) && true) || this.config.reverseDNS.enabled) {
           this.reverseDns = await this.reverseLookup(this.config.reverseDNS.value)
         }
       }
     }
-    return super.validate()
+    return super.validate(verbose)
   }
 
-  protected async validateWebcalls() {
+  protected async validateWebcalls(verbose: boolean) {
     const result: WebcallValidator[] = []
     if (this.config.webcalls) {
       for (const webcall of this.config.webcalls.values()) {
@@ -42,7 +45,7 @@ export class RecordValidator extends Validator<RecordConfig> {
           if (record.data) {
             const validator = new WebcallValidator(webcall, record.data, this.domain)
             result.push(validator)
-            await validator.validate()
+            await validator.validate(verbose)
             this.errorCount += validator.errorCount
           }
         }
@@ -51,7 +54,7 @@ export class RecordValidator extends Validator<RecordConfig> {
     return result
   }
 
-  protected async validateValues() {
+  protected async validateValues(verbose: boolean) {
     let valueErrorCount = 0
     const result: ValueValidator[] = []
     if (this.config.values) {
@@ -72,7 +75,7 @@ export class RecordValidator extends Validator<RecordConfig> {
         }
         const validator = new ValueValidator(values, dataArray, `${this.domain}:${this.type}`)
         result.push(validator)
-        await validator.validate()
+        await validator.validate(verbose)
         this.errorCount += validator.errorCount
         valueErrorCount += validator.errorCount
       }
@@ -131,7 +134,15 @@ export class RecordValidator extends Validator<RecordConfig> {
         this.addError('resolve', 'Missing Domain')
         return
       }
-      this.records = await Dns.resolve(this.domain, this.type)
+      let domain = this.domain
+      this.records = await Dns.resolve(domain, this.type)
+      if (this.inheritable) {
+        while (this.records.length === 0 && domain.includes('.')) {
+          const parts = domain.split('.')
+          domain = parts.slice(1).join('.')
+          this.records = await Dns.resolve(domain, this.type)
+        }
+      }
     } catch (ex) {
       this.addError('resolve', ex.message)
       console.error(chalk.red(ex.stack))

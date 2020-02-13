@@ -17,7 +17,7 @@ export class Validator<T extends Config> {
     return _.omit(this, ['config'])
   }
 
-  public async validate() {
+  public async validate(verbose: boolean) {
     if (this.errors) {
       this.errorCount += this.addErrors.length
     }

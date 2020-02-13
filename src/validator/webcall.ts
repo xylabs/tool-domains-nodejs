@@ -22,7 +22,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
     this.host = host
   }
 
-  public async validate() {
+  public async validate(verbose: boolean) {
     try {
       let callTime = Date.now()
       const response: any = await this.get(this.config.protocol, this.address)
@@ -41,7 +41,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         }
 
         if (this.headers && this.config.headers) {
-          this.validations.concat(await this.validateHeaders())
+          this.validations.concat(await this.validateHeaders(verbose))
         }
 
         const expectedCode = this.config.statusCode || 200
@@ -67,22 +67,22 @@ export class WebcallValidator extends Validator<WebcallConfig> {
     if (this.errorCount === 0) {
       console.log(chalk.gray(`Webcall Check Passed: ${this.address} [${this.host}]`))
     }
-    return super.validate()
+    return super.validate(verbose)
   }
 
-  protected async validateHeaders() {
+  protected async validateHeaders(verbose: boolean) {
     const result: ValueValidator[] = []
     let errorCount = 0
     if (this.config.headers && this.headers) {
       for (const value of this.config.headers.values()) {
-        const dataArray: string[] | object[] | number[] = []
+        const dataArray: string[] = []
         const data = this.headers[value.name]
         if (data) {
           dataArray.push(data)
         }
         const validator = new ValueValidator(value, dataArray)
         result.push(validator)
-        await validator.validate()
+        await validator.validate(verbose)
         errorCount += validator.errorCount
       }
     }

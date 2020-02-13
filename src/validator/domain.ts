@@ -21,7 +21,7 @@ export class DomainValidator extends Validator<DomainConfig> {
     this.type = type
   }
 
-  public async validate() {
+  public async validate(verbose: boolean) {
     if (!this.config.isEnabled()) {
       console.log(chalk.gray(`Skipping Disabled Domain: ${this.config.name}`))
       return 0
@@ -30,11 +30,14 @@ export class DomainValidator extends Validator<DomainConfig> {
       this.records = []
       if (this.config.records) {
         for (const recordConfig of this.config.records.values()) {
+          if (verbose) {
+            console.log(chalk.green(`Validation Record [${recordConfig.type}]`))
+          }
           if (recordConfig.type !== '*') {
             if (recordConfig.isEnabled()) {
               const record = new RecordValidator(recordConfig, this.name)
               this.records.push(record)
-              this.errorCount += await record.validate()
+              this.errorCount += await record.validate(verbose)
             }
           }
         }
@@ -51,7 +54,7 @@ export class DomainValidator extends Validator<DomainConfig> {
     if (this.config.crawl !== undefined) {
       crawl = this.config.crawl
     }
-    return super.validate()
+    return super.validate(verbose)
   }
 
   /*private async getDomainUrls() {
