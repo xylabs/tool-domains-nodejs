@@ -31,7 +31,7 @@
     "node": ">=8.0.0"
   },
   "dependencies": {
-    "@xyo-network/sdk-base-nodejs": "^0.6.1",
+    "@xyo-network/sdk-base-nodejs": "^0.6.9",
     "assert": "^2.0.0",
     "aws-sdk": "^2.453.0",
     "axios": "^0.19.2",
@@ -39,7 +39,7 @@
     "commander": "^4.0.1",
     "dns-packet": "^5.2.1",
     "dotenv-expand": "^5.1.0",
-    "html-validator": "^5.0.0",
+    "html-validator": "^5.1.14",
     "is-circular": "^1.0.2",
     "load-json-file": "^6.0.0",
     "lodash": "^4.17.15",
