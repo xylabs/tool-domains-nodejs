@@ -1,9 +1,8 @@
-import { Config } from './config'
 import assert from 'assert'
 import _ from 'lodash'
+import { Config } from './config'
 
 export class WebcallConfig extends Config {
-
   public static parse(source: any) {
     let srcObj = source
     if (typeof source === 'string') {
@@ -18,11 +17,17 @@ export class WebcallConfig extends Config {
   }
 
   public protocol: string
+
   public port?: number
+
   public timeout?: number
+
   public html?: boolean
+
   public callTimeMax?: number
+
   public headers?: any[]
+
   public statusCode?: number
 
   constructor(protocol: string) {

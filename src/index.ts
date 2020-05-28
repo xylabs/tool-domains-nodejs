@@ -1,22 +1,24 @@
-import { AWS } from './aws'
 import fs from 'fs'
-import { MasterConfig } from './config'
 import chalk from 'chalk'
-import { MasterValidator } from './validator/master'
-import { AWSConfig } from './config/aws'
 import loadJsonFile from 'load-json-file'
 import _ from 'lodash'
+import { AWS } from './aws'
+import { MasterConfig } from './config'
+import { MasterValidator } from './validator/master'
+import { AWSConfig } from './config/aws'
 
 export class XyDomainScan {
-
   private aws = new AWS()
+
   private config = new MasterConfig('master')
+
   private validator = new MasterValidator(new MasterConfig('master'))
+
   private preflight?: string
+
   private verbose = false
 
   public async loadConfig(filename: string, defaultConfigFilename: string) {
-
     function customizer(objValue: any, srcValue: any) {
       if (_.isArray(objValue)) {
         return objValue.concat(srcValue)
@@ -32,24 +34,24 @@ export class XyDomainScan {
     }
 
     try {
-      /*const ajv = new Ajv({ schemaId: 'id' })
+      /* const ajv = new Ajv({ schemaId: 'id' })
       const validate = ajv.compile(schema)
       if (!validate(defaultConfig)) {
         console.error(chalk.red(`${validate.errors}`))
       } else {
         console.log(chalk.green("Default Config Validated"))
-      }*/
+      } */
       const defaultConfigJson = await loadJsonFile(defaultConfigFilename)
       const defaultConfig = MasterConfig.parse(defaultConfigJson)
       console.log(chalk.gray('Loaded Default Config'))
       try {
         const userConfigJson = await loadJsonFile(filename)
         const userConfig = MasterConfig.parse(userConfigJson)
-        /*if (!validate(userJson)) {
+        /* if (!validate(userJson)) {
           console.error(chalk.red(`${validate.errors}`))
         } else {
           console.log(chalk.green("User Config Validated"))
-        }*/
+        } */
         console.log(chalk.gray('Loaded User Config'))
         if (defaultConfig) {
           // _.mergeWith(userConfig, defaultConfig, customizer)
@@ -69,7 +71,7 @@ export class XyDomainScan {
   }
 
   public async start(
-    params: {defaultConfig: string, verbose: boolean, output: string, singleDomain?: string, bucket?: string, config?: MasterConfig, preflight?: string}
+    params: {defaultConfig: string; verbose: boolean; output: string; singleDomain?: string; bucket?: string; config?: MasterConfig; preflight?: string},
   ) {
     this.verbose = params.verbose
     this.config = await this.loadConfig('./dnslint.json', params.defaultConfig)
@@ -85,7 +87,7 @@ export class XyDomainScan {
       const singleDomainConfig = this.config.getDomainConfig(params.singleDomain)
       this.config.domains.set(
         singleDomainConfig.name,
-        singleDomainConfig
+        singleDomainConfig,
       )
 
       // since we are only doing one, remove the rest

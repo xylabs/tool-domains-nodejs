@@ -1,12 +1,15 @@
 import chalk from 'chalk'
-import { ValidationError } from './error'
 import _ from 'lodash'
+import { ValidationError } from './error'
 import { Config } from '../config/config'
 
 export class Validator<T extends Config> {
   public config: T
+
   public validations: any[] = []
+
   public errors?: ValidationError[]
+
   public errorCount = 0
 
   constructor(config: T) {
@@ -37,5 +40,4 @@ export class Validator<T extends Config> {
       this.errors = this.errors.concat(errors)
     }
   }
-
 }

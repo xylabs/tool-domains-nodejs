@@ -1,10 +1,10 @@
+import chalk from 'chalk'
 import { Validator } from './validator'
 import { ValueConfig } from '../config/value'
-import chalk from 'chalk'
 
 export class ValueValidator extends Validator<ValueConfig> {
-
   public data: string[] | object[] | number[]
+
   private context: string
 
   constructor(config: ValueConfig, data: string[] | object[] | number[], context?: string) {
@@ -21,7 +21,8 @@ export class ValueValidator extends Validator<ValueConfig> {
       }
     }
     console.log(chalk.gray(
-      `Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`))
+      `Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`,
+    ))
     return super.validate(verbose)
   }
 
@@ -60,9 +61,10 @@ export class ValueValidator extends Validator<ValueConfig> {
         matched = true
       }
     } else {
-      this.addError(this.context, `Value type mismatch [${ typeof data } should be ${ typeof filter }]`)
+      this.addError(this.context, `Value type mismatch [${typeof data} should be ${typeof filter}]`)
       this.addError(
-        this.context, `Value type mismatch [${ JSON.stringify(data) } should be ${ JSON.stringify(filter) }]`)
+        this.context, `Value type mismatch [${JSON.stringify(data)} should be ${JSON.stringify(filter)}]`,
+      )
     }
     return matched
   }
