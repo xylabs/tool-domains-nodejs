@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import chalk from 'chalk'
 import _ from 'lodash'
 import url from 'url'
-import { inspect } from 'util'
-import { MasterConfig } from '../config'
 import { Validator } from './validator'
 import { RecordValidator } from './record'
 import { DomainConfig } from '../config/domain'
