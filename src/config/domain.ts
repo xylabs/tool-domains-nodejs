@@ -1,11 +1,10 @@
-import { RecordConfig } from './record'
 import _ from 'lodash'
-import { Configs } from './configs'
 import assert from 'assert'
+import { RecordConfig } from './record'
+import { Configs } from './configs'
 import { RecordsConfig } from './records'
 
 export class DomainConfig extends RecordsConfig {
-
   public static parse(source: any, type?: string) {
     let srcObj = source
     if (typeof source === 'string') {
@@ -28,8 +27,11 @@ export class DomainConfig extends RecordsConfig {
   }
 
   public name: string
+
   public serverType: string
+
   public timeout = 1000
+
   public crawl?: boolean
 
   constructor(name: string, type: string) {
@@ -40,7 +42,7 @@ export class DomainConfig extends RecordsConfig {
 
   public merge(config?: DomainConfig) {
     if (config) {
-      const name = this.name
+      const { name } = this
       _.merge(new DomainConfig(name, this.serverType), config)
       this.name = name
       super.merge(config)

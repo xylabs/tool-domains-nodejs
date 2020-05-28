@@ -10,7 +10,8 @@
     "cli": "node dist/cli.js",
     "develop": "ts-node --files src/cli.ts",
     "snyk-protect": "snyk protect",
-    "prepublish": "npm run snyk-protect"
+    "prepublish": "npm run snyk-protect",
+    "lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "bin": {
     "dnslint": "bin/dnslint"
@@ -29,12 +30,6 @@
   "engineStrict": true,
   "engines": {
     "node": ">=8.0.0"
-  },
-  "prettier": {
-    "semi": false,
-    "trailingComma": "none",
-    "singleQuote": true,
-    "jsxSingleQuote": true
   },
   "dependencies": {
     "@xyo-network/sdk-base-nodejs": "^0.6.9",
@@ -63,10 +58,9 @@
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
     "object.assign": "^4.1.0",
     "object.entries": "^1.1.2",
-    "prettier": "^1.19.1",
     "ts-node": "^8.1.0",
     "typescript": "^3.7.5",
     "yarn": "^1.16.0"

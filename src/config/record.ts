@@ -1,12 +1,11 @@
-import { Config } from './config'
 import assert from 'assert'
 import _ from 'lodash'
+import { Config } from './config'
 import { WebcallConfig } from './webcall'
 import { Configs } from './configs'
 import { ValueConfig } from './value'
 
 export class RecordConfig extends Config {
-
   public static parse(source: any, domain?: string) {
     let srcObj = source
     if (typeof source === 'string') {
@@ -37,17 +36,22 @@ export class RecordConfig extends Config {
   }
 
   public type: string
+
   public domain?: string
+
   public timeout?: number
+
   public callTimeMax?: number
+
   public inheritable?: boolean
 
   public reverseDNS?: {
-    'enabled': true,
-    'value': string
+    'enabled': true;
+    'value': string;
   }
 
   public values?: Configs<ValueConfig>
+
   public webcalls?: Configs<WebcallConfig>
 
   constructor(type: string, domain?: string) {
@@ -58,8 +62,8 @@ export class RecordConfig extends Config {
 
   public merge(config?: any) {
     if (config) {
-      const type = this.type
-      const domain = this.domain
+      const { type } = this
+      const { domain } = this
       let values = new Configs<ValueConfig>()
       values = values.merge(this.values)
       values = values.merge(config.values)

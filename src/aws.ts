@@ -3,6 +3,7 @@ import chalk from 'chalk'
 
 export class AWS {
   private r53 = new Route53()
+
   private s3 = new S3()
 
   public async getDomains(): Promise<string[]> {
@@ -28,7 +29,7 @@ export class AWS {
         Bucket: bucket,
         Key: filename,
         Body: buffer,
-        ContentType: 'application/json'
+        ContentType: 'application/json',
       }
 
       this.s3.upload(params, (err: any, result: any) => {
@@ -62,7 +63,7 @@ export class AWS {
   private async getResources(zone: Route53.Types.HostedZone): Promise<Route53.Types.ListResourceRecordSetsResponse> {
     return new Promise((resolve, reject) => {
       const params = {
-        HostedZoneId: zone.Id
+        HostedZoneId: zone.Id,
       }
 
       this.r53.listResourceRecordSets(params, (err, data) => {

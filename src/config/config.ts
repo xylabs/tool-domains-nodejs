@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import assert from 'assert'
-export class Config {
 
+export class Config {
   public static parse(source: any) {
     if (source) {
       let srcObj = source
@@ -17,6 +17,7 @@ export class Config {
   }
 
   public key: string
+
   public enabled?: boolean
 
   constructor(key: string) {

@@ -1,19 +1,24 @@
+import chalk from 'chalk'
+import assert from 'assert'
 import { Validator } from './validator'
 import { Dns } from '../dns'
-import chalk from 'chalk'
 import { RecordConfig } from '../config/record'
 import { WebcallValidator } from './webcall'
 import { ValueValidator } from './value'
-import assert from 'assert'
 
 export class RecordValidator extends Validator<RecordConfig> {
-
   public type: string
+
   public domain: string
+
   public inheritable: boolean
+
   public records: any[] = []
+
   public webcalls: WebcallValidator[] = []
+
   public values: ValueValidator[] = []
+
   public reverseDns?: any
 
   constructor(config: RecordConfig, domain: string) {
@@ -88,7 +93,7 @@ export class RecordValidator extends Validator<RecordConfig> {
     return result
   }
 
-  protected async reverseLookup(value ?: string) {
+  protected async reverseLookup(value?: string) {
     const result: any[] = []
     try {
       for (const record of this.records) {
@@ -112,7 +117,7 @@ export class RecordValidator extends Validator<RecordConfig> {
           result.push({
             domains,
             valid,
-            ip: record
+            ip: record,
           })
         }
       }
@@ -134,7 +139,7 @@ export class RecordValidator extends Validator<RecordConfig> {
         this.addError('resolve', 'Missing Domain')
         return
       }
-      let domain = this.domain
+      let { domain } = this
       this.records = await Dns.resolve(domain, this.type)
       if (this.inheritable) {
         while (this.records.length === 0 && domain.includes('.')) {
@@ -148,5 +153,4 @@ export class RecordValidator extends Validator<RecordConfig> {
       console.error(chalk.red(ex.stack))
     }
   }
-
 }
