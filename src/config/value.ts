@@ -1,9 +1,8 @@
-import { Config } from './config'
 import assert from 'assert'
 import _ from 'lodash'
+import { Config } from './config'
 
 export class ValueConfig extends Config {
-
   public static parse(source: any) {
     let srcObj = source
     if (typeof source === 'string') {
@@ -16,7 +15,9 @@ export class ValueConfig extends Config {
   }
 
   public name: string
+
   public disposition?: string
+
   public filter?: string | object | number
 
   constructor(name: string) {

@@ -3,9 +3,10 @@ import net from 'net'
 
 export class DnsClient {
   private host: string
+
   private expectedLength = 0
 
-  constructor(host: string = '8.8.8.8') {
+  constructor(host = '8.8.8.8') {
     this.host = host
   }
 
@@ -19,8 +20,8 @@ export class DnsClient {
         flags: dnsPacket.RECURSION_DESIRED,
         questions: [{
           type,
-          name
-        }]
+          name,
+        }],
       })
 
       const client = new net.Socket()

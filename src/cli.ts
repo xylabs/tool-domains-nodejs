@@ -1,13 +1,13 @@
 import commander from 'commander'
 import dotenvExpand from 'dotenv-expand'
-import { XyDomainScan } from './'
+import { XyDomainScan } from "."
 
 const getVersion = (): string => {
   dotenvExpand({
     parsed: {
-      APP_VERSION:'$npm_package_version',
-      APP_NAME:'$npm_package_name'
-    }
+      APP_VERSION: '$npm_package_version',
+      APP_NAME: '$npm_package_name',
+    },
   })
 
   return process.env.APP_VERSION || 'Unknown'
@@ -35,6 +35,6 @@ tool.start(
     output: program.output,
     singleDomain: program.domainToCheck,
     bucket: program.bucket,
-    preflight: program.preflight
-  }
+    preflight: program.preflight,
+  },
 )

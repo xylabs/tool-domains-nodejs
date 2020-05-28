@@ -1,18 +1,23 @@
-import { Validator } from './validator'
-import { WebcallConfig } from '../config/webcall'
 import axios from 'axios'
 import htmlValidator from 'html-validator'
 import chalk from 'chalk'
+import { WebcallConfig } from '../config/webcall'
+import { Validator } from './validator'
 import { ValueValidator } from './value'
 
 export class WebcallValidator extends Validator<WebcallConfig> {
-
   public protocol: string
+
   public address: string
+
   public host: string
+
   public headers?: any[]
+
   public statusCode?: number
+
   public statusMessage?: string
+
   public callTime?: number
 
   constructor(config: WebcallConfig, address: string, host: string) {
@@ -34,9 +39,9 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         if (this.config.callTimeMax && this.callTime) {
           if (this.callTime > this.config.callTimeMax) {
             this.addError(
-                'validate',
-                `Call too slow: ${this.callTime}ms [Expected < ${this.config.callTimeMax}ms]`
-              )
+              'validate',
+              `Call too slow: ${this.callTime}ms [Expected < ${this.config.callTimeMax}ms]`,
+            )
           }
         }
 
@@ -47,14 +52,12 @@ export class WebcallValidator extends Validator<WebcallConfig> {
         const expectedCode = this.config.statusCode || 200
         if (this.statusCode !== expectedCode) {
           this.addError(
-              'validate',
-              `Unexpected Response Code: ${this.statusCode} [Expected: ${expectedCode}]`
-            )
-        } else {
-          if (this.config.html) {
-            if (this.statusCode === 200) {
-              this.validations.concat(await this.validateHtml(response.data))
-            }
+            'validate',
+            `Unexpected Response Code: ${this.statusCode} [Expected: ${expectedCode}]`,
+          )
+        } else if (this.config.html) {
+          if (this.statusCode === 200) {
+            this.validations.concat(await this.validateHtml(response.data))
           }
         }
       } else {
@@ -97,13 +100,14 @@ export class WebcallValidator extends Validator<WebcallConfig> {
   private async validateHtml(data: string) {
     const results = await htmlValidator({
       data,
-      format: 'json'
+      format: 'json',
     })
     for (const item of results.messages) {
       if (item.type === 'error') {
         this.addError(
           'validateHtml',
-          `[L:${item.lastLine}, C:${item.lastColumn}]: ${item.message}`)
+          `[L:${item.lastLine}, C:${item.lastColumn}]: ${item.message}`,
+        )
       }
     }
     return results.messages
@@ -122,15 +126,15 @@ export class WebcallValidator extends Validator<WebcallConfig> {
           validateStatus: (status: any) => true,
           transformResponse: (data: any) => data,
           headers: {
-            Host: this.host
-          }
-        }
+            Host: this.host,
+          },
+        },
       )
     } catch (ex) {
       this.addError('get', `Failed [${protocol}://${this.address}]:${ex.code}`)
       response = {
         code: ex.code,
-        message: ex.message
+        message: ex.message,
       }
     }
     return response

@@ -1,11 +1,10 @@
+import chalk from 'chalk'
 import { MasterConfig } from '../config'
 import { Validator } from './validator'
 import { DomainValidator } from './domain'
 import { AWS } from '../aws'
-import chalk from 'chalk'
 
 export class MasterValidator extends Validator<MasterConfig> {
-
   public domains: DomainValidator[] = []
 
   constructor(config: MasterConfig) {

@@ -1,6 +1,6 @@
+import _ from 'lodash'
 import { AWSConfig } from './aws'
 import { DomainConfig } from './domain'
-import _ from 'lodash'
 import { RecordConfig } from './record'
 import { Config } from './config'
 import { Configs } from './configs'
@@ -8,7 +8,6 @@ import { ServerConfig } from './server'
 import { RecordsConfig } from './records'
 
 export class MasterConfig extends Config {
-
   public static parse(source: any) {
     let srcObj = source
     if (typeof source === 'string') {
@@ -34,7 +33,9 @@ export class MasterConfig extends Config {
   }
 
   public aws = new AWSConfig('aws')
+
   public domains = new Configs<DomainConfig>()
+
   public servers = new Configs<ServerConfig>()
 
   public merge(config?: MasterConfig) {
@@ -104,7 +105,7 @@ export class MasterConfig extends Config {
     let defaultName = 'unknown'
     if (this.servers) {
       for (const server of this.servers.values()) {
-        const filters = server.filters
+        const { filters } = server
         if (filters) {
           for (const filter of filters) {
             if (domain.match(filter)) {

@@ -2,7 +2,6 @@ import _ from 'lodash'
 import { Config } from './config'
 
 export class Configs<T extends Config> extends Map<string, T> {
-
   public merge(items?: Configs<T>) {
     if (items) {
       for (const item of items.values()) {

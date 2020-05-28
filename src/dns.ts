@@ -1,8 +1,8 @@
 import dns, { MxRecord } from 'dns'
-import { DnsClient } from './dnsclient'
 import chalk from 'chalk'
-export class Dns {
+import { DnsClient } from './dnsclient'
 
+export class Dns {
   public static client = new DnsClient()
 
   public static async lookup(name: string): Promise < string > {
