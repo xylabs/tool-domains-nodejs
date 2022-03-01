@@ -1,13 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import chalk from 'chalk'
-import assert from 'assert'
-import { Validator } from './validator'
+
+import { RecordConfig } from '../config'
 import { Dns } from '../dns'
-import { RecordConfig } from '../config/record'
-import { WebcallValidator } from './webcall'
+import { Validator } from './validator'
 import { ValueValidator } from './value'
+import { WebcallValidator } from './Webcall'
 
 export class RecordValidator extends Validator<RecordConfig> {
   public type: string
@@ -16,12 +13,14 @@ export class RecordValidator extends Validator<RecordConfig> {
 
   public inheritable: boolean
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public records: any[] = []
 
   public webcalls: WebcallValidator[] = []
 
   public values: ValueValidator[] = []
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public reverseDns?: any
 
   constructor(config: RecordConfig, domain: string) {
@@ -37,7 +36,7 @@ export class RecordValidator extends Validator<RecordConfig> {
       this.webcalls = await this.validateWebcalls(verbose)
       this.values = await this.validateValues(verbose)
       if (this.config.reverseDNS) {
-        if (((this.config.reverseDNS.enabled === undefined) && true) || this.config.reverseDNS.enabled) {
+        if ((this.config.reverseDNS.enabled === undefined && true) || this.config.reverseDNS.enabled) {
           this.reverseDns = await this.reverseLookup(this.config.reverseDNS.value)
         }
       }
@@ -67,11 +66,13 @@ export class RecordValidator extends Validator<RecordConfig> {
     const result: ValueValidator[] = []
     if (this.config.values) {
       for (const values of this.config.values.values()) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const dataArray: any[] = []
         for (const record of this.records) {
           if (record.data) {
             if (Array.isArray(record.data)) {
               for (const innerRecord of record.data) {
+                // eslint-disable-next-line max-depth
                 if (Buffer.isBuffer(innerRecord)) {
                   dataArray.push(innerRecord.toString())
                 }
@@ -97,6 +98,7 @@ export class RecordValidator extends Validator<RecordConfig> {
   }
 
   protected async reverseLookup(value?: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result: any[] = []
     try {
       for (const record of this.records) {
@@ -106,7 +108,8 @@ export class RecordValidator extends Validator<RecordConfig> {
           try {
             domains = await Dns.reverse(record.data)
           } catch (ex) {
-            this.addError('reverse', ex.message)
+            const error = ex as Error
+            this.addError('reverse', error.message)
             valid = false
           }
           if (value && domains) {
@@ -119,14 +122,15 @@ export class RecordValidator extends Validator<RecordConfig> {
           }
           result.push({
             domains,
-            valid,
             ip: record,
+            valid,
           })
         }
       }
     } catch (ex) {
-      this.addError('RecordValidator.reverseLookup', ex.message)
-      console.error(chalk.red(ex.stack))
+      const error = ex as Error
+      this.addError('RecordValidator.reverseLookup', error.message)
+      console.error(chalk.red(error.stack))
     }
     return result
   }
@@ -152,8 +156,9 @@ export class RecordValidator extends Validator<RecordConfig> {
         }
       }
     } catch (ex) {
-      this.addError('resolve', ex.message)
-      console.error(chalk.red(ex.stack))
+      const error = ex as Error
+      this.addError('resolve', error.message)
+      console.error(chalk.red(error.stack))
     }
   }
 }

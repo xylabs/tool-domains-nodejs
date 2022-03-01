@@ -1,17 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "lib": [
-      "esnext", "dom"
-    ],
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "strict": true,
-    "esModuleInterop": true,
-    "noImplicitAny": true,
-    "moduleResolution": "node",
-    "outDir": "dist"
-  }
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "extends": "@xylabs/tsconfig"
 }

@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist"
+  },
+  "exclude": ["src/**/*.spec.ts"],
+  "extends": "@xylabs/tsconfig",
+  "include": ["src"]
+}

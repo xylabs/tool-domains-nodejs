@@ -3,12 +3,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import chalk from 'chalk'
-import _ from 'lodash'
 import url from 'url'
-import { Validator } from './validator'
+
+import { DomainConfig, RecordConfig } from '../config'
 import { RecordValidator } from './record'
-import { DomainConfig } from '../config/domain'
-import { RecordConfig } from '../config/record'
+import { Validator } from './validator'
 
 export class DomainValidator extends Validator<DomainConfig> {
   public name: string
@@ -47,8 +46,9 @@ export class DomainValidator extends Validator<DomainConfig> {
         }
       }
     } catch (ex) {
-      this.addError('DomainValidator.validate', ex.message)
-      console.error(chalk.red(ex.stack)) // since this is unexpected, show the stack
+      const error = ex as Error
+      this.addError('DomainValidator.validate', error.message)
+      console.error(chalk.red(error.stack)) // since this is unexpected, show the stack
     }
     if (this.errorCount) {
       console.log(chalk.yellow(`Errors: ${this.errorCount}`))

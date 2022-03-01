@@ -1,48 +1,44 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "id": "dnslint.schema.json",
   "additionalItems": false,
   "additionalProperties": false,
   "definitions": {
-    "source": {
-      "$id": "#definitions/source",
+    "disposition": {
+        "enum": ["required", "optional", "disallowed"],
+        "type": "string"
+    },
+    "domain": {
+      "$id": "#definitions/domain",
       "additionalProperties": false,
-      "title": "Source",
-      "type": "object",
       "properties": {
         "enabled": {"type": "boolean"},
-        "filter": {"type": "string"}
-      }
+        "name": {"type": "string"},
+        "type": {"type": "string"},
+        "records": {
+          "items": {
+            "$ref": "#/definitions/record"
+          },
+          "type": "array"
+        },
+        "validations": {"$ref": "#/definitions/validations"}
+      },
+      "type": "object"
     },
-    "disposition": {
-        "type": "string",
-        "enum": ["required", "optional", "disallowed"]
-    },
-    "value": {
-      "$id": "#definitions/value",
+    "header": {
+      "$id": "#definitions/header",
       "additionalProperties": false,
-      "title": "Record",
-      "type": "object",
       "properties": {
         "name": {"type": "string"},
-        "disposition": {"$ref": "#/definitions/disposition"},
-        "filter": {"type": ["string", "object"]}
-      }
+        "value": {"$ref": "#/definitions/value"}
+      },
+      "type": "object"
     },
     "record": {
       "$id": "#definitions/record",
       "additionalProperties": false,
-      "title": "Record",
-      "type": "object",
       "properties": {
-        "type": {"type": "string"},
         "enabled": {"type": "boolean"},
-        "timeout": {"type": "number"},
         "html": {"type": "boolean" },
-        "values": {
-          "type": "array",
-          "items": {"$ref": "#/definitions/value"}
-        },
         "addresses": {
           "type": "object",
           "properties": {
@@ -50,42 +46,53 @@
             "minimum": {"type": "number"}
           }
         },
+        "type": {"type": "string"},
+        "timeout": {"type": "number"},
+        "values": {
+          "items": {"$ref": "#/definitions/value"},
+          "type": "array"
+        },
         "webcalls": {
-          "type": "array",
-          "items": {"$ref": "#/definitions/validation/webcall"}
+          "items": {"$ref": "#/definitions/validation/webcall"},
+          "type": "array"
         }
-      }
+      },
+      "title": "Record",
+      "type": "object"
     },
-    "header": {
-      "$id": "#definitions/header",
-      "type": "object",
+    "server": {
+      "$id": "#definitions/server",
       "additionalProperties": false,
       "properties": {
+        "*": {"type": "boolean"},
+        "filters": {
+          "items": {"type": "string"},
+          "type": "array"
+        },
         "name": {"type": "string"},
-        "value": {"$ref": "#/definitions/value"}
-      }
+        "records": {
+          "items": {
+            "$ref": "#/definitions/record"
+          },
+          "type": "array"
+        },
+        "validations": {"$ref": "#/definitions/validations"}
+      },
+      "type": "object"
     },
-    "validations": {
-      "$id": "#definitions/validations",
+    "source": {
+      "$id": "#definitions/source",
+      "additionalProperties": false,
       "properties": {
         "enabled": {"type": "boolean"},
-        "crawl": {"type": "array", "items": {"$ref": "#/definitions/validation/crawl"}},
-        "favicon": {"type": "array", "items": {"$ref": "#/definitions/validation/favicon"}},
-        "robots": {"type": "array", "items": {"$ref": "#/definitions/validation/robots"}},
-        "seo": {"type": "array", "items": {"$ref": "#/definitions/validation/seo"}},
-        "sitemap": {"type": "array", "items": {"$ref": "#/definitions/validation/sitemap"}},
-        "social": {"type": "array", "items": {"$ref": "#/definitions/validation/social"}}
-      }
+        "filter": {"type": "string"}
+      },
+      "title": "Source",
+      "type": "object"
     },
     "validation": {
       "crawl": {
         "$id": "#definitions/validation/crawl",
-        "properties": {
-          "enabled": {"type": "boolean"}
-        }
-      },
-      "robots": {
-        "$id": "#definitions/validation/robots",
         "properties": {
           "enabled": {"type": "boolean"}
         }
@@ -96,22 +103,16 @@
           "enabled": {"type": "boolean"}
         }
       },
-      "sitemap": {
-        "$id": "#definitions/validation/sitemap",
+      "reverseDns": {
+        "$id": "#definitions/validation/reverseDns",
         "properties": {
-          "enabled": {"type": "boolean"},
-          "files": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": [
-                {
-                  "name": {"type": "string"},
-                  "dispositioon": {"$ref": "#/definitions/disposition"}
-                }
-              ]
-            }
-          }
+          "enabled": {"type": "boolean"}
+        }
+      },
+      "robots": {
+        "$id": "#definitions/validation/robots",
+        "properties": {
+          "enabled": {"type": "boolean"}
         }
       },
       "seo": {
@@ -120,90 +121,89 @@
           "enabled": {"type": "boolean"}
         }
       },
+      "sitemap": {
+        "$id": "#definitions/validation/sitemap",
+        "properties": {
+          "enabled": {"type": "boolean"},
+          "files": {
+            "items": {
+              "properties": [
+                {
+                  "dispositioon": {"$ref": "#/definitions/disposition"},
+                  "name": {"type": "string"}
+                }
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        }
+      },
       "social": {
         "$id": "#definitions/validation/social",
         "properties": {
           "enabled": {"type": "boolean"}
         }
       },
-      "reverseDns": {
-        "$id": "#definitions/validation/reverseDns",
-        "properties": {
-          "enabled": {"type": "boolean"}
-        }
-      },
       "webcall": {
         "$id": "#definitions/validation/webcall",
-        "type": "object",
         "additionalProperties": false,
         "properties": {
-          "enabled": {"type": "boolean"},
-          "statusCode": {"type": "number"},
-          "httpVersion": {"type": "string"},
           "callTimeMax": {"type": "number"},
-          "protocol": {"type": "string"},
+          "enabled": {"type": "boolean"},
+          "httpVersion": {"type": "string"},
           "port": {"type": "number"},
           "headers": {
-            "type": "array",
-            "items": {"$ref": "#/definitions/header"}
-          }
-        }
-      }
-    },
-    "domain": {
-      "$id": "#definitions/domain",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "name": {"type": "string"},
-        "enabled": {"type": "boolean"},
-        "validations": {"$ref": "#/definitions/validations"},
-        "type": {"type": "string"},
-        "records": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/record"
-          }
-        }
-      }
-    },
-    "server": {
-      "$id": "#definitions/server",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "name": {"type": "string"},
-        "*": {"type": "boolean"},
-        "validations": {"$ref": "#/definitions/validations"},
-        "filters": {
-          "type": "array",
-          "items": {"type": "string"}
+            "items": {"$ref": "#/definitions/header"},
+            "type": "array"
+          },
+          "statusCode": {"type": "number"},
+          "protocol": {"type": "string"}
         },
-        "records": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/record"
-          }
-        }
+        "type": "object"
       }
+    },
+    "validations": {
+      "$id": "#definitions/validations",
+      "properties": {
+        "crawl": {"items": {"$ref": "#/definitions/validation/crawl"}, "type": "array"},
+        "enabled": {"type": "boolean"},
+        "favicon": {"items": {"$ref": "#/definitions/validation/favicon"}, "type": "array"},
+        "robots": {"items": {"$ref": "#/definitions/validation/robots"}, "type": "array"},
+        "seo": {"items": {"$ref": "#/definitions/validation/seo"}, "type": "array"},
+        "sitemap": {"items": {"$ref": "#/definitions/validation/sitemap"}, "type": "array"},
+        "social": {"items": {"$ref": "#/definitions/validation/social"}, "type": "array"}
+      }
+    },
+    "value": {
+      "$id": "#definitions/value",
+      "additionalProperties": false,
+      "properties": {
+        "disposition": {"$ref": "#/definitions/disposition"},
+        "name": {"type": "string"},
+        "filter": {"type": ["string", "object"]}
+      },
+      "title": "Record",
+      "type": "object"
     }
   },
-  "type": "object",
+  "id": "dnslint.schema.json",
   "properties": {
     "$schema": {"type": "string"},
     "additionalProperties": false,
     "aws": {"$ref": "#/definitions/source"},
     "domains": {
-      "type": "array",
       "items": {
         "$ref": "#/definitions/domain"
-      }
+      },
+      "type": "array"
     },
     "servers": {
-      "type": "array",
       "items": {
         "$ref": "#/definitions/server"
-      }
+      },
+      "type": "array"
     }
-  }
+  },
+  "type": "object"
 }

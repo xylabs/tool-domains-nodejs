@@ -7,8 +7,8 @@
     {
       "name": "*",
       "records": [{
-        "type": "*",
-        "html": false
+        "html": false,
+        "type": "*"
       }]
     },
     {
@@ -29,8 +29,8 @@
       "name": "website",
       "records": [
         {
-          "type": "*",
-          "html": false
+          "html": false,
+          "type": "*"
         }
       ]
     }

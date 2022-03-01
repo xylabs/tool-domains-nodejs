@@ -1,11 +1,13 @@
 import chalk from 'chalk'
-import _ from 'lodash'
+import omit from 'lodash/omit'
+
+import { Config } from '../config'
 import { ValidationError } from './error'
-import { Config } from '../config/config'
 
 export class Validator<T extends Config> {
   public config: T
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public validations: any[] = []
 
   public errors?: ValidationError[]
@@ -17,10 +19,11 @@ export class Validator<T extends Config> {
   }
 
   public toJSON() {
-    return _.omit(this, ['config'])
+    return omit(this, ['config'])
   }
 
-  public async validate(verbose: boolean) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public validate(verbose: boolean): Promise<number> | number {
     if (this.errors) {
       this.errorCount += this.addErrors.length
     }
@@ -28,6 +31,7 @@ export class Validator<T extends Config> {
     return this.errorCount
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public addError(action: string, error: any) {
     this.errors = this.errors || []
     this.errors.push(new ValidationError(action, error))

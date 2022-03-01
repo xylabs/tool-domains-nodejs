@@ -1,10 +1,12 @@
-import _ from 'lodash'
 import assert from 'assert'
-import { RecordConfig } from './record'
+import merge from 'lodash/merge'
+
 import { Configs } from './configs'
+import { RecordConfig } from './record'
 import { RecordsConfig } from './records'
 
 export class DomainConfig extends RecordsConfig {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static parse(source: any, type?: string) {
     let srcObj = source
     if (typeof source === 'string') {
@@ -15,7 +17,7 @@ export class DomainConfig extends RecordsConfig {
     assert(type)
 
     let domain = new DomainConfig(srcObj.name, type || 'unknown')
-    domain = _.merge(domain, srcObj)
+    domain = merge(domain, srcObj)
     domain.records = new Configs<RecordConfig>()
     if (srcObj.records) {
       for (const record of srcObj.records) {
@@ -43,7 +45,7 @@ export class DomainConfig extends RecordsConfig {
   public merge(config?: DomainConfig) {
     if (config) {
       const { name } = this
-      _.merge(new DomainConfig(name, this.serverType), config)
+      merge(new DomainConfig(name, this.serverType), config)
       this.name = name
       super.merge(config)
     }

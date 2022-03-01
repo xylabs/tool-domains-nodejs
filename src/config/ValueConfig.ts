@@ -1,8 +1,9 @@
-import assert from 'assert'
-import _ from 'lodash'
+import merge from 'lodash/merge'
+
 import { Config } from './config'
 
 export class ValueConfig extends Config {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static parse(source: any) {
     let srcObj = source
     if (typeof source === 'string') {
@@ -10,7 +11,7 @@ export class ValueConfig extends Config {
     }
 
     let value = new ValueConfig(srcObj.name || JSON.stringify(srcObj))
-    value = _.merge(value, srcObj)
+    value = merge(value, srcObj)
     return value
   }
 

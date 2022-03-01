@@ -5,26 +5,19 @@
   },
   "domains": [
     {
-      "name": "*",
       "enabled": true,
-      "validations": [
-        {
-
-        }
-      ],
+      "name": "*",
       "records": [
         {
-          "type": "*",
-          "timeout": 1000
+          "timeout": 1000,
+          "type": "*"
         },
         {
+          "enabled": true,
           "type": "A",
-          "enabled": true,
           "webcalls":
           [
             {
-              "protocol": "http",
-              "statusCode": 301,
               "callTimeMax": 200,
               "headers": [
                 {
@@ -33,11 +26,11 @@
                     "disposition": "required"
                   }
                 }
-              ]
+              ],
+              "protocol": "http",
+              "statusCode": 301
             },
             {
-              "protocol": "https",
-              "statusCode": 200,
               "callTimeMax": 200,
               "headers": [
                 {
@@ -81,18 +74,18 @@
                     "filter": "same-origin"
                   }
                 }
-              ]
+              ],
+              "protocol": "https",
+              "statusCode": 200
             }
           ]
         },
         {
+          "enabled": true,
           "type": "AAAA",
-          "enabled": true,
           "webcalls":
           [
             {
-              "protocol": "http",
-              "statusCode": 301,
               "headers": [
                 {
                   "name": "location",
@@ -100,11 +93,11 @@
                     "disposition": "required"
                   }
                 }
-              ]
+              ],
+              "protocol": "http",
+              "statusCode": 301
             },
             {
-              "protocol": "https",
-              "statusCode": 200,
               "headers": [
                 {
                   "name": "content-type",
@@ -147,61 +140,61 @@
                     "filter": "same-origin"
                   }
                 }
-              ]
+              ],
+              "protocol": "https",
+              "statusCode": 200
             }
           ]
         },
         {
-          "type": "CAA",
           "enabled": true,
           "inheritable": true,
+          "type": "CAA",
           "values": [
             {
               "disposition": "required",
               "filter": {
                 "flags": 0,
+                "issuerCritical": false,
                 "tag": "^issue$",
-                "value": "^amazon.com$",
-                "issuerCritical": false
+                "value": "^amazon.com$"
               }
             },
             {
               "disposition": "required",
               "filter": {
                 "flags": 0,
+                "issuerCritical": false,
                 "tag": "^issue$",
-                "value": "^amazonaws.com$",
-                "issuerCritical": false
+                "value": "^amazonaws.com$"
               }
             },
             {
               "disposition": "required",
               "filter": {
                 "flags": 0,
+                "issuerCritical": false,
                 "tag": "^issue$",
-                "value": "^amazontrust.com$",
-                "issuerCritical": false
+                "value": "^amazontrust.com$"
               }
             },
             {
               "disposition": "required",
               "filter": {
                 "flags": 0,
+                "issuerCritical": false,
                 "tag": "^issue$",
-                "value": "^awstrust.com$",
-                "issuerCritical": false
+                "value": "^awstrust.com$"
               }
             }
           ]
         },
         {
-          "type": "CNAME",
           "enabled": true,
+          "type": "CNAME",
           "webcalls":
           [
             {
-              "protocol": "http",
-              "statusCode": 301,
               "headers": [
                 {
                   "name": "location",
@@ -209,11 +202,11 @@
                     "disposition": "required"
                   }
                 }
-              ]
+              ],
+              "protocol": "http",
+              "statusCode": 301
             },
             {
-              "protocol": "https",
-              "statusCode": 200,
               "headers": [
                 {
                   "name": "content-type",
@@ -256,28 +249,35 @@
                     "filter": "same-origin"
                   }
                 }
-              ]
+              ],
+              "protocol": "https",
+              "statusCode": 200
             }
           ]
         },
         {
-          "type": "MX",
-          "enabled": true
+          "enabled": true,
+          "type": "MX"
         },
         {
-          "type": "TXT",
-          "enabled": true
+          "enabled": true,
+          "type": "TXT"
+        }
+      ],
+      "validations": [
+        {
+
         }
       ]
     }
   ],
   "servers": [
     {
-      "name": "api",
       "filter": [
         "^api\\.",
         "^devapi\\."
       ],
+      "name": "api",
       "records": [
         {
           "type": "A|CNAME"
@@ -294,22 +294,22 @@
       ]
     },
     {
-      "name": "domainkey",
       "filter": [
         "._domainkey."
       ],
+      "name": "domainkey",
       "records": [
         {
           "type": "A",
           "webcalls":
           [
             {
-              "protocol": "http",
-              "enabled": false
+              "enabled": false,
+              "protocol": "http"
             },
             {
-              "protocol": "https",
-              "enabled": false
+              "enabled": false,
+              "protocol": "https"
             }
           ]
         },
@@ -318,12 +318,12 @@
           "webcalls":
           [
             {
-              "protocol": "http",
-              "enabled": false
+              "enabled": false,
+              "protocol": "http"
             },
             {
-              "protocol": "https",
-              "enabled": false
+              "enabled": false,
+              "protocol": "https"
             }
           ]
         },
@@ -332,12 +332,12 @@
           "webcalls":
           [
             {
-              "protocol": "http",
-              "enabled": false
+              "enabled": false,
+              "protocol": "http"
             },
             {
-              "protocol": "https",
-              "enabled": false
+              "enabled": false,
+              "protocol": "https"
             }
           ]
         },
@@ -353,10 +353,10 @@
       ]
     },
     {
-      "name": "dmarc",
       "filter": [
         "^_dmarc."
       ],
+      "name": "dmarc",
       "records": [
         {
           "type": "TXT",
@@ -370,10 +370,35 @@
       ]
     },
     {
-      "name": "website",
       "*": true,
       "filters": [
         "^www\\."
+      ],
+      "name": "website",
+      "records": [
+        {
+          "type": "A|CNAME"
+        },
+        {
+          "type": "A"
+        },
+        {
+          "type": "CNAME"
+        },
+        {
+          "type": "MX",
+          "values": [{
+              "disposition": "required",
+              "filter": {
+                "exchange": "alt1.aspmx.l.google.com",
+                "preference": 5
+              }
+            }
+          ]
+        },
+        {
+          "type": "TXT"
+        }
       ],
       "validations": {
         "crawl": [
@@ -412,8 +437,8 @@
                 "tags": [
                   {
                     "disposition": "required",
-                    "path": "/html/head/script",
-                    "filter": ""
+                    "filter": "",
+                    "path": "/html/head/script"
                   }
                 ]
               }
@@ -445,56 +470,31 @@
                 "path": "/",
                 "tags": [
                   {
-                    "path": "/html/head/meta[@property='og:url']",
-                    "disposition": "required"
+                    "disposition": "required",
+                    "path": "/html/head/meta[@property='og:url']"
                   },
                   {
-                    "path": "/html/head/meta[@property='og:title']",
-                    "disposition": "required"
+                    "disposition": "required",
+                    "path": "/html/head/meta[@property='og:title']"
                   },
                   {
-                    "path": "/html/head/meta[@property='og:description']",
-                    "disposition": "required"
+                    "disposition": "required",
+                    "path": "/html/head/meta[@property='og:description']"
                   },
                   {
-                    "path": "/html/head/meta[@property='og:image']",
-                    "disposition": "required"
+                    "disposition": "required",
+                    "path": "/html/head/meta[@property='og:image']"
                   },
                   {
-                    "path": "/html/head/meta[@property='fb:app_id']",
-                    "disposition": "required"
+                    "disposition": "required",
+                    "path": "/html/head/meta[@property='fb:app_id']"
                   }
                 ]
               }
             ]
           }
         ]
-      },
-      "records": [
-        {
-          "type": "A|CNAME"
-        },
-        {
-          "type": "A"
-        },
-        {
-          "type": "CNAME"
-        },
-        {
-          "type": "MX",
-          "values": [{
-              "disposition": "required",
-              "filter": {
-                "preference": 5,
-                "exchange": "alt1.aspmx.l.google.com"
-              }
-            }
-          ]
-        },
-        {
-          "type": "TXT"
-        }
-      ]
+      }
     }
   ]
 }

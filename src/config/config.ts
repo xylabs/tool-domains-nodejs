@@ -1,7 +1,7 @@
-import _ from 'lodash'
-import assert from 'assert'
+import merge from 'lodash/merge'
 
 export class Config {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static parse(source: any) {
     if (source) {
       let srcObj = source
@@ -10,7 +10,7 @@ export class Config {
       }
 
       let config = new Config(srcObj.key)
-      config = _.merge(config, srcObj)
+      config = merge(config, srcObj)
       return config
     }
     return undefined
@@ -32,9 +32,10 @@ export class Config {
   }
 
   // replace this in derived class for more advanced merge
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public merge(config?: any) {
     if (config) {
-      return _.merge(this, config)
+      return merge(this, config)
     }
     return this
   }

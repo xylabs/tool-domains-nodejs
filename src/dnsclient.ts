@@ -10,18 +10,23 @@ export class DnsClient {
     this.host = host
   }
 
-  public resolve(name: string, type: string): Promise<any> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async resolve(name: string, type: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let response: any = null
-    return new Promise((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await new Promise<any>((resolve, reject) => {
       let result = {}
       const buf = dnsPacket.streamEncode({
-        type: 'query',
-        id: this.getRandomInt(1, 65534),
         flags: dnsPacket.RECURSION_DESIRED,
-        questions: [{
-          type,
-          name,
-        }],
+        id: this.getRandomInt(1, 65534),
+        questions: [
+          {
+            name,
+            type,
+          },
+        ],
+        type: 'query',
       })
 
       const client = new net.Socket()
@@ -29,6 +34,7 @@ export class DnsClient {
         client.write(buf)
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       client.on('data', (data: any) => {
         if (response == null) {
           if (data.byteLength > 1) {

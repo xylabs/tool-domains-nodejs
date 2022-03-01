@@ -26,12 +26,13 @@ export class AWS {
     return new Promise((resolve, reject) => {
       const buffer = Buffer.from(JSON.stringify(data))
       const params = {
-        Bucket: bucket,
-        Key: filename,
         Body: buffer,
+        Bucket: bucket,
         ContentType: 'application/json',
+        Key: filename,
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.s3.upload(params, (err: any, result: any) => {
         if (err) {
           console.error(chalk.red(`aws.saveFileToS3: ${err}`))
@@ -44,7 +45,7 @@ export class AWS {
     })
   }
 
-  private async getZones(): Promise<Route53.Types.ListHostedZonesResponse> {
+  private getZones(): Promise<Route53.Types.ListHostedZonesResponse> {
     console.log(chalk.gray('Getting AWS Zones'))
     return new Promise((resolve, reject) => {
       const params = {}
@@ -60,7 +61,7 @@ export class AWS {
     })
   }
 
-  private async getResources(zone: Route53.Types.HostedZone): Promise<Route53.Types.ListResourceRecordSetsResponse> {
+  private getResources(zone: Route53.Types.HostedZone): Promise<Route53.Types.ListResourceRecordSetsResponse> {
     return new Promise((resolve, reject) => {
       const params = {
         HostedZoneId: zone.Id,

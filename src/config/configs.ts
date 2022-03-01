@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { Config } from './config'
 
 export class Configs<T extends Config> extends Map<string, T> {

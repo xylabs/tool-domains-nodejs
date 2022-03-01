@@ -7,15 +7,12 @@
   "scripts": {
     "pretest": "yarn install",
     "test": "yarn lint",
-    "cli": "node dist/cli.js",
+    "cli": "node cli.js",
     "develop": "ts-node --files src/cli.ts",
     "snyk-protect": "snyk protect",
-    "prepublish": "npm run snyk-protect",
-    "lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx"
+    "prepublish": "npm run snyk-protect"
   },
-  "bin": {
-    "dnslint": "bin/dnslint"
-  },
+  "bin": "bin/dnslint",
   "files": [
     "dist",
     "bin",
@@ -23,7 +20,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/XYOracleNetwork/tool-domains-nodejs.git"
+    "url": "https://github.com/xylabs/tool-domains-nodejs.git"
   },
   "author": "Arie Trouw",
   "license": "LGPL-3.0",
@@ -32,38 +29,42 @@
     "node": ">=8.0.0"
   },
   "dependencies": {
-    "@xyo-network/sdk-base-nodejs": "^0.6.9",
     "assert": "^2.0.0",
-    "aws-sdk": "^2.453.0",
-    "axios": "^0.19.2",
-    "chalk": "^3.0.0",
-    "commander": "^4.0.1",
-    "dns-packet": "^5.2.1",
-    "dotenv-expand": "^5.1.0",
-    "html-validator": "^5.1.14",
+    "aws-sdk": "^2.1084.0",
+    "axios": "^0.26.0",
+    "chalk": "^5.0.0",
+    "commander": "^9.0.0",
+    "dns-packet": "^5.3.1",
+    "dotenv-expand": "^8.0.1",
+    "html-validator": "^6.0.0",
     "is-circular": "^1.0.2",
-    "load-json-file": "^6.0.0",
+    "load-json-file": "^7.0.1",
     "lodash": "^4.17.15",
     "snyk": "^1.290.2"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.126",
-    "@types/node": "^13.1.1",
-    "@types/stream-buffers": "^3.0.3",
-    "@typescript-eslint/eslint-plugin": "^2.19.2",
-    "@typescript-eslint/parser": "^2.19.2",
-    "ajv": "^6.10.0",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb": "^18.1.0",
-    "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "@types/lodash": "^4.14.179",
+    "@types/node": "^13.13.52",
+    "@types/stream-buffers": "^3.0.4",
+    "@xylabs/eslint-config": "^2.3.17",
+    "@xylabs/rollup-config": "^1.1.7",
+    "@xylabs/ts-scripts": "^1.0.44",
+    "@xylabs/tsconfig": "^1.0.12",
+    "ajv": "^6.12.6",
+    "copyfiles": "^2.4.1",
+    "eslint": "^8.10.0",
     "object.assign": "^4.1.0",
     "object.entries": "^1.1.2",
-    "ts-node": "^8.1.0",
-    "typescript": "^3.7.5",
-    "yarn": "^1.16.0"
+    "rimraf": "^3.0.2",
+    "rollup": "^2.68.0",
+    "ts-node": "^10.6.0",
+    "typescript": "^4.6.2",
+    "yarn": "^1.22.17"
   },
-  "snyk": true
+  "resolutions": {
+    "chalk": "^4.0.0",
+    "load-json-file": "^6.2.0"
+  },
+  "snyk": true,
+  "packageManager": "yarn@3.2.0"
 }

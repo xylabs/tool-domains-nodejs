@@ -1,8 +1,9 @@
 import chalk from 'chalk'
-import { MasterConfig } from '../config'
-import { Validator } from './validator'
-import { DomainValidator } from './domain'
+
 import { AWS } from '../aws'
+import { MasterConfig } from '../config'
+import { DomainValidator } from './domain'
+import { Validator } from './validator'
 
 export class MasterValidator extends Validator<MasterConfig> {
   public domains: DomainValidator[] = []
@@ -25,9 +26,10 @@ export class MasterValidator extends Validator<MasterConfig> {
         console.log(`Domain:[${completedDomains}/${this.domains.length}]: ${domain.name} [${domain.type}]`)
         this.errorCount += errors
       } catch (ex) {
-        this.addError('MasterValidator.validate', `Unexpected Error: ${ex.message}`)
-        console.error(chalk.red(ex.message))
-        console.error(chalk.red(ex.stack))
+        const error = ex as Error
+        this.addError('MasterValidator.validate', `Unexpected Error: ${error.message}`)
+        console.error(chalk.red(error.message))
+        console.error(chalk.red(error.stack))
         this.errorCount++
       }
     }
@@ -71,7 +73,8 @@ export class MasterValidator extends Validator<MasterConfig> {
         this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(cleanDomain)))
       }
     } catch (ex) {
-      console.error(chalk.red(`AWS Domains Error: ${ex.message}`))
+      const error = ex as Error
+      console.error(chalk.red(`AWS Domains Error: ${error.message}`))
     }
   }
 }

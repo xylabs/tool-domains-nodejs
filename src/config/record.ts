@@ -1,11 +1,13 @@
 import assert from 'assert'
-import _ from 'lodash'
+import merge from 'lodash/merge'
+
 import { Config } from './config'
-import { WebcallConfig } from './webcall'
 import { Configs } from './configs'
-import { ValueConfig } from './value'
+import { ValueConfig } from './ValueConfig'
+import { WebcallConfig } from './WebcallConfig'
 
 export class RecordConfig extends Config {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static parse(source: any, domain?: string) {
     let srcObj = source
     if (typeof source === 'string') {
@@ -16,7 +18,7 @@ export class RecordConfig extends Config {
     assert(domain)
 
     let record = new RecordConfig(srcObj.type, domain)
-    record = _.merge(record, srcObj)
+    record = merge(record, srcObj)
     record.webcalls = new Configs<WebcallConfig>()
     if (srcObj.webcalls) {
       for (const webcall of srcObj.webcalls) {
@@ -46,8 +48,8 @@ export class RecordConfig extends Config {
   public inheritable?: boolean
 
   public reverseDNS?: {
-    'enabled': true;
-    'value': string;
+    enabled: true
+    value: string
   }
 
   public values?: Configs<ValueConfig>
@@ -60,6 +62,7 @@ export class RecordConfig extends Config {
     this.domain = domain
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public merge(config?: any) {
     if (config) {
       const { type } = this
@@ -68,7 +71,7 @@ export class RecordConfig extends Config {
       values = values.merge(this.values)
       values = values.merge(config.values)
       let newItem = new RecordConfig(type, domain)
-      newItem = _.merge(newItem, config)
+      newItem = merge(newItem, config)
       newItem.values = values
       newItem.type = type
       newItem.domain = domain

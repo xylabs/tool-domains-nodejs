@@ -1,6 +1,7 @@
 import chalk from 'chalk'
+
+import { ValueConfig } from '../config'
 import { Validator } from './validator'
-import { ValueConfig } from '../config/value'
 
 export class ValueValidator extends Validator<ValueConfig> {
   public data: string[] | object[] | number[]
@@ -13,16 +14,16 @@ export class ValueValidator extends Validator<ValueConfig> {
     this.context = context || 'ValueValidator'
   }
 
-  public async validate(verbose: boolean) {
+  public validate(verbose: boolean) {
     if (this.config.filter) {
       switch (this.config.disposition) {
         case 'required':
           return this.validateRequired(verbose)
       }
     }
-    console.log(chalk.gray(
-      `Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`,
-    ))
+    console.log(
+      chalk.gray(`Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`)
+    )
     return super.validate(verbose)
   }
 
@@ -43,11 +44,12 @@ export class ValueValidator extends Validator<ValueConfig> {
     return super.validate(verbose)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private checkValue(filter: any, data: any) {
     let matched = false
     if (typeof filter === typeof data) {
       if (typeof data === 'string') {
-        if ((data.match(filter as string))) {
+        if (data.match(filter as string)) {
           matched = true
         }
       } else if (typeof data === 'object') {
@@ -62,9 +64,7 @@ export class ValueValidator extends Validator<ValueConfig> {
       }
     } else {
       this.addError(this.context, `Value type mismatch [${typeof data} should be ${typeof filter}]`)
-      this.addError(
-        this.context, `Value type mismatch [${JSON.stringify(data)} should be ${JSON.stringify(filter)}]`,
-      )
+      this.addError(this.context, `Value type mismatch [${JSON.stringify(data)} should be ${JSON.stringify(filter)}]`)
     }
     return matched
   }
