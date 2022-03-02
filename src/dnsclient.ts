@@ -1,4 +1,4 @@
-import dnsPacket from 'dns-packet'
+import { RecordType, RECURSION_DESIRED, streamDecode, streamEncode } from 'dns-packet'
 import net from 'net'
 
 export class DnsClient {
@@ -11,14 +11,14 @@ export class DnsClient {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async resolve(name: string, type: string) {
+  public async resolve(name: string, type: RecordType) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let response: any = null
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return await new Promise<any>((resolve, reject) => {
       let result = {}
-      const buf = dnsPacket.streamEncode({
-        flags: dnsPacket.RECURSION_DESIRED,
+      const buf = streamEncode({
+        flags: RECURSION_DESIRED,
         id: this.getRandomInt(1, 65534),
         questions: [
           {
@@ -50,7 +50,7 @@ export class DnsClient {
         }
 
         if (response.byteLength >= this.expectedLength) {
-          result = dnsPacket.streamDecode(response)
+          result = streamDecode(response)
           client.destroy()
         }
       })

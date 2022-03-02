@@ -1,13 +1,14 @@
 import chalk from 'chalk'
+import { RecordType } from 'dns-packet'
 
-import { RecordConfig } from '../config'
 import { Dns } from '../dns'
+import { Record } from '../schema'
 import { Validator } from './validator'
 import { ValueValidator } from './value'
 import { WebcallValidator } from './Webcall'
 
-export class RecordValidator extends Validator<RecordConfig> {
-  public type: string
+export class RecordValidator extends Validator<Record> {
+  public type?: RecordType
 
   public domain: string
 
@@ -23,23 +24,23 @@ export class RecordValidator extends Validator<RecordConfig> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public reverseDns?: any
 
-  constructor(config: RecordConfig, domain: string) {
+  constructor(config: Record, domain: string) {
     super(config)
     this.domain = domain
-    this.type = config.type
+    this.type = config.type as RecordType
     this.inheritable = config.inheritable ?? false
   }
 
   public async validate(verbose: boolean) {
-    if (this.type.split('|').length === 1) {
+    if (this.type?.split('|').length === 1) {
       await this.resolve()
       this.webcalls = await this.validateWebcalls(verbose)
       this.values = await this.validateValues(verbose)
-      if (this.config.reverseDNS) {
+      /*if (this.config.reverseDNS) {
         if ((this.config.reverseDNS.enabled === undefined && true) || this.config.reverseDNS.enabled) {
           this.reverseDns = await this.reverseLookup(this.config.reverseDNS.value)
         }
-      }
+      }*/
     }
     return super.validate(verbose)
   }

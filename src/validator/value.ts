@@ -1,14 +1,14 @@
 import chalk from 'chalk'
 
-import { ValueConfig } from '../config'
+import { Value } from '../schema'
 import { Validator } from './validator'
 
-export class ValueValidator extends Validator<ValueConfig> {
+export class ValueValidator extends Validator<Value> {
   public data: string[] | object[] | number[]
 
   private context: string
 
-  constructor(config: ValueConfig, data: string[] | object[] | number[], context?: string) {
+  constructor(config: Value, data: string[] | object[] | number[], context?: string) {
     super(config)
     this.data = data
     this.context = context || 'ValueValidator'

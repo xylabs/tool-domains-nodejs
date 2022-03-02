@@ -1,10 +1,9 @@
 import chalk from 'chalk'
 import omit from 'lodash/omit'
 
-import { Config } from '../config'
 import { ValidationError } from './error'
 
-export class Validator<T extends Config> {
+export class Validator<T> {
   public config: T
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

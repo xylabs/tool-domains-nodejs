@@ -3,14 +3,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import chalk from 'chalk'
-import url from 'url'
 
-import { DomainConfig, RecordConfig } from '../config'
+import { Domain } from '../schema'
 import { RecordValidator } from './record'
 import { Validator } from './validator'
 
-export class DomainValidator extends Validator<DomainConfig> {
-  public name: string
+export class DomainValidator extends Validator<Domain> {
+  public name?: string
 
   public type: string
 
@@ -18,14 +17,15 @@ export class DomainValidator extends Validator<DomainConfig> {
 
   public pages?: any
 
-  constructor(config: DomainConfig, type: string) {
+  constructor(config: Domain, type: string) {
     super(config)
+    console.log(`DomainValidator: ${JSON.stringify(this.config, null, 2)}`)
     this.name = config.name
     this.type = type
   }
 
   public async validate(verbose: boolean) {
-    if (!this.config.isEnabled()) {
+    if (this.config.enabled === false) {
       console.log(chalk.gray(`Skipping Disabled Domain: ${this.config.name}`))
       return 0
     }
@@ -37,8 +37,8 @@ export class DomainValidator extends Validator<DomainConfig> {
             console.log(chalk.green(`Validation Record [${recordConfig.type}]`))
           }
           if (recordConfig.type !== '*') {
-            if (recordConfig.isEnabled()) {
-              const record = new RecordValidator(recordConfig, this.name)
+            if (recordConfig.enabled !== false) {
+              const record = new RecordValidator(recordConfig, this.name ?? 'Unknown')
               this.records.push(record)
               this.errorCount += await record.validate(verbose)
             }
@@ -54,10 +54,6 @@ export class DomainValidator extends Validator<DomainConfig> {
       console.log(chalk.yellow(`Errors: ${this.errorCount}`))
     }
 
-    let crawl = false
-    if (this.config.crawl !== undefined) {
-      crawl = this.config.crawl
-    }
     return super.validate(verbose)
   }
 

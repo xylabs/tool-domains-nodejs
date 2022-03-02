@@ -38,12 +38,18 @@ export class MasterValidator extends Validator<MasterConfig> {
   }
 
   private addDomainsFromConfig() {
+    this.config.domains?.map(
+      (domainConfig) =>
+        new DomainValidator(domainConfig, this.config.getServerType(domainConfig.name ?? '*') ?? 'unknown')
+    )
     if (this.config.domains) {
       for (const domain of this.config.domains.values()) {
         if (domain.name !== '*') {
           console.log(chalk.yellow(`Adding Domain from Config: ${domain.name}`))
-          const domainConfig = this.config.getDomainConfig(domain.name)
-          this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(domainConfig.name)))
+          const domainConfig = this.config.getDomainConfig(domain.name ?? '*') ?? {}
+          this.domains.push(
+            new DomainValidator(domainConfig, this.config.getServerType(domainConfig.name ?? '*') ?? 'unknown')
+          )
         }
       }
     }
@@ -58,19 +64,19 @@ export class MasterValidator extends Validator<MasterConfig> {
       for (const domain of awsDomains) {
         // remove trailing '.'
         const cleanDomain = domain.slice(0, domain.length - 1)
-        const domainConfig = this.config.getDomainConfig(cleanDomain)
+        const domainConfig = this.config.getDomainConfig(cleanDomain) ?? {}
 
-        if (this.config.aws.filter) {
-          if (!domainConfig.name.match(this.config.aws.filter)) {
+        if (this.config.aws?.filter) {
+          if (!domainConfig.name?.match(this.config.aws.filter)) {
             continue
           }
         }
 
-        if (!domainConfig.isEnabled()) {
+        if (!domainConfig.enabled !== false) {
           continue
         }
 
-        this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(cleanDomain)))
+        this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(cleanDomain ?? '*') ?? 'unknown'))
       }
     } catch (ex) {
       const error = ex as Error

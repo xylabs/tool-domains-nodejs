@@ -1,5 +1,5 @@
 {
-  "$schema": "../schema/dnslint.schema.json#",
+  "$schema": "../src/schema/dnslint.schema.json",
   "aws": {
     "enabled": true
   },
@@ -15,8 +15,7 @@
         {
           "enabled": true,
           "type": "A",
-          "webcalls":
-          [
+          "webcalls": [
             {
               "callTimeMax": 200,
               "headers": [
@@ -81,10 +80,9 @@
           ]
         },
         {
-          "enabled": true,
+          "enabled": false,
           "type": "AAAA",
-          "webcalls":
-          [
+          "webcalls": [
             {
               "headers": [
                 {
@@ -192,8 +190,7 @@
         {
           "enabled": true,
           "type": "CNAME",
-          "webcalls":
-          [
+          "webcalls": [
             {
               "headers": [
                 {
@@ -265,17 +262,14 @@
         }
       ],
       "validations": [
-        {
-
-        }
+        {}
       ]
     }
   ],
   "servers": [
     {
       "filter": [
-        "^api\\.",
-        "^devapi\\."
+        "^api\\."
       ],
       "name": "api",
       "records": [
@@ -301,8 +295,7 @@
       "records": [
         {
           "type": "A",
-          "webcalls":
-          [
+          "webcalls": [
             {
               "enabled": false,
               "protocol": "http"
@@ -315,8 +308,7 @@
         },
         {
           "type": "AAAA",
-          "webcalls":
-          [
+          "webcalls": [
             {
               "enabled": false,
               "protocol": "http"
@@ -329,8 +321,7 @@
         },
         {
           "type": "CNAME",
-          "webcalls":
-          [
+          "webcalls": [
             {
               "enabled": false,
               "protocol": "http"
@@ -371,7 +362,7 @@
     },
     {
       "*": true,
-      "filters": [
+      "filter": [
         "^www\\."
       ],
       "name": "website",
@@ -387,7 +378,8 @@
         },
         {
           "type": "MX",
-          "values": [{
+          "values": [
+            {
               "disposition": "required",
               "filter": {
                 "exchange": "alt1.aspmx.l.google.com",

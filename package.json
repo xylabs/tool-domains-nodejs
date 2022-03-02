@@ -5,12 +5,14 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "start": "node --max-old-space-size=8192 --experimental-specifier-resolution=node --loader ts-node/esm ./src/run.ts",
     "pretest": "yarn install",
     "test": "yarn lint",
     "cli": "node cli.js",
     "develop": "ts-node --files src/cli.ts",
     "snyk-protect": "snyk protect",
-    "prepublish": "npm run snyk-protect"
+    "prepublish": "npm run snyk-protect",
+    "gen": "json2ts ./src/schema/*.json > ./src/schema/index.d.ts"
   },
   "bin": "bin/dnslint",
   "files": [
@@ -29,8 +31,9 @@
     "node": ">=8.0.0"
   },
   "dependencies": {
+    "@aws-sdk/client-route-53": "^3.53.0",
+    "@aws-sdk/client-s3": "^3.53.1",
     "assert": "^2.0.0",
-    "aws-sdk": "^2.1084.0",
     "axios": "^0.26.0",
     "chalk": "^5.0.0",
     "commander": "^9.0.0",
@@ -43,6 +46,8 @@
     "snyk": "^1.290.2"
   },
   "devDependencies": {
+    "@types/dns-packet": "^5.2.4",
+    "@types/html-validator": "^5.0.2",
     "@types/lodash": "^4.14.179",
     "@types/node": "^13.13.52",
     "@types/stream-buffers": "^3.0.4",
@@ -53,6 +58,7 @@
     "ajv": "^6.12.6",
     "copyfiles": "^2.4.1",
     "eslint": "^8.10.0",
+    "json-schema-to-typescript": "^10.1.5",
     "object.assign": "^4.1.0",
     "object.entries": "^1.1.2",
     "rimraf": "^3.0.2",
@@ -66,5 +72,6 @@
     "load-json-file": "^6.2.0"
   },
   "snyk": true,
-  "packageManager": "yarn@3.2.0"
+  "packageManager": "yarn@3.2.0",
+  "type": "module"
 }

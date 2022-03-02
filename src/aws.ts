@@ -1,79 +1,78 @@
-import { Route53, S3 } from 'aws-sdk'
+import {
+  HostedZone,
+  ListHostedZonesByNameCommand,
+  ListHostedZonesByNameCommandInput,
+  ListResourceRecordSetsCommand,
+  ListResourceRecordSetsCommandInput,
+  Route53Client,
+} from '@aws-sdk/client-route-53'
+import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3'
 import chalk from 'chalk'
 
 export class AWS {
-  private r53 = new Route53()
+  private r53 = new Route53Client({})
 
-  private s3 = new S3()
+  private s3 = new S3Client({})
 
   public async getDomains(): Promise<string[]> {
     const zones = await this.getZones()
     const result: string[] = []
 
-    console.log(`AWS Zones Found: ${zones.HostedZones.length}`)
+    if (zones?.HostedZones) {
+      console.log(`AWS Zones Found: ${zones.HostedZones?.length}`)
 
-    for (const zone of zones.HostedZones) {
-      const resourceRecordSetResponse = await this.getResources(zone)
-      for (const recordSet of resourceRecordSetResponse.ResourceRecordSets) {
-        result.push(recordSet.Name)
+      for (const zone of zones.HostedZones) {
+        const resourceRecordSetResponse = await this.getResources(zone)
+        if (resourceRecordSetResponse?.ResourceRecordSets) {
+          for (const recordSet of resourceRecordSetResponse.ResourceRecordSets) {
+            if (recordSet.Name) {
+              result.push(recordSet.Name)
+            }
+          }
+        }
       }
     }
     return result
   }
 
-  public saveFileToS3(bucket: string, filename: string, data: object) {
+  public async saveFileToS3(bucket: string, filename: string, data: object) {
     console.log(chalk.gray('Saving to S3'))
-    return new Promise((resolve, reject) => {
-      const buffer = Buffer.from(JSON.stringify(data))
-      const params = {
-        Body: buffer,
-        Bucket: bucket,
-        ContentType: 'application/json',
-        Key: filename,
-      }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      this.s3.upload(params, (err: any, result: any) => {
-        if (err) {
-          console.error(chalk.red(`aws.saveFileToS3: ${err}`))
-          reject(err)
-        } else {
-          console.log(chalk.gray(`Saved to S3: ${filename}`))
-          resolve(result)
-        }
-      })
-    })
+    const buffer = Buffer.from(JSON.stringify(data))
+    const params: PutObjectCommandInput = {
+      Body: buffer,
+      Bucket: bucket,
+      ContentType: 'application/json',
+      Key: filename,
+    }
+
+    try {
+      await this.s3.send(new PutObjectCommand(params))
+      console.log(chalk.gray(`Saved to S3: ${filename}`))
+    } catch (ex) {
+      console.error(chalk.red(`aws.saveFileToS3: ${ex}`))
+    }
   }
 
-  private getZones(): Promise<Route53.Types.ListHostedZonesResponse> {
+  private async getZones() {
     console.log(chalk.gray('Getting AWS Zones'))
-    return new Promise((resolve, reject) => {
-      const params = {}
-
-      this.r53.listHostedZones(params, (err, data) => {
-        if (err) {
-          console.error(chalk.red(`aws.getZones: ${err}`))
-          reject(err)
-        } else {
-          resolve(data)
-        }
-      })
-    })
+    const params: ListHostedZonesByNameCommandInput = {}
+    try {
+      return await this.r53.send(new ListHostedZonesByNameCommand(params))
+    } catch (ex) {
+      console.error(chalk.red(`aws.getZones: ${ex}`))
+    }
   }
 
-  private getResources(zone: Route53.Types.HostedZone): Promise<Route53.Types.ListResourceRecordSetsResponse> {
-    return new Promise((resolve, reject) => {
-      const params = {
-        HostedZoneId: zone.Id,
-      }
+  private async getResources(zone: HostedZone) {
+    const params: ListResourceRecordSetsCommandInput = {
+      HostedZoneId: zone.Id,
+    }
 
-      this.r53.listResourceRecordSets(params, (err, data) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(data)
-        }
-      })
-    })
+    try {
+      return await this.r53.send(new ListResourceRecordSetsCommand(params))
+    } catch (ex) {
+      console.error(chalk.red(`aws.getResources: ${ex}`))
+    }
   }
 }

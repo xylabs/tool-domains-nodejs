@@ -2,12 +2,12 @@ import axios, { AxiosError } from 'axios'
 import chalk from 'chalk'
 import htmlValidator from 'html-validator'
 
-import { WebcallConfig } from '../config'
+import { WebcallValidation } from '../schema'
 import { Validator } from './validator'
 import { ValueValidator } from './value'
 
-export class WebcallValidator extends Validator<WebcallConfig> {
-  public protocol: string
+export class WebcallValidator extends Validator<WebcallValidation> {
+  public protocol?: string
 
   public address: string
 
@@ -22,7 +22,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
 
   public callTime?: number
 
-  constructor(config: WebcallConfig, address: string, host: string) {
+  constructor(config: WebcallValidation, address: string, host: string) {
     super(config)
     this.protocol = this.config.protocol
     this.address = address
@@ -31,7 +31,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
 
   public async validate(verbose: boolean) {
     try {
-      const response = await this.get(this.config.protocol, this.address)
+      const response = await this.get(this.config.protocol ?? 'http', this.address)
       if (response.status) {
         this.headers = response.headers
         this.statusCode = response.status
@@ -74,7 +74,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
     if (this.config.headers && this.headers) {
       for (const value of this.config.headers.values()) {
         const dataArray: string[] = []
-        const data = this.headers[value.name]
+        const data = this.headers.find((header) => header.name === value.name)
         if (data) {
           dataArray.push(data)
         }
@@ -99,7 +99,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
     })
     for (const item of results.messages) {
       if (item.type === 'error') {
-        this.addError('validateHtml', `[L:${item.lastLine}, C:${item.lastColumn}]: ${item.message}`)
+        this.addError('validateHtml', JSON.stringify(item, null, 2))
       }
     }
     return results.messages
@@ -107,7 +107,7 @@ export class WebcallValidator extends Validator<WebcallConfig> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async get(protocol: string, address: string) {
-    const timeout = this.config.timeout || 1000
+    const timeout = this.config?.timeout || 1000
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let response: any
     try {

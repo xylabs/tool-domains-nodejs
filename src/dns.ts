@@ -1,4 +1,5 @@
 import dns, { MxRecord } from 'dns'
+import { RecordType } from 'dns-packet'
 
 import { DnsClient } from './dnsclient'
 
@@ -18,7 +19,7 @@ export class Dns {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public static async resolve(domain: string, type: string): Promise<any[]> {
+  public static async resolve(domain: string, type: RecordType): Promise<any[]> {
     const result = await this.client.resolve(domain, type)
     const items = []
     for (const answer of result.answers) {
