@@ -37,6 +37,6 @@ export const cli = () => {
     output: opts.output,
     preflight: opts.preflight,
     singleDomain: opts.domainToCheck,
-    verbose: opts.verbose === 'true',
+    verbose: opts.verbose === 'false',
   })
 }

@@ -21,9 +21,10 @@ export class ValueValidator extends Validator<Value> {
           return this.validateRequired(verbose)
       }
     }
-    console.log(
-      chalk.gray(`Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`)
-    )
+    verbose ??
+      console.log(
+        chalk.gray(`Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`)
+      )
     return super.validate(verbose)
   }
 
@@ -36,9 +37,9 @@ export class ValueValidator extends Validator<Value> {
         }
       }
       if (matchesFound > 0) {
-        console.log(chalk.gray(`Required Value Check Passed [${this.context}]: ${this.config}`))
+        verbose ?? console.log(chalk.gray(`Required Value Check Passed [${this.context}]: ${this.config}`))
       } else {
-        this.addError(this.context, `Required value missing: ${this.config}:${JSON.stringify(this.data)}`)
+        this.addError(this.context, 'Required value missing')
       }
     }
     return super.validate(verbose)

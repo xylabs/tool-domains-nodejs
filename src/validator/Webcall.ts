@@ -14,7 +14,7 @@ export class WebcallValidator extends Validator<WebcallValidation> {
   public host: string
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public headers?: any[]
+  public headers?: Record<string, string>
 
   public statusCode?: number
 
@@ -63,7 +63,7 @@ export class WebcallValidator extends Validator<WebcallValidation> {
       console.error(error.stack)
     }
     if (this.errorCount === 0) {
-      console.log(chalk.gray(`Webcall Check Passed: ${this.address} [${this.host}]`))
+      verbose ?? console.log(chalk.gray(`Webcall Check Passed: ${this.address} [${this.host}]`))
     }
     return super.validate(verbose)
   }
@@ -73,19 +73,21 @@ export class WebcallValidator extends Validator<WebcallValidation> {
     let errorCount = 0
     if (this.config.headers && this.headers) {
       for (const value of this.config.headers.values()) {
-        const dataArray: string[] = []
-        const data = this.headers.find((header) => header.name === value.name)
-        if (data) {
-          dataArray.push(data)
+        if (value.name) {
+          const dataArray: string[] = []
+          const data = this.headers?.[value.name]
+          if (data) {
+            dataArray.push(data)
+          }
+          const validator = new ValueValidator(value, dataArray)
+          result.push(validator)
+          await validator.validate(verbose)
+          errorCount += validator.errorCount
         }
-        const validator = new ValueValidator(value, dataArray)
-        result.push(validator)
-        await validator.validate(verbose)
-        errorCount += validator.errorCount
       }
     }
     if (errorCount === 0) {
-      console.log(chalk.green('validateHeaders', 'Passed'))
+      verbose ?? console.log(chalk.green('validateHeaders', 'Passed'))
     } else {
       console.log(chalk.red('validateHeaders', `Errors: ${errorCount}`))
     }

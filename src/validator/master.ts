@@ -1,15 +1,17 @@
 import chalk from 'chalk'
 
 import { AWS } from '../aws'
-import { MasterConfig } from '../config'
+import { Config } from '../config'
 import { DomainValidator } from './domain'
 import { Validator } from './validator'
 
-export class MasterValidator extends Validator<MasterConfig> {
+export class MasterValidator extends Validator<Config> {
   public domains: DomainValidator[] = []
+  public verbose: boolean
 
-  constructor(config: MasterConfig) {
+  constructor(config: Config, verbose: boolean) {
     super(config)
+    this.verbose = verbose
   }
 
   public async validate(verbose: boolean) {
@@ -40,7 +42,10 @@ export class MasterValidator extends Validator<MasterConfig> {
   private addDomainsFromConfig() {
     this.config.domains?.map(
       (domainConfig) =>
-        new DomainValidator(domainConfig, this.config.getServerType(domainConfig.name ?? '*') ?? 'unknown')
+        new DomainValidator(
+          domainConfig,
+          this.config.getServerType(domainConfig.name ?? '*', this.verbose) ?? 'unknown'
+        )
     )
     if (this.config.domains) {
       for (const domain of this.config.domains.values()) {
@@ -48,7 +53,10 @@ export class MasterValidator extends Validator<MasterConfig> {
           console.log(chalk.yellow(`Adding Domain from Config: ${domain.name}`))
           const domainConfig = this.config.getDomainConfig(domain.name ?? '*') ?? {}
           this.domains.push(
-            new DomainValidator(domainConfig, this.config.getServerType(domainConfig.name ?? '*') ?? 'unknown')
+            new DomainValidator(
+              domainConfig,
+              this.config.getServerType(domainConfig.name ?? '*', this.verbose) ?? 'unknown'
+            )
           )
         }
       }
@@ -60,7 +68,7 @@ export class MasterValidator extends Validator<MasterConfig> {
     try {
       const aws = new AWS()
       const awsDomains = await aws.getDomains()
-      console.log(chalk.gray(`AWS Domains Found: ${awsDomains.length}`))
+      console.log(chalk.yellow(`Domains Found [AWS]: ${awsDomains.length}`))
       for (const domain of awsDomains) {
         // remove trailing '.'
         const cleanDomain = domain.slice(0, domain.length - 1)
@@ -76,7 +84,9 @@ export class MasterValidator extends Validator<MasterConfig> {
           continue
         }
 
-        this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(cleanDomain ?? '*') ?? 'unknown'))
+        this.domains.push(
+          new DomainValidator(domainConfig, this.config.getServerType(cleanDomain ?? '*', this.verbose) ?? 'unknown')
+        )
       }
     } catch (ex) {
       const error = ex as Error

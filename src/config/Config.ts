@@ -1,8 +1,9 @@
+import chalk from 'chalk'
 import merge from 'lodash/merge'
 
 import { DnslintSchemaJson, Domain, Record, Server, Source } from '../schema'
 
-export class MasterConfig implements DnslintSchemaJson {
+export class Config implements DnslintSchemaJson {
   $schema?: string
   additionalProperties?: false
   aws?: Source
@@ -17,8 +18,8 @@ export class MasterConfig implements DnslintSchemaJson {
     this.servers = json.servers
   }
 
-  public getRecordConfig(domain: string, recordType: string) {
-    const serverType = this.getServerType(domain)
+  public getRecordConfig(domain: string, recordType: string, verbose: boolean) {
+    const serverType = this.getServerType(domain, verbose)
     let serverRecord: Record | undefined = undefined
     let domainRecord: Record | undefined = undefined
 
@@ -41,12 +42,15 @@ export class MasterConfig implements DnslintSchemaJson {
     return merge({}, serverRecord, domainRecord)
   }
 
-  public getDomainConfig(domain: string) {
-    return this.domains?.find(({ name }) => name === domain) ?? this.domains?.find(({ name }) => name === '*')
+  public getDomainConfig(domain: string): Domain {
+    return merge(
+      {},
+      this.domains?.find(({ name }) => name === domain) ?? this.domains?.find(({ name }) => name === '*'),
+      { name: domain }
+    )
   }
 
-  public getServerType(domain: string) {
-    console.log(`getServerType: ${domain}`)
+  public getServerType(domain: string, verbose: boolean) {
     const defaultName = 'unknown'
     if (this.servers) {
       for (const server of this.servers.values()) {
@@ -54,12 +58,14 @@ export class MasterConfig implements DnslintSchemaJson {
         if (filter) {
           for (const item of filter) {
             if (domain.match(item) || item === '*') {
+              verbose ?? console.log(chalk.magenta(`ServerType: ${domain}:${server.name}`))
               return server.name
             }
           }
         }
       }
     }
+    verbose ?? console.log(chalk.magenta(`ServerType[Default]: ${domain}:${defaultName}`))
     return defaultName
   }
 }

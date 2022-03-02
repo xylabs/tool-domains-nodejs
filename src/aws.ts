@@ -8,6 +8,7 @@ import {
 } from '@aws-sdk/client-route-53'
 import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3'
 import chalk from 'chalk'
+import uniq from 'lodash/uniq'
 
 export class AWS {
   private r53 = new Route53Client({})
@@ -32,7 +33,7 @@ export class AWS {
         }
       }
     }
-    return result
+    return uniq(result)
   }
 
   public async saveFileToS3(bucket: string, filename: string, data: object) {

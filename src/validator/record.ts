@@ -91,7 +91,7 @@ export class RecordValidator extends Validator<Record> {
       }
     }
     if (valueErrorCount === 0) {
-      console.log(chalk.green('validateValues', 'Passed'))
+      verbose ?? console.log(chalk.green('validateValues', 'Passed'))
     } else {
       console.log(chalk.red('validateValues', `Errors: ${valueErrorCount}`))
     }

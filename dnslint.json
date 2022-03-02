@@ -3,9 +3,5 @@
   "aws": {
     "enabled": true
   },
-  "domains": [
-    {
-      "name": "xyo.network"
-    }
-  ]
+  "domains": []
 }

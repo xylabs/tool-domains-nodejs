@@ -5,14 +5,14 @@ import isMap from 'lodash/isMap'
 import merge from 'lodash/merge'
 
 import { AWS } from './aws'
-import { MasterConfig } from './config'
+import { Config } from './config'
 import { DnslintSchemaJson } from './schema'
 import { MasterValidator } from './validator'
 
 export class XyDomainScan {
   private aws = new AWS()
 
-  private config: MasterConfig | undefined
+  private config: Config | undefined
 
   private validator: MasterValidator | undefined
 
@@ -43,7 +43,7 @@ export class XyDomainScan {
         const userConfigJson = await loadJsonFile<DnslintSchemaJson>(filename)
         console.log(chalk.gray('Loaded User Config'))
         if (defaultConfigJson) {
-          merge({}, defaultConfigJson, userConfigJson)
+          return merge({}, defaultConfigJson, userConfigJson)
         }
         return userConfigJson
       } catch (ex) {
@@ -70,11 +70,11 @@ export class XyDomainScan {
     preflight?: string
   }) {
     this.verbose = params.verbose
-    this.config = new MasterConfig(await this.loadConfig('./dnslint.json', params.defaultConfig))
+    this.config = new Config(await this.loadConfig('./dnslint.json', params.defaultConfig))
     this.preflight = params.preflight
 
     for (const domain of this.config?.domains?.values() ?? []) {
-      domain.type = this.config.getServerType(domain?.name ?? '*')
+      domain.type = this.config.getServerType(domain?.name ?? '*', this.verbose)
     }
 
     // if domain specified, clear configed domains and add it
@@ -90,9 +90,9 @@ export class XyDomainScan {
       await this.saveToFile(this.preflight, this.config)
     }
 
-    this.validator = new MasterValidator(this.config)
+    this.validator = new MasterValidator(this.config, this.verbose)
 
-    console.log(`Domains Found: ${this.config?.domains?.length ?? 0}`)
+    console.log(chalk.yellow(`Domains Found [Config]: ${this.config?.domains?.length ?? 0}`))
 
     await this.validator.validate(this.verbose)
 

@@ -19,7 +19,6 @@ export class DomainValidator extends Validator<Domain> {
 
   constructor(config: Domain, type: string) {
     super(config)
-    console.log(`DomainValidator: ${JSON.stringify(this.config, null, 2)}`)
     this.name = config.name
     this.type = type
   }
