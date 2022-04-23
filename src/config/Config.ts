@@ -23,31 +23,21 @@ export class Config implements DnslintSchemaJson {
     let serverRecord: Record | undefined = undefined
     let domainRecord: Record | undefined = undefined
 
-    const serverConfig =
-      this.servers?.find(({ name }) => name === serverType) ?? this.servers?.find(({ name }) => name === '*')
+    const serverConfig = this.servers?.find(({ name }) => name === serverType) ?? this.servers?.find(({ name }) => name === '*')
     if (serverConfig && serverConfig.records) {
-      serverRecord =
-        serverConfig.records.find((record) => record.type === recordType) ??
-        serverConfig.records.find((record) => record.type === '*')
+      serverRecord = serverConfig.records.find((record) => record.type === recordType) ?? serverConfig.records.find((record) => record.type === '*')
     }
 
-    const domainConfig =
-      this.domains?.find(({ name }) => name === domain) ?? this.domains?.find(({ name }) => name === '*')
+    const domainConfig = this.domains?.find(({ name }) => name === domain) ?? this.domains?.find(({ name }) => name === '*')
     if (domainConfig && domainConfig.records) {
-      domainRecord =
-        domainConfig.records.find((record) => record.type === recordType) ??
-        domainConfig.records.find((record) => record.type === '*')
+      domainRecord = domainConfig.records.find((record) => record.type === recordType) ?? domainConfig.records.find((record) => record.type === '*')
     }
 
     return merge({}, serverRecord, domainRecord)
   }
 
   public getDomainConfig(domain: string): Domain {
-    return merge(
-      {},
-      this.domains?.find(({ name }) => name === domain) ?? this.domains?.find(({ name }) => name === '*'),
-      { name: domain }
-    )
+    return merge({}, this.domains?.find(({ name }) => name === domain) ?? this.domains?.find(({ name }) => name === '*'), { name: domain })
   }
 
   public getServerType(domain: string, verbose: boolean) {

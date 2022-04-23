@@ -60,15 +60,7 @@ export class XyDomainScan {
     }
   }
 
-  public async start(params: {
-    defaultConfig: string
-    verbose: boolean
-    output: string
-    singleDomain?: string
-    bucket?: string
-    config?: DnslintSchemaJson
-    preflight?: string
-  }) {
+  public async start(params: { defaultConfig: string; verbose: boolean; output: string; singleDomain?: string; bucket?: string; config?: DnslintSchemaJson; preflight?: string }) {
     this.verbose = params.verbose
     this.config = new Config(await this.loadConfig('./dnslint.json', params.defaultConfig))
     this.preflight = params.preflight

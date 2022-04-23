@@ -40,24 +40,13 @@ export class MasterValidator extends Validator<Config> {
   }
 
   private addDomainsFromConfig() {
-    this.config.domains?.map(
-      (domainConfig) =>
-        new DomainValidator(
-          domainConfig,
-          this.config.getServerType(domainConfig.name ?? '*', this.verbose) ?? 'unknown'
-        )
-    )
+    this.config.domains?.map((domainConfig) => new DomainValidator(domainConfig, this.config.getServerType(domainConfig.name ?? '*', this.verbose) ?? 'unknown'))
     if (this.config.domains) {
       for (const domain of this.config.domains.values()) {
         if (domain.name !== '*') {
           console.log(chalk.yellow(`Adding Domain from Config: ${domain.name}`))
           const domainConfig = this.config.getDomainConfig(domain.name ?? '*') ?? {}
-          this.domains.push(
-            new DomainValidator(
-              domainConfig,
-              this.config.getServerType(domainConfig.name ?? '*', this.verbose) ?? 'unknown'
-            )
-          )
+          this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(domainConfig.name ?? '*', this.verbose) ?? 'unknown'))
         }
       }
     }
@@ -84,9 +73,7 @@ export class MasterValidator extends Validator<Config> {
           continue
         }
 
-        this.domains.push(
-          new DomainValidator(domainConfig, this.config.getServerType(cleanDomain ?? '*', this.verbose) ?? 'unknown')
-        )
+        this.domains.push(new DomainValidator(domainConfig, this.config.getServerType(cleanDomain ?? '*', this.verbose) ?? 'unknown'))
       }
     } catch (ex) {
       const error = ex as Error

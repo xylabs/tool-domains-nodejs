@@ -21,10 +21,7 @@ export class ValueValidator extends Validator<Value> {
           return this.validateRequired(verbose)
       }
     }
-    verbose ??
-      console.log(
-        chalk.gray(`Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`)
-      )
+    verbose ?? console.log(chalk.gray(`Value Check Passed[${this.context}]: ${this.config.name || this.config.filter}:${this.data}`))
     return super.validate(verbose)
   }
 
