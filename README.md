@@ -8,7 +8,7 @@
 
 [![npm version](https://badge.fury.io/js/dnslint.svg)](https://badge.fury.io/js/dnslint) ![](https://github.com/xycorp/app-matrix-react/workflows/CI/badge.svg?branch=develop)[![DepShield Badge](https://depshield.sonatype.org/badges/XYOracleNetwork/tool-domains-nodejs/depshield.svg)](https://depshield.github.io) ![npm](https://img.shields.io/npm/dt/dnslint.svg)
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6fecaa016b2a4f3da64cee1b680085c1)](https://app.codacy.com/app/arietrouw/tool-domains-nodejs?utm_source=github.com&utm_medium=referral&utm_content=XYOracleNetwork/tool-domains-nodejs&utm_campaign=Badge_Grade_Dashboard) [![Maintainability](https://api.codeclimate.com/v1/badges/7b4591ab55a5c83f0a86/maintainability)](https://codeclimate.com/repos/5c74a1ecac0eba026f00a686/maintainability) [![BCH compliance](https://bettercodehub.com/edge/badge/XYOracleNetwork/tool-domains-nodejs?branch=master)](https://bettercodehub.com/results/XYOracleNetwork/tool-domains-nodejs)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/595485397e3945cd8df6ee47eeb47311)](https://www.codacy.com/gh/xylabs/tool-domains-nodejs/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=xylabs/tool-domains-nodejs&amp;utm_campaign=Badge_Grade) [![Maintainability](https://api.codeclimate.com/v1/badges/0a3061bc912c2e75d77e/maintainability)](https://codeclimate.com/github/xylabs/tool-domains-nodejs/maintainability) [![BCH compliance](https://bettercodehub.com/edge/badge/XYOracleNetwork/tool-domains-nodejs?branch=master)](https://bettercodehub.com/results/XYOracleNetwork/tool-domains-nodejs)
 
 ## Table of Contents
 
