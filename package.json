@@ -44,7 +44,7 @@
     "is-circular": "^1.0.2",
     "load-json-file": "^6.0.0",
     "lodash": "^4.17.15",
-    "snyk": "^1.290.2"
+    "snyk": "^1.324.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.126",
